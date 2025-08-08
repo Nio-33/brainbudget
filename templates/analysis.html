@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+
+{% block title %}Your Financial Insights - BrainBudget{% endblock %}
+
+{% block content %}
+<!-- Results Hero Section -->
+<section class="py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-success-500 to-success-600 rounded-2xl shadow-lg mb-6 animate-celebration">
+                <span class="text-3xl">✨</span>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-bold text-text-primary mb-4">
+                Here's what we discovered about your spending
+            </h1>
+            <p class="text-xl text-text-secondary max-w-3xl mx-auto">
+                Remember, this is about understanding, not judgment. Every insight is a step toward financial clarity.
+            </p>
+        </div>
+        
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <!-- Total Spending -->
+            <div class="bg-surface rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-primary-400 to-primary-500 rounded-xl flex items-center justify-center">
+                        <span class="text-2xl">💰</span>
+                    </div>
+                    <div>
+                        <p class="text-sm text-text-muted font-medium">Total Spending</p>
+                        <p class="text-2xl font-bold text-text-primary" id="total-spending">$0.00</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Transaction Count -->
+            <div class="bg-surface rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-success-400 to-success-500 rounded-xl flex items-center justify-center">
+                        <span class="text-2xl">📊</span>
+                    </div>
+                    <div>
+                        <p class="text-sm text-text-muted font-medium">Transactions</p>
+                        <p class="text-2xl font-bold text-text-primary" id="transaction-count">0</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Average Daily -->
+            <div class="bg-surface rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-warning-400 to-warning-500 rounded-xl flex items-center justify-center">
+                        <span class="text-2xl">📅</span>
+                    </div>
+                    <div>
+                        <p class="text-sm text-text-muted font-medium">Daily Average</p>
+                        <p class="text-2xl font-bold text-text-primary" id="daily-average">$0.00</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Analysis Grid -->
+        <div class="grid lg:grid-cols-2 gap-8 mb-12">
+            <!-- Spending by Category -->
+            <div class="bg-surface rounded-2xl p-8 shadow-sm border border-gray-100">
+                <div class="mb-6">
+                    <h2 class="text-xl font-semibold text-text-primary mb-2">Where your money went</h2>
+                    <p class="text-text-secondary">Your spending broken down by category</p>
+                </div>
+                <div class="relative h-80">
+                    <canvas id="category-chart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Spending Over Time -->
+            <div class="bg-surface rounded-2xl p-8 shadow-sm border border-gray-100">
+                <div class="mb-6">
+                    <h2 class="text-xl font-semibold text-text-primary mb-2">Your spending rhythm</h2>
+                    <p class="text-text-secondary">Daily spending patterns throughout the month</p>
+                </div>
+                <div class="relative h-80">
+                    <canvas id="timeline-chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Comparison & Budget Goals -->
+        <div class="grid lg:grid-cols-2 gap-8 mb-12">
+            <!-- Monthly Comparison -->
+            <div class="bg-surface rounded-2xl p-8 shadow-sm border border-gray-100">
+                <div class="mb-6">
+                    <h2 class="text-xl font-semibold text-text-primary mb-2">Monthly Comparison</h2>
+                    <p class="text-text-secondary">Spending across different months</p>
+                </div>
+                <div class="relative h-80">
+                    <canvas id="monthly-comparison-chart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Budget Goals -->
+            <div class="bg-surface rounded-2xl p-8 shadow-sm border border-gray-100">
+                <div class="mb-6">
+                    <h2 class="text-xl font-semibold text-text-primary mb-2">Budget Goals</h2>
+                    <p class="text-text-secondary">Your progress towards spending goals</p>
+                </div>
+                <div id="budget-goals" class="space-y-4">
+                    <!-- Progress bars will be loaded here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- AI Insights Section -->
+        <div class="bg-gradient-to-br from-primary-50 to-primary-100 rounded-3xl p-8 mb-12">
+            <div class="flex items-start space-x-4">
+                <div class="flex-shrink-0">
+                    <div class="w-12 h-12 bg-primary-500 rounded-2xl flex items-center justify-center">
+                        <span class="text-2xl">🤖</span>
+                    </div>
+                </div>
+                <div class="flex-1">
+                    <h2 class="text-xl font-semibold text-text-primary mb-4">What your AI coach noticed</h2>
+                    <div id="ai-insights" class="space-y-4">
+                        <!-- Insights will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Category Breakdown -->
+        <div class="bg-surface rounded-2xl p-8 shadow-sm border border-gray-100 mb-12">
+            <div class="mb-6">
+                <h2 class="text-xl font-semibold text-text-primary mb-2">Detailed breakdown</h2>
+                <p class="text-text-secondary">A closer look at each spending category</p>
+            </div>
+            
+            <div id="category-list" class="space-y-4">
+                <!-- Categories will be loaded here -->
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="text-center space-y-4">
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button id="save-analysis" class="inline-flex items-center justify-center px-8 py-4 bg-primary-500 text-white font-semibold rounded-2xl shadow-lg hover:bg-primary-600 gentle-transition focus-ring transform hover:scale-105">
+                    <span class="mr-3 text-xl">💾</span>
+                    Save This Analysis
+                </button>
+                <a href="/dashboard" class="inline-flex items-center justify-center px-8 py-4 bg-success-500 text-white font-semibold rounded-2xl shadow-lg hover:bg-success-600 gentle-transition focus-ring transform hover:scale-105">
+                    <span class="mr-3 text-xl">📊</span>
+                    View Dashboard
+                </a>
+                <a href="/upload" class="inline-flex items-center justify-center px-8 py-4 border-2 border-gray-300 text-text-secondary font-semibold rounded-2xl hover:bg-gray-50 gentle-transition focus-ring">
+                    <span class="mr-3 text-xl">📄</span>
+                    Analyze Another
+                </a>
+            </div>
+            
+            <!-- Share & Export -->
+            <div class="flex justify-center space-x-4 text-sm mt-4">
+                <button id="export-category-chart" class="text-text-muted hover:text-primary-500 gentle-transition focus-ring rounded px-3 py-1">
+                    📄 Export Category Chart
+                </button>
+                <button id="export-timeline-chart" class="text-text-muted hover:text-primary-500 gentle-transition focus-ring rounded px-3 py-1">
+                    📄 Export Timeline Chart
+                </button>
+                <button id="share-insights" class="text-text-muted hover:text-primary-500 gentle-transition focus-ring rounded px-3 py-1">
+                    🔗 Share Link
+                </button>
+            </div>
+        </div>
+        
+        <!-- Encouragement Section -->
+        <div class="mt-16 bg-gradient-to-r from-success-500 to-success-600 rounded-3xl p-8 text-center">
+            <div class="max-w-2xl mx-auto">
+                <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-6">
+                    <span class="text-3xl">🎉</span>
+                </div>
+                <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
+                    You're already on the right path!
+                </h2>
+                <p class="text-success-100 text-lg mb-6">
+                    Taking time to understand your spending is a huge step. Every insight you gain makes future financial decisions easier.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="/dashboard" class="inline-flex items-center justify-center px-6 py-3 bg-white text-success-600 font-semibold rounded-xl hover:bg-gray-50 gentle-transition focus-ring">
+                        Set Up Tracking
+                    </a>
+                    <a href="/" class="inline-flex items-center justify-center px-6 py-3 border-2 border-white text-white font-semibold rounded-xl hover:bg-white hover:text-success-600 gentle-transition focus-ring">
+                        Learn More
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Mock data - replace with actual data from your backend
+        const analysisData = {
+            summary: {
+                total_expenses: 3450.75,
+                transaction_count: 152,
+                analysis_period: { start: '2025-07-01', end: '2025-07-31' }
+            },
+            charts: {
+                spending_breakdown: {
+                    labels: ['Food', 'Transport', 'Shopping', 'Bills', 'Entertainment'],
+                    values: [850.50, 450.25, 1200.00, 750.00, 200.00]
+                },
+                monthly_trend: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                    values: [2800, 2950, 3100, 3050, 3200, 3300, 3450.75]
+                }
+            },
+            budget_goals: [
+                { label: 'Groceries', current: 450, goal: 500 },
+                { label: 'Shopping', current: 1200, goal: 1000 },
+                { label: 'Dining Out', current: 400, goal: 300 }
+            ],
+            insights: [
+                { title: 'Great job on utility bills!', message: 'Your utility spending was 10% lower this month.', icon: '🎉' },
+                { title: 'Shopping alert!', message: 'You went over your shopping budget by $200.', icon: '💡' }
+            ]
+        };
+
+        // --- Initialize ---
+        showChartLoading('category-chart');
+        showChartLoading('timeline-chart');
+        showChartLoading('monthly-comparison-chart');
+
+        // --- Populate Data ---
+        // Stats
+        const totalSpending = analysisData.summary.total_expenses;
+        document.getElementById('total-spending').textContent = `${totalSpending.toLocaleString()}`;
+        document.getElementById('transaction-count').textContent = analysisData.summary.transaction_count;
+        const days = (new Date(analysisData.summary.analysis_period.end) - new Date(analysisData.summary.analysis_period.start)) / (1000 * 60 * 60 * 24);
+        document.getElementById('daily-average').textContent = `${(totalSpending / days).toFixed(2)}`;
+
+        // Charts
+        window.ChartManager.createDonutChart('category-chart', {
+            labels: analysisData.charts.spending_breakdown.labels,
+            values: analysisData.charts.spending_breakdown.values
+        });
+        window.ChartManager.createLineChart('timeline-chart', analysisData.charts.monthly_trend);
+        window.ChartManager.createBarChart('monthly-comparison-chart', analysisData.charts.monthly_trend);
+        
+        // Budget Goals
+        const budgetContainer = document.getElementById('budget-goals');
+        analysisData.budget_goals.forEach(goal => {
+            const goalId = `goal-${goal.label.replace(/\s+/g, '-')}`;
+            const goalEl = document.createElement('div');
+            goalEl.id = goalId;
+            budgetContainer.appendChild(goalEl);
+            window.ChartManager.createProgressBar(goalId, goal);
+        });
+
+        // AI Insights
+        const insightsContainer = document.getElementById('ai-insights');
+        insightsContainer.innerHTML = analysisData.insights.map(insight => `
+            <div class="bg-white rounded-xl p-4 shadow-sm flex items-start space-x-3">
+                <span class="text-2xl">${insight.icon}</span>
+                <div>
+                    <p class="font-medium text-text-primary">${insight.title}</p>
+                    <p class="text-sm text-text-secondary">${insight.message}</p>
+                </div>
+            </div>
+        `).join('');
+
+        // --- Hide Loading ---
+        hideChartLoading('category-chart');
+        hideChartLoading('timeline-chart');
+        hideChartLoading('monthly-comparison-chart');
+
+        // --- Event Listeners ---
+        document.getElementById('export-category-chart').addEventListener('click', () => {
+            window.ChartManager.exportChart('category-chart', 'spending-categories.png');
+        });
+        document.getElementById('export-timeline-chart').addEventListener('click', () => {
+            window.ChartManager.exportChart('timeline-chart', 'spending-timeline.png');
+        });
+        document.getElementById('share-insights').addEventListener('click', () => {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                alert('Link copied to clipboard!');
+            });
+        });
+    });
+</script>
+{% endblock %}

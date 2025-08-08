@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Statement - BrainBudget{% endblock %}
+
+{% block content %}
+<!-- Upload Section -->
+<section class="py-12 px-4 sm:px-6 lg:px-8 min-h-screen">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl shadow-lg mb-6">
+                <span class="text-3xl">📊</span>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-bold text-text-primary mb-4">
+                Let's understand your spending together
+            </h1>
+            <p class="text-xl text-text-secondary max-w-2xl mx-auto">
+                Upload your bank statement and we'll create a gentle, insightful analysis of your financial patterns.
+            </p>
+        </div>
+        
+        <!-- Upload Card -->
+        <div class="bg-surface rounded-3xl p-8 shadow-sm border-2 border-dashed border-gray-200 mb-8">
+            <!-- Drag and Drop Area -->
+            <div id="drop-zone" class="relative">
+                <div id="drop-area" class="border-2 border-dashed border-primary-300 rounded-2xl p-12 text-center gentle-transition hover:border-primary-400 hover:bg-primary-50/30 focus-within:border-primary-500 focus-within:bg-primary-50/50">
+                    <div id="drop-content" class="space-y-6">
+                        <!-- Upload Icon -->
+                        <div class="flex justify-center">
+                            <div class="w-20 h-20 bg-primary-100 rounded-2xl flex items-center justify-center">
+                                <svg class="w-10 h-10 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        
+                        <!-- Upload Text -->
+                        <div>
+                            <h3 class="text-xl font-semibold text-text-primary mb-2">
+                                Drag your statement here, or click to browse
+                            </h3>
+                            <p class="text-text-secondary mb-6">
+                                We support PDF files and images (JPG, PNG). Max file size: 16MB
+                            </p>
+                        </div>
+                        
+                        <!-- File Input -->
+                        <div>
+                            <input 
+                                type="file" 
+                                id="file-input" 
+                                name="statement" 
+                                accept=".pdf,.jpg,.jpeg,.png" 
+                                class="hidden" 
+                                aria-label="Select bank statement file"
+                            >
+                            <button 
+                                type="button" 
+                                id="browse-btn"
+                                class="inline-flex items-center justify-center px-6 py-3 bg-primary-500 text-white font-semibold rounded-xl hover:bg-primary-600 gentle-transition focus-ring"
+                            >
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                </svg>
+                                Choose File
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Upload Progress (Hidden initially) -->
+                    <div id="upload-progress" class="hidden space-y-4">
+                        <div class="flex justify-center">
+                            <div class="w-16 h-16 bg-success-100 rounded-2xl flex items-center justify-center">
+                                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-success-500"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold text-text-primary mb-2">Processing your statement...</h3>
+                            <p class="text-text-secondary mb-4">This usually takes 10-30 seconds</p>
+                            <div class="w-full bg-gray-200 rounded-full h-3">
+                                <div id="progress-bar" class="bg-success-500 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                            <p id="progress-text" class="text-sm text-text-muted mt-2">Uploading...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- File Preview (Hidden initially) -->
+        <div id="file-preview" class="hidden bg-surface rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-success-100 rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-success-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-text-primary" id="file-name">statement.pdf</h4>
+                        <p class="text-sm text-text-secondary" id="file-size">2.4 MB</p>
+                    </div>
+                </div>
+                <button id="remove-file" class="text-text-muted hover:text-red-500 gentle-transition focus-ring rounded p-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Security Notice -->
+        <div class="bg-primary-50 rounded-2xl p-6 border border-primary-100 mb-8">
+            <div class="flex items-start space-x-4">
+                <div class="flex-shrink-0">
+                    <div class="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-text-primary mb-2">Your privacy matters to us 🔒</h3>
+                    <p class="text-text-secondary text-sm leading-relaxed">
+                        Your financial data is encrypted during upload and analysis. We never store your statements permanently or share your information with third parties. You maintain full control over your data.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <button 
+                id="analyze-btn" 
+                class="inline-flex items-center justify-center px-8 py-4 bg-primary-500 text-white font-semibold rounded-2xl shadow-lg hover:bg-primary-600 gentle-transition focus-ring disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 disabled:hover:scale-100"
+                disabled
+            >
+                <span class="mr-3 text-xl">🤖</span>
+                Analyze My Spending
+            </button>
+            <a 
+                href="/" 
+                class="inline-flex items-center justify-center px-8 py-4 border-2 border-gray-300 text-text-secondary font-semibold rounded-2xl hover:bg-gray-50 gentle-transition focus-ring"
+            >
+                <span class="mr-3 text-xl">🏠</span>
+                Back to Home
+            </a>
+        </div>
+        
+        <!-- Help Section -->
+        <div class="mt-12 bg-warning-50 rounded-2xl p-6 border border-warning-100">
+            <h3 class="font-semibold text-text-primary mb-4 flex items-center">
+                <span class="mr-2 text-xl">💡</span>
+                Need help finding your bank statement?
+            </h3>
+            <div class="grid md:grid-cols-2 gap-4 text-sm text-text-secondary">
+                <div>
+                    <h4 class="font-medium text-text-primary mb-2">Most banks:</h4>
+                    <ul class="space-y-1">
+                        <li>• Log into online banking</li>
+                        <li>• Go to "Statements" or "Documents"</li>
+                        <li>• Download your latest monthly statement</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-medium text-text-primary mb-2">Mobile banking apps:</h4>
+                    <ul class="space-y-1">
+                        <li>• Look for "Statements" or "Documents"</li>
+                        <li>• Select your account</li>
+                        <li>• Download or share the PDF</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-4 p-4 bg-white rounded-xl border border-warning-200">
+                <p class="text-sm text-text-secondary">
+                    <strong class="text-text-primary">Tip:</strong> Screenshot your transaction list works too! Just make sure all transactions are visible and readable.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/upload.js') }}"></script>
+<script>
+    // Initialize upload functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const uploader = new FileUploader({
+            dropZone: 'drop-area',
+            fileInput: 'file-input',
+            browseBtn: 'browse-btn',
+            progressContainer: 'upload-progress',
+            progressBar: 'progress-bar',
+            progressText: 'progress-text',
+            filePreview: 'file-preview',
+            fileName: 'file-name',
+            fileSize: 'file-size',
+            removeBtn: 'remove-file',
+            analyzeBtn: 'analyze-btn',
+            dropContent: 'drop-content',
+            apiEndpoint: '/api/upload'
+        });
+    });
+</script>
+{% endblock %}

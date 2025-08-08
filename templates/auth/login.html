@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - BrainBudget</title>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/charts.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    
+    <!-- Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+      import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+      
+      // Initialize Firebase with configuration from backend
+      async function initializeFirebaseAuth() {
+        try {
+          console.log('🔥 Initializing Firebase authentication...');
+          const response = await fetch('/api/auth/firebase-config');
+          
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+          
+          const result = await response.json();
+          
+          if (!result.success || !result.config) {
+            throw new Error(result.error || 'Firebase configuration not available');
+          }
+          
+          console.log('🔥 Initializing Firebase with project:', result.config.projectId);
+          const app = initializeApp(result.config);
+          const auth = getAuth(app);
+          const googleProvider = new GoogleAuthProvider();
+          
+          // Make available globally
+          window.firebaseAuth = auth;
+          window.googleProvider = googleProvider;
+          window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+          window.signInWithPopup = signInWithPopup;
+          
+          console.log('🔥 Firebase authentication ready!');
+          
+        } catch (error) {
+          console.error('❌ Firebase initialization failed:', error);
+          
+          // Show error to user
+          setTimeout(() => {
+            if (window.brainBudgetAuth) {
+              window.brainBudgetAuth.showMessage('error', 
+                'Firebase authentication failed to load. Please refresh the page or contact support.');
+            }
+          }, 2000);
+          
+          // Don't set up Firebase objects - let the auth system handle the error
+          window.firebaseAuth = null;
+          window.googleProvider = null;
+          window.signInWithEmailAndPassword = null;
+          window.signInWithPopup = null;
+        }
+      }
+      
+      // Initialize Firebase when page loads
+      initializeFirebaseAuth();
+    </script>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <!-- Authentication Header -->
+            <div class="auth-header">
+                <span class="auth-logo">🧠💰</span>
+                <h1 class="auth-title">👋 Welcome Back!</h1>
+                <p class="auth-subtitle">Ready to manage your finances with a smile?</p>
+            </div>
+            
+            <!-- Security Badge -->
+            <div class="auth-security-badge">
+                <span>🔒</span>
+                <span>Your data is encrypted and secure</span>
+            </div>
+            
+            <!-- Messages Container -->
+            <div id="auth-messages" aria-live="polite"></div>
+            
+            <!-- Login Form Container -->
+            <div id="login-form-container" class="auth-form-container">
+                <form id="login-form" class="auth-form" novalidate>
+                    <!-- Email Field -->
+                    <div class="auth-form-group">
+                        <label for="email" class="auth-form-label">
+                            📧 Email Address <span class="required">*</span>
+                        </label>
+                        <div class="auth-input-group">
+                            <span class="auth-input-icon">📧</span>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email"
+                                class="auth-input" 
+                                placeholder="your.email@example.com"
+                                autocomplete="email"
+                                required
+                                aria-describedby="email-error"
+                            >
+                        </div>
+                    </div>
+                    
+                    <!-- Password Field -->
+                    <div class="auth-form-group">
+                        <label for="password" class="auth-form-label">
+                            🔑 Password <span class="required">*</span>
+                        </label>
+                        <div class="auth-input-group auth-password-group">
+                            <span class="auth-input-icon">🔑</span>
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password"
+                                class="auth-input" 
+                                placeholder="Enter your password"
+                                autocomplete="current-password"
+                                required
+                                aria-describedby="password-error"
+                            >
+                            <button 
+                                type="button" 
+                                class="auth-password-toggle"
+                                aria-label="Show password"
+                            >👁️</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Remember Me & Forgot Password -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin: var(--spacing-md) 0;">
+                        <div class="auth-checkbox-group">
+                            <input type="checkbox" id="remember-me" class="auth-checkbox">
+                            <label for="remember-me" class="auth-checkbox-label">
+                                Remember me for next time 💾
+                            </label>
+                        </div>
+                        
+                        <a href="#" 
+                           onclick="brainBudgetAuth.switchMode('reset')" 
+                           class="auth-link">
+                            Forgot password? 🔑
+                        </a>
+                    </div>
+                    
+                    <!-- Login Button -->
+                    <div class="auth-button-group">
+                        <button 
+                            type="submit" 
+                            id="login-btn"
+                            class="auth-button auth-button-primary"
+                        >
+                            <span>🚀 Sign In</span>
+                        </button>
+                        
+                        <!-- Divider -->
+                        <div class="auth-divider">
+                            <span class="auth-divider-text">or continue with</span>
+                        </div>
+                        
+                        <!-- Google Sign-In -->
+                        <button 
+                            type="button" 
+                            id="google-signin-btn"
+                            class="auth-button auth-button-google"
+                        >
+                            <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo">
+                            <span>Sign in with Google</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Registration Form Container (Hidden by default) -->
+            <div id="register-form-container" class="auth-form-container" style="display: none;">
+                <!-- Step Progress Indicator -->
+                <ol class="auth-steps" aria-label="Registration progress">
+                    <li class="auth-step active" aria-label="Step 1: Basic Information">1</li>
+                    <li class="auth-step pending" aria-label="Step 2: Security Settings">2</li>
+                    <li class="auth-step pending" aria-label="Step 3: Preferences">3</li>
+                </ol>
+                
+                <form id="register-form" class="auth-form" novalidate>
+                    <!-- Step 1: Basic Information -->
+                    <div class="auth-step-content" id="register-step-1">
+                        <h3 style="color: var(--color-text-primary); margin-bottom: var(--spacing-lg); text-align: center;">
+                            📝 Let's Get Started!
+                        </h3>
+                        
+                        <!-- Email -->
+                        <div class="auth-form-group">
+                            <label for="register-email" class="auth-form-label">
+                                📧 Email Address <span class="required">*</span>
+                            </label>
+                            <div class="auth-input-group">
+                                <span class="auth-input-icon">📧</span>
+                                <input 
+                                    type="email" 
+                                    id="register-email" 
+                                    name="email"
+                                    class="auth-input" 
+                                    placeholder="your.email@example.com"
+                                    autocomplete="email"
+                                    required
+                                >
+                            </div>
+                        </div>
+                        
+                        <!-- Display Name -->
+                        <div class="auth-form-group">
+                            <label for="display-name" class="auth-form-label">
+                                👤 What should we call you? 
+                                <span class="optional">(optional)</span>
+                            </label>
+                            <div class="auth-input-group">
+                                <span class="auth-input-icon">👤</span>
+                                <input 
+                                    type="text" 
+                                    id="display-name" 
+                                    name="displayName"
+                                    class="auth-input" 
+                                    placeholder="Your preferred name"
+                                    autocomplete="name"
+                                >
+                            </div>
+                            <small style="color: var(--color-text-secondary); font-size: var(--font-size-legend);">
+                                💡 This helps us personalize your experience!
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2: Security Settings -->
+                    <div class="auth-step-content" id="register-step-2" style="display: none;">
+                        <h3 style="color: var(--color-text-primary); margin-bottom: var(--spacing-lg); text-align: center;">
+                            🔒 Secure Your Account
+                        </h3>
+                        
+                        <!-- Password -->
+                        <div class="auth-form-group">
+                            <label for="register-password" class="auth-form-label">
+                                🔑 Create Password <span class="required">*</span>
+                            </label>
+                            <div class="auth-input-group auth-password-group">
+                                <span class="auth-input-icon">🔑</span>
+                                <input 
+                                    type="password" 
+                                    id="register-password" 
+                                    name="password"
+                                    class="auth-input" 
+                                    placeholder="Create a strong password"
+                                    autocomplete="new-password"
+                                    required
+                                >
+                                <button 
+                                    type="button" 
+                                    class="auth-password-toggle"
+                                    aria-label="Show password"
+                                >👁️</button>
+                            </div>
+                            
+                            <!-- Password Strength Indicator -->
+                            <div class="password-strength">
+                                <div class="password-strength-label">🔐 Weak - Let's make it stronger!</div>
+                                <div class="password-strength-bar">
+                                    <div class="password-strength-fill weak"></div>
+                                </div>
+                                <div class="password-requirements">
+                                    <div class="password-requirement">
+                                        <span class="password-requirement-icon">⭕</span>
+                                        <span>At least 8 characters long</span>
+                                    </div>
+                                    <div class="password-requirement">
+                                        <span class="password-requirement-icon">⭕</span>
+                                        <span>Contains lowercase letters</span>
+                                    </div>
+                                    <div class="password-requirement">
+                                        <span class="password-requirement-icon">⭕</span>
+                                        <span>Contains uppercase letters</span>
+                                    </div>
+                                    <div class="password-requirement">
+                                        <span class="password-requirement-icon">⭕</span>
+                                        <span>Contains numbers</span>
+                                    </div>
+                                    <div class="password-requirement">
+                                        <span class="password-requirement-icon">⭕</span>
+                                        <span>Contains special characters</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Confirm Password -->
+                        <div class="auth-form-group">
+                            <label for="confirm-password" class="auth-form-label">
+                                🔁 Confirm Password <span class="required">*</span>
+                            </label>
+                            <div class="auth-input-group">
+                                <span class="auth-input-icon">🔁</span>
+                                <input 
+                                    type="password" 
+                                    id="confirm-password" 
+                                    name="confirmPassword"
+                                    class="auth-input" 
+                                    placeholder="Type your password again"
+                                    autocomplete="new-password"
+                                    required
+                                >
+                            </div>
+                        </div>
+                        
+                        <!-- Phone Number (Optional) -->
+                        <div class="auth-form-group">
+                            <label for="phone-number" class="auth-form-label">
+                                📱 Phone Number 
+                                <span class="optional">(optional, for account recovery)</span>
+                            </label>
+                            <div class="auth-phone-group">
+                                <select class="auth-input auth-country-code">
+                                    <option value="+1">🇺🇸 +1</option>
+                                    <option value="+44">🇬🇧 +44</option>
+                                    <option value="+33">🇫🇷 +33</option>
+                                    <option value="+49">🇩🇪 +49</option>
+                                </select>
+                                <input 
+                                    type="tel" 
+                                    id="phone-number" 
+                                    name="phoneNumber"
+                                    class="auth-input auth-phone-number" 
+                                    placeholder="(555) 123-4567"
+                                    autocomplete="tel"
+                                >
+                            </div>
+                            <small style="color: var(--color-text-secondary); font-size: var(--font-size-legend);">
+                                💡 We'll only use this to help you recover your account if needed
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 3: Preferences -->
+                    <div class="auth-step-content" id="register-step-3" style="display: none;">
+                        <h3 style="color: var(--color-text-primary); margin-bottom: var(--spacing-lg); text-align: center;">
+                            ⚙️ Final Touches
+                        </h3>
+                        
+                        <!-- Terms Acceptance -->
+                        <div class="auth-checkbox-group">
+                            <input type="checkbox" id="accept-terms" class="auth-checkbox" required>
+                            <label for="accept-terms" class="auth-checkbox-label">
+                                <strong>I agree to the 
+                                <a href="/terms" target="_blank" class="auth-link">Terms of Service</a> 
+                                and 
+                                <a href="/privacy" target="_blank" class="auth-link">Privacy Policy</a> 
+                                <span class="required">*</span></strong>
+                            </label>
+                        </div>
+                        
+                        <!-- Newsletter Opt-in -->
+                        <div class="auth-checkbox-group">
+                            <input type="checkbox" id="newsletter-opt-in" class="auth-checkbox">
+                            <label for="newsletter-opt-in" class="auth-checkbox-label">
+                                📧 Send me helpful tips and updates about managing finances with ADHD 
+                                <span class="optional">(you can unsubscribe anytime)</span>
+                            </label>
+                        </div>
+                        
+                        <!-- Data Privacy Notice -->
+                        <div class="auth-message info">
+                            <span class="auth-message-icon">🛡️</span>
+                            <div>
+                                <strong>Your Privacy Matters!</strong><br>
+                                We only collect the information needed to make BrainBudget work great for you. 
+                                We never sell your data and you can delete your account anytime.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step Navigation -->
+                    <div class="auth-button-group">
+                        <div class="auth-button-group-row">
+                            <button 
+                                type="button" 
+                                id="prev-step-btn"
+                                class="auth-button auth-button-secondary"
+                                style="display: none;"
+                            >
+                                ← Back
+                            </button>
+                            
+                            <button 
+                                type="submit" 
+                                id="register-btn"
+                                class="auth-button auth-button-primary"
+                            >
+                                Continue to Step 2 →
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Password Reset Form Container (Hidden by default) -->
+            <div id="reset-form-container" class="auth-form-container" style="display: none;">
+                <form id="reset-form" class="auth-form" novalidate>
+                    <h3 style="color: var(--color-text-primary); margin-bottom: var(--spacing-lg); text-align: center;">
+                        🔑 Let's Reset Your Password
+                    </h3>
+                    
+                    <div class="auth-message info">
+                        <span class="auth-message-icon">💡</span>
+                        <div>
+                            No worries! We've all been there. Enter your email or phone number and we'll help you get back in.
+                        </div>
+                    </div>
+                    
+                    <!-- Email Reset -->
+                    <div class="auth-form-group">
+                        <label for="reset-email" class="auth-form-label">
+                            📧 Email Address
+                        </label>
+                        <div class="auth-input-group">
+                            <span class="auth-input-icon">📧</span>
+                            <input 
+                                type="email" 
+                                id="reset-email" 
+                                name="email"
+                                class="auth-input" 
+                                placeholder="your.email@example.com"
+                                autocomplete="email"
+                            >
+                        </div>
+                    </div>
+                    
+                    <div class="auth-divider">
+                        <span class="auth-divider-text">or</span>
+                    </div>
+                    
+                    <!-- Phone Reset -->
+                    <div class="auth-form-group">
+                        <label for="reset-phone" class="auth-form-label">
+                            📱 Phone Number
+                        </label>
+                        <div class="auth-phone-group">
+                            <select class="auth-input auth-country-code">
+                                <option value="+1">🇺🇸 +1</option>
+                                <option value="+44">🇬🇧 +44</option>
+                                <option value="+33">🇫🇷 +33</option>
+                                <option value="+49">🇩🇪 +49</option>
+                            </select>
+                            <input 
+                                type="tel" 
+                                id="reset-phone" 
+                                name="phoneNumber"
+                                class="auth-input auth-phone-number" 
+                                placeholder="(555) 123-4567"
+                                autocomplete="tel"
+                            >
+                        </div>
+                    </div>
+                    
+                    <!-- Reset Button -->
+                    <div class="auth-button-group">
+                        <button 
+                            type="submit" 
+                            id="reset-btn"
+                            class="auth-button auth-button-primary"
+                        >
+                            🚀 Send Reset Instructions
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Footer -->
+            <div class="auth-footer">
+                <p>
+                    <span id="auth-switch-text">Don't have an account?</span>
+                    <a href="#" 
+                       id="switch-to-register"
+                       onclick="brainBudgetAuth.switchMode('register')" 
+                       class="auth-link">
+                        Join BrainBudget! 🎉
+                    </a>
+                </p>
+                
+                <p id="back-to-login-link" style="display: none;">
+                    <a href="#" 
+                       id="switch-to-login"
+                       onclick="brainBudgetAuth.switchMode('login')" 
+                       class="auth-link">
+                        ← Back to Sign In
+                    </a>
+                </p>
+                
+                <p style="margin-top: var(--spacing-lg); font-size: 12px;">
+                    🔒 Secured with enterprise-grade encryption<br>
+                    Built with ❤️ for the ADHD community
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Load Authentication JavaScript -->
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+    
+    <!-- Additional JavaScript for UI enhancements -->
+    <script>
+        // Update footer links based on current mode
+        function updateFooterLinks() {
+            const authSwitchText = document.getElementById('auth-switch-text');
+            const switchToRegisterLink = document.getElementById('switch-to-register');
+            const backToLoginLink = document.getElementById('back-to-login-link');
+            
+            // Show/hide appropriate links based on current mode
+            if (brainBudgetAuth.authMode === 'login') {
+                authSwitchText.textContent = "Don't have an account?";
+                switchToRegisterLink.textContent = 'Join BrainBudget! 🎉';
+                switchToRegisterLink.style.display = 'inline';
+                backToLoginLink.style.display = 'none';
+            } else {
+                authSwitchText.textContent = '';
+                switchToRegisterLink.style.display = 'none';
+                backToLoginLink.style.display = 'block';
+            }
+        }
+        
+        // Override switchMode to update footer
+        const originalSwitchMode = brainBudgetAuth.switchMode;
+        brainBudgetAuth.switchMode = function(mode) {
+            originalSwitchMode.call(this, mode);
+            updateFooterLinks();
+        };
+        
+    </script>
+</body>
+</html>

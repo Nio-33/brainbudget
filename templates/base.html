@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ADHD-friendly budgeting app with AI-powered spending analysis">
+    
+    <!-- SEO and Social Meta -->
+    <meta property="og:title" content="BrainBudget - ADHD-Friendly Budgeting">
+    <meta property="og:description" content="Transform your financial stress into financial success with our neurodivergent-friendly budgeting app">
+    <meta property="og:type" content="website">
+    
+    <title>{% block title %}BrainBudget - ADHD-Friendly Budgeting{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        // ADHD-friendly warm color palette
+                        primary: {
+                            50: '#f0f8ff',
+                            100: '#e0f2fe', 
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#4A90E2', // Main brand blue
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e'
+                        },
+                        success: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#7ED321', // Gentle green
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d'
+                        },
+                        warning: {
+                            50: '#fefce8',
+                            100: '#fef9c3',
+                            200: '#fef08a',
+                            300: '#fde047',
+                            400: '#facc15',
+                            500: '#F5A623', // Gentle orange
+                            600: '#ca8a04',
+                            700: '#a16207',
+                            800: '#854d0e',
+                            900: '#713f12'
+                        },
+                        background: '#FAFAFA', // Soft off-white
+                        surface: '#FFFFFF',
+                        text: {
+                            primary: '#4A4A4A',   // Soft gray instead of pure black
+                            secondary: '#6B7280',
+                            muted: '#9CA3AF'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'], // Clean, readable font
+                    },
+                    spacing: {
+                        '18': '4.5rem',
+                        '88': '22rem',
+                    },
+                    borderRadius: {
+                        'xl': '1rem',
+                        '2xl': '1.5rem',
+                    },
+                    animation: {
+                        'bounce-gentle': 'bounce 2s infinite',
+                        'pulse-soft': 'pulse 3s infinite',
+                        'wiggle': 'wiggle 1s ease-in-out infinite',
+                        'celebration': 'celebration 0.6s ease-in-out',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Custom CSS for ADHD-friendly animations -->
+    <style>
+        @keyframes wiggle {
+            0%, 7%, 14%, 21%, 100% { transform: rotate(0deg); }
+            3.5%, 10.5%, 17.5% { transform: rotate(-3deg); }
+        }
+        
+        @keyframes celebration {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        /* Focus indicators for accessibility */
+        .focus-ring:focus {
+            outline: 2px solid #4A90E2;
+            outline-offset: 2px;
+        }
+        
+        /* Gentle transitions */
+        .gentle-transition {
+            transition: all 0.3s ease-out;
+        }
+        
+        /* Reduced motion for users who prefer it */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#4A90E2">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="BrainBudget">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='icons/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='icons/favicon-16x16.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/apple-touch-icon.png') }}">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/charts.css') }}">
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body class="bg-background min-h-screen text-text-primary antialiased">
+    <!-- Skip to main content for screen readers -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary-500 text-white px-4 py-2 rounded-lg z-50">
+        Skip to main content
+    </a>
+    
+    <!-- Loading indicator -->
+    <div id="loading-overlay" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 hidden items-center justify-center">
+        <div class="text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto mb-4"></div>
+            <p class="text-text-secondary">Loading your financial insights...</p>
+        </div>
+    </div>
+    
+    <!-- Navigation -->
+    <nav class="bg-surface shadow-sm border-b border-gray-100" role="navigation">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">🧠</span>
+                    </div>
+                    <span class="font-semibold text-xl text-text-primary">BrainBudget</span>
+                </div>
+                
+                <!-- Navigation Links (Desktop) -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="/" class="nav-link text-text-secondary hover:text-primary-500 gentle-transition focus-ring rounded px-2 py-1">Home</a>
+                    <a href="/upload" class="nav-link text-text-secondary hover:text-primary-500 gentle-transition focus-ring rounded px-2 py-1">Upload</a>
+                    <a href="/dashboard" class="nav-link text-text-secondary hover:text-primary-500 gentle-transition focus-ring rounded px-2 py-1">Dashboard</a>
+                    <a href="/settings" class="nav-link text-text-secondary hover:text-primary-500 gentle-transition focus-ring rounded px-2 py-1">Settings</a>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="focus-ring rounded p-2 text-text-secondary hover:text-primary-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="md:hidden hidden bg-surface border-t border-gray-100">
+            <div class="px-4 py-3 space-y-2">
+                <a href="/" class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50 hover:text-primary-500 focus-ring">Home</a>
+                <a href="/upload" class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50 hover:text-primary-500 focus-ring">Upload</a>
+                <a href="/dashboard" class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50 hover:text-primary-500 focus-ring">Dashboard</a>
+                <a href="/settings" class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50 hover:text-primary-500 focus-ring">Settings</a>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main id="main-content" class="flex-1">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-surface border-t border-gray-100 mt-12">
+        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+            <div class="text-center text-text-secondary">
+                <p class="mb-2">Made with 💜 for the neurodivergent community</p>
+                <p class="text-sm">BrainBudget - Making budgeting accessible and kind</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Success Toast Notification -->
+    <div id="success-toast" class="fixed bottom-4 right-4 bg-success-500 text-white px-6 py-4 rounded-xl shadow-lg transform translate-y-full transition-transform duration-300 z-50 hidden">
+        <div class="flex items-center space-x-3">
+            <div class="flex-shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+            <div class="flex-1">
+                <p class="font-medium" id="success-message">Great job! 🎉</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Error Toast Notification -->
+    <div id="error-toast" class="fixed bottom-4 right-4 bg-red-500 text-white px-6 py-4 rounded-xl shadow-lg transform translate-y-full transition-transform duration-300 z-50 hidden">
+        <div class="flex items-center space-x-3">
+            <div class="flex-shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </div>
+            <div class="flex-1">
+                <p class="font-medium" id="error-message">Something went wrong</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Core JavaScript -->
+    <script src="{{ url_for('static', filename='js/core.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/navigation.js') }}"></script>
+    
+    {% block scripts %}{% endblock %}
+    
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch(function(registrationError) {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>

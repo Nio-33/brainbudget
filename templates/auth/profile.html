@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - BrainBudget</title>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/charts.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    
+    <!-- Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        .profile-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: var(--spacing-xl);
+            font-family: var(--font-family);
+        }
+        
+        .profile-header {
+            background: linear-gradient(135deg, var(--color-cozy-blue), var(--color-warm-green));
+            border-radius: var(--border-radius-xl);
+            padding: var(--spacing-2xl);
+            text-align: center;
+            color: white;
+            margin-bottom: var(--spacing-xl);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .profile-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 20px,
+                rgba(255, 255, 255, 0.05) 20px,
+                rgba(255, 255, 255, 0.05) 40px
+            );
+            animation: float 20s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
+        }
+        
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto var(--spacing-md);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .profile-name {
+            font-size: var(--font-size-title);
+            font-weight: 700;
+            margin-bottom: var(--spacing-xs);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .profile-email {
+            opacity: 0.9;
+            font-size: var(--font-size-label);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .profile-stat {
+            background-color: var(--color-card-background);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-lg);
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            transition: transform var(--animation-duration-normal) var(--animation-easing);
+        }
+        
+        .profile-stat:hover {
+            transform: translateY(-2px);
+        }
+        
+        .profile-stat-icon {
+            font-size: 2rem;
+            margin-bottom: var(--spacing-sm);
+            display: block;
+        }
+        
+        .profile-stat-value {
+            font-size: var(--font-size-title);
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .profile-stat-label {
+            font-size: var(--font-size-legend);
+            color: var(--color-text-secondary);
+        }
+        
+        .profile-section {
+            background-color: var(--color-card-background);
+            border-radius: var(--border-radius-xl);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-xl);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .profile-section-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 2px solid var(--color-grid-lines);
+        }
+        
+        .profile-section-title {
+            font-size: var(--font-size-title);
+            font-weight: 700;
+            color: var(--color-text-primary);
+        }
+        
+        .profile-section-icon {
+            font-size: 1.25rem;
+        }
+        
+        .profile-form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+        }
+        
+        .profile-preference {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-md);
+            background-color: var(--color-background);
+            border-radius: var(--border-radius-md);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .profile-preference-info {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        
+        .profile-preference-icon {
+            font-size: 1.25rem;
+        }
+        
+        .profile-preference-text {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .profile-preference-label {
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .profile-preference-description {
+            font-size: var(--font-size-legend);
+            color: var(--color-text-secondary);
+        }
+        
+        .profile-toggle {
+            position: relative;
+            width: 50px;
+            height: 28px;
+            background-color: var(--color-neutral-gray);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: background-color var(--animation-duration-normal) var(--animation-easing);
+        }
+        
+        .profile-toggle.active {
+            background-color: var(--color-cozy-blue);
+        }
+        
+        .profile-toggle::before {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: white;
+            top: 2px;
+            left: 2px;
+            transition: transform var(--animation-duration-normal) var(--animation-easing);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .profile-toggle.active::before {
+            transform: translateX(22px);
+        }
+        
+        .profile-danger-zone {
+            border: 2px solid var(--color-soft-red);
+            border-radius: var(--border-radius-lg);
+            background-color: rgba(239, 83, 80, 0.05);
+        }
+        
+        .profile-danger-header {
+            background-color: var(--color-soft-red);
+            color: white;
+            padding: var(--spacing-md);
+            margin: calc(var(--spacing-xl) * -1) calc(var(--spacing-xl) * -1) var(--spacing-lg);
+            border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+            font-weight: 600;
+        }
+        
+        .data-export-card {
+            background-color: var(--color-background);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+            border-left: 4px solid var(--color-cozy-blue);
+        }
+        
+        .verification-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--border-radius-sm);
+            font-size: var(--font-size-legend);
+            font-weight: 600;
+            margin-left: var(--spacing-sm);
+        }
+        
+        .verification-badge.verified {
+            background-color: rgba(102, 187, 106, 0.2);
+            color: var(--color-success-green);
+        }
+        
+        .verification-badge.unverified {
+            background-color: rgba(255, 167, 38, 0.2);
+            color: var(--color-warning-amber);
+        }
+        
+        @media (max-width: 768px) {
+            .profile-container {
+                padding: var(--spacing-lg);
+            }
+            
+            .profile-form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .profile-preference {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--spacing-md);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .profile-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="profile-avatar">👤</div>
+            <h1 class="profile-name">Sarah Johnson</h1>
+            <p class="profile-email">sarah.johnson@email.com</p>
+        </div>
+        
+        <!-- Profile Statistics -->
+        <div class="profile-stats">
+            <div class="profile-stat">
+                <span class="profile-stat-icon">📊</span>
+                <div class="profile-stat-value">47</div>
+                <div class="profile-stat-label">Statements Analyzed</div>
+            </div>
+            
+            <div class="profile-stat">
+                <span class="profile-stat-icon">💰</span>
+                <div class="profile-stat-value">$12,456</div>
+                <div class="profile-stat-label">Total Tracked</div>
+            </div>
+            
+            <div class="profile-stat">
+                <span class="profile-stat-icon">🎯</span>
+                <div class="profile-stat-value">5</div>
+                <div class="profile-stat-label">Budget Goals</div>
+            </div>
+            
+            <div class="profile-stat">
+                <span class="profile-stat-icon">📈</span>
+                <div class="profile-stat-value">23%</div>
+                <div class="profile-stat-label">Savings Improved</div>
+            </div>
+        </div>
+        
+        <!-- Messages Container -->
+        <div id="profile-messages" aria-live="polite"></div>
+        
+        <!-- Personal Information -->
+        <div class="profile-section">
+            <div class="profile-section-header">
+                <span class="profile-section-icon">👤</span>
+                <h2 class="profile-section-title">Personal Information</h2>
+            </div>
+            
+            <form id="personal-info-form" class="auth-form">
+                <div class="profile-form-grid">
+                    <div class="auth-form-group">
+                        <label for="display-name" class="auth-form-label">
+                            Display Name
+                        </label>
+                        <div class="auth-input-group">
+                            <span class="auth-input-icon">👤</span>
+                            <input 
+                                type="text" 
+                                id="display-name" 
+                                class="auth-input" 
+                                value="Sarah Johnson"
+                                placeholder="Your preferred name"
+                            >
+                        </div>
+                    </div>
+                    
+                    <div class="auth-form-group">
+                        <label for="email-address" class="auth-form-label">
+                            Email Address
+                            <span class="verification-badge verified">
+                                ✅ Verified
+                            </span>
+                        </label>
+                        <div class="auth-input-group">
+                            <span class="auth-input-icon">📧</span>
+                            <input 
+                                type="email" 
+                                id="email-address" 
+                                class="auth-input" 
+                                value="sarah.johnson@email.com"
+                                readonly
+                            >
+                        </div>
+                        <small style="color: var(--color-text-secondary); font-size: var(--font-size-legend);">
+                            💡 Contact support to change your email address
+                        </small>
+                    </div>
+                    
+                    <div class="auth-form-group">
+                        <label for="phone-number" class="auth-form-label">
+                            Phone Number
+                            <span class="verification-badge unverified">
+                                ⚠️ Unverified
+                            </span>
+                        </label>
+                        <div class="auth-phone-group">
+                            <select class="auth-input auth-country-code">
+                                <option value="+1" selected>🇺🇸 +1</option>
+                                <option value="+44">🇬🇧 +44</option>
+                                <option value="+33">🇫🇷 +33</option>
+                                <option value="+49">🇩🇪 +49</option>
+                            </select>
+                            <input 
+                                type="tel" 
+                                id="phone-number" 
+                                class="auth-input auth-phone-number" 
+                                value="(555) 123-4567"
+                                placeholder="(555) 123-4567"
+                            >
+                        </div>
+                        <button 
+                            type="button" 
+                            class="auth-button auth-button-secondary" 
+                            style="margin-top: var(--spacing-sm);"
+                            onclick="verifyPhone()"
+                        >
+                            📱 Verify Phone Number
+                        </button>
+                    </div>
+                    
+                    <div class="auth-form-group">
+                        <label for="timezone" class="auth-form-label">
+                            Timezone
+                        </label>
+                        <div class="auth-input-group">
+                            <span class="auth-input-icon">🌎</span>
+                            <select id="timezone" class="auth-input">
+                                <option value="America/New_York">🇺🇸 Eastern Time (ET)</option>
+                                <option value="America/Chicago">🇺🇸 Central Time (CT)</option>
+                                <option value="America/Denver">🇺🇸 Mountain Time (MT)</option>
+                                <option value="America/Los_Angeles" selected>🇺🇸 Pacific Time (PT)</option>
+                                <option value="Europe/London">🇬🇧 London (GMT)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="auth-button-group">
+                    <button type="submit" class="auth-button auth-button-primary">
+                        💾 Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- ADHD-Friendly Preferences -->
+        <div class="profile-section">
+            <div class="profile-section-header">
+                <span class="profile-section-icon">🧠</span>
+                <h2 class="profile-section-title">ADHD-Friendly Settings</h2>
+            </div>
+            
+            <div class="profile-preference">
+                <div class="profile-preference-info">
+                    <span class="profile-preference-icon">🎨</span>
+                    <div class="profile-preference-text">
+                        <div class="profile-preference-label">Gentle Color Mode</div>
+                        <div class="profile-preference-description">Use softer, less stimulating colors</div>
+                    </div>
+                </div>
+                <div class="profile-toggle active" onclick="togglePreference(this)"></div>
+            </div>
+            
+            <div class="profile-preference">
+                <div class="profile-preference-info">
+                    <span class="profile-preference-icon">⚡</span>
+                    <div class="profile-preference-text">
+                        <div class="profile-preference-label">Reduced Animations</div>
+                        <div class="profile-preference-description">Minimize motion for focus and comfort</div>
+                    </div>
+                </div>
+                <div class="profile-toggle" onclick="togglePreference(this)"></div>
+            </div>
+            
+            <div class="profile-preference">
+                <div class="profile-preference-info">
+                    <span class="profile-preference-icon">📱</span>
+                    <div class="profile-preference-text">
+                        <div class="profile-preference-label">Gentle Notifications</div>
+                        <div class="profile-preference-description">Supportive reminders without pressure</div>
+                    </div>
+                </div>
+                <div class="profile-toggle active" onclick="togglePreference(this)"></div>
+            </div>
+            
+            <div class="profile-preference">
+                <div class="profile-preference-info">
+                    <span class="profile-preference-icon">🔢</span>
+                    <div class="profile-preference-text">
+                        <div class="profile-preference-label">Rounded Numbers</div>
+                        <div class="profile-preference-description">Show amounts like "$123" instead of "$123.45"</div>
+                    </div>
+                </div>
+                <div class="profile-toggle" onclick="togglePreference(this)"></div>
+            </div>
+            
+            <div class="profile-preference">
+                <div class="profile-preference-info">
+                    <span class="profile-preference-icon">💬</span>
+                    <div class="profile-preference-text">
+                        <div class="profile-preference-label">Encouraging Language</div>
+                        <div class="profile-preference-description">Extra positive reinforcement and support</div>
+                    </div>
+                </div>
+                <div class="profile-toggle active" onclick="togglePreference(this)"></div>
+            </div>
+        </div>
+        
+        <!-- Security Settings -->
+        <div class="profile-section">
+            <div class="profile-section-header">
+                <span class="profile-section-icon">🔒</span>
+                <h2 class="profile-section-title">Security & Privacy</h2>
+            </div>
+            
+            <div class="profile-form-grid">
+                <div class="auth-form-group">
+                    <label class="auth-form-label">Password</label>
+                    <button 
+                        type="button" 
+                        class="auth-button auth-button-secondary"
+                        onclick="changePassword()"
+                    >
+                        🔑 Change Password
+                    </button>
+                    <small style="color: var(--color-text-secondary); font-size: var(--font-size-legend);">
+                        Last changed: 30 days ago
+                    </small>
+                </div>
+                
+                <div class="auth-form-group">
+                    <label class="auth-form-label">Two-Factor Authentication</label>
+                    <button 
+                        type="button" 
+                        class="auth-button auth-button-primary"
+                        onclick="setup2FA()"
+                    >
+                        🛡️ Enable 2FA
+                    </button>
+                    <small style="color: var(--color-text-secondary); font-size: var(--font-size-legend);">
+                        Add an extra layer of security to your account
+                    </small>
+                </div>
+                
+                <div class="auth-form-group">
+                    <label class="auth-form-label">Active Sessions</label>
+                    <button 
+                        type="button" 
+                        class="auth-button auth-button-secondary"
+                        onclick="viewSessions()"
+                    >
+                        📱 Manage Sessions
+                    </button>
+                    <small style="color: var(--color-text-secondary); font-size: var(--font-size-legend);">
+                        See where you're signed in and end sessions
+                    </small>
+                </div>
+                
+                <div class="auth-form-group">
+                    <label class="auth-form-label">Login Alerts</label>
+                    <div class="profile-preference" style="margin: 0;">
+                        <div class="profile-preference-info">
+                            <div class="profile-preference-text">
+                                <div class="profile-preference-description">Email me when someone signs into my account</div>
+                            </div>
+                        </div>
+                        <div class="profile-toggle active" onclick="togglePreference(this)"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Data Management -->
+        <div class="profile-section">
+            <div class="profile-section-header">
+                <span class="profile-section-icon">💾</span>
+                <h2 class="profile-section-title">Data Management</h2>
+            </div>
+            
+            <div class="data-export-card">
+                <h3 style="color: var(--color-text-primary); margin-bottom: var(--spacing-sm);">
+                    📦 Export Your Data
+                </h3>
+                <p style="color: var(--color-text-secondary); margin-bottom: var(--spacing-lg);">
+                    Download all your BrainBudget data including analyses, transactions, and preferences. 
+                    We believe your data belongs to you!
+                </p>
+                <button 
+                    type="button" 
+                    class="auth-button auth-button-primary"
+                    onclick="exportData()"
+                >
+                    📥 Download My Data
+                </button>
+            </div>
+            
+            <div class="profile-preference">
+                <div class="profile-preference-info">
+                    <span class="profile-preference-icon">📈</span>
+                    <div class="profile-preference-text">
+                        <div class="profile-preference-label">Analytics & Insights</div>
+                        <div class="profile-preference-description">Help improve BrainBudget with anonymous usage data</div>
+                    </div>
+                </div>
+                <div class="profile-toggle active" onclick="togglePreference(this)"></div>
+            </div>
+            
+            <div class="profile-preference">
+                <div class="profile-preference-info">
+                    <span class="profile-preference-icon">💌</span>
+                    <div class="profile-preference-text">
+                        <div class="profile-preference-label">Marketing Emails</div>
+                        <div class="profile-preference-description">Receive tips and updates about ADHD-friendly finance</div>
+                    </div>
+                </div>
+                <div class="profile-toggle" onclick="togglePreference(this)"></div>
+            </div>
+        </div>
+        
+        <!-- Danger Zone -->
+        <div class="profile-section profile-danger-zone">
+            <div class="profile-danger-header">
+                ⚠️ Danger Zone
+            </div>
+            
+            <div class="auth-message warning">
+                <span class="auth-message-icon">⚠️</span>
+                <div>
+                    <strong>Account Deletion</strong><br>
+                    Once you delete your account, there's no going back. All your data will be permanently removed.
+                    We'll miss you, but we understand if BrainBudget isn't the right fit! 💙
+                </div>
+            </div>
+            
+            <div class="auth-button-group" style="margin-top: var(--spacing-lg);">
+                <button 
+                    type="button" 
+                    class="auth-button auth-button-secondary"
+                    style="background-color: var(--color-soft-red); color: white; border-color: var(--color-soft-red);"
+                    onclick="deleteAccount()"
+                >
+                    🗑️ Delete My Account
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Load Authentication JavaScript -->
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+    
+    <!-- Profile-specific JavaScript -->
+    <script>
+        // Toggle preference switches
+        function togglePreference(toggle) {
+            toggle.classList.toggle('active');
+            
+            // Add haptic feedback for mobile
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+            
+            // Announce change to screen readers
+            const isActive = toggle.classList.contains('active');
+            const preferenceLabel = toggle.parentElement.querySelector('.profile-preference-label').textContent;
+            const message = `${preferenceLabel} ${isActive ? 'enabled' : 'disabled'}`;
+            
+            announceToScreenReader(message);
+            
+            // Show temporary success message
+            showProfileMessage('success', `${preferenceLabel} ${isActive ? 'enabled' : 'disabled'}! ✨`);
+        }
+        
+        // Verify phone number
+        function verifyPhone() {
+            showProfileMessage('info', '📱 Verification code sent to your phone! Check your messages.');
+            
+            // Simulate verification process
+            setTimeout(() => {
+                const badge = document.querySelector('.verification-badge.unverified');
+                if (badge) {
+                    badge.className = 'verification-badge verified';
+                    badge.innerHTML = '✅ Verified';
+                    showProfileMessage('success', '🎉 Phone number verified successfully!');
+                }
+            }, 3000);
+        }
+        
+        // Change password
+        function changePassword() {
+            // In a real app, this would open a password change modal
+            showProfileMessage('info', '🔑 Password change form would open here. For security, this requires re-authentication.');
+        }
+        
+        // Setup 2FA
+        function setup2FA() {
+            showProfileMessage('info', '🛡️ Two-factor authentication setup would begin here. We\'ll guide you through each step!');
+        }
+        
+        // View sessions
+        function viewSessions() {
+            showProfileMessage('info', '📱 Session management panel would open here. You could see and manage all your active sessions.');
+        }
+        
+        // Export data
+        function exportData() {
+            showProfileMessage('info', '📦 Preparing your data export... This may take a few minutes for large accounts.');
+            
+            // Simulate data export
+            setTimeout(() => {
+                showProfileMessage('success', '✅ Data export ready! Download should start automatically. Check your Downloads folder.');
+                
+                // Create a dummy download
+                const link = document.createElement('a');
+                link.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent('BrainBudget Data Export - Demo File');
+                link.download = `brainbudget-export-${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+            }, 2000);
+        }
+        
+        // Delete account
+        function deleteAccount() {
+            const confirmed = confirm(
+                '⚠️ Are you absolutely sure you want to delete your BrainBudget account?\n\n' +
+                'This action cannot be undone and will:\n' +
+                '• Permanently delete all your data\n' +
+                '• Remove all your analyses and insights\n' +
+                '• Cancel any active subscriptions\n\n' +
+                'Type "DELETE" in the next prompt to confirm.'
+            );
+            
+            if (confirmed) {
+                const deleteConfirmation = prompt('Please type "DELETE" to confirm account deletion:');
+                if (deleteConfirmation === 'DELETE') {
+                    showProfileMessage('warning', '🗑️ Account deletion initiated. You have 7 days to cancel by contacting support.');
+                    
+                    // In a real app, this would trigger the account deletion process
+                    setTimeout(() => {
+                        showProfileMessage('info', '📧 We\'ve sent you an email with instructions to cancel deletion if you change your mind.');
+                    }, 2000);
+                } else {
+                    showProfileMessage('info', '✋ Account deletion cancelled. Your data is safe!');
+                }
+            }
+        }
+        
+        // Show profile-specific messages
+        function showProfileMessage(type, message) {
+            const messageContainer = document.getElementById('profile-messages');
+            if (!messageContainer) return;
+            
+            const icons = {
+                success: '✅',
+                error: '❌',
+                warning: '⚠️',
+                info: 'ℹ️'
+            };
+            
+            const messageElement = document.createElement('div');
+            messageElement.className = `auth-message ${type}`;
+            messageElement.innerHTML = `
+                <span class="auth-message-icon">${icons[type] || icons.info}</span>
+                <div>${message}</div>
+            `;
+            
+            messageContainer.appendChild(messageElement);
+            
+            // Auto-remove success messages after 4 seconds
+            if (type === 'success' || type === 'info') {
+                setTimeout(() => {
+                    if (messageElement.parentElement) {
+                        messageElement.remove();
+                    }
+                }, 4000);
+            }
+            
+            // Announce to screen readers
+            announceToScreenReader(`${type}: ${message}`);
+            
+            // Scroll message into view
+            messageElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        
+        // Screen reader announcements
+        function announceToScreenReader(message) {
+            const announcement = document.createElement('div');
+            announcement.setAttribute('aria-live', 'polite');
+            announcement.setAttribute('aria-atomic', 'true');
+            announcement.style.position = 'absolute';
+            announcement.style.left = '-10000px';
+            announcement.style.width = '1px';
+            announcement.style.height = '1px';
+            announcement.style.overflow = 'hidden';
+            announcement.textContent = message;
+            
+            document.body.appendChild(announcement);
+            
+            setTimeout(() => {
+                document.body.removeChild(announcement);
+            }, 1000);
+        }
+        
+        // Handle personal info form submission
+        document.getElementById('personal-info-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Collect form data
+            const formData = {
+                displayName: document.getElementById('display-name').value,
+                phoneNumber: document.getElementById('phone-number').value,
+                timezone: document.getElementById('timezone').value
+            };
+            
+            // Simulate save
+            showProfileMessage('info', '💾 Saving your changes...');
+            
+            setTimeout(() => {
+                showProfileMessage('success', '🎉 Profile updated successfully! Your changes have been saved.');
+                
+                // Update profile header if name changed
+                const profileName = document.querySelector('.profile-name');
+                if (profileName && formData.displayName) {
+                    profileName.textContent = formData.displayName;
+                }
+            }, 1000);
+        });
+        
+        // Initialize profile page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📱 Profile page loaded');
+            
+            // Show welcome message for new users
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('welcome') === 'true') {
+                setTimeout(() => {
+                    showProfileMessage('info', 
+                        '👋 Welcome to BrainBudget! Take a moment to personalize your experience. ' +
+                        'These ADHD-friendly settings can make budgeting more comfortable for you!'
+                    );
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+</html>

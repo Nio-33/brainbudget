@@ -1,0 +1,639 @@
+/**
+ * BrainBudget Charts CSS - ADHD-Friendly Visualization Styles
+ * Designed for neurodivergent users with cognitive load reduction in mind
+ */
+
+/* CSS Custom Properties for ADHD-friendly theming */
+:root {
+  /* ADHD-friendly color palette */
+  --color-cozy-blue: #6B9BD6;
+  --color-warm-green: #81C784;
+  --color-sunny-orange: #FFB74D;
+  --color-soft-purple: #BA68C8;
+  --color-gentle-pink: #F48FB1;
+  --color-earthy-brown: #A1887F;
+  
+  /* Support colors */
+  --color-success-green: #66BB6A;
+  --color-warning-amber: #FFA726;
+  --color-soft-red: #EF5350;
+  --color-neutral-gray: #90A4AE;
+  
+  /* Text and background */
+  --color-text-primary: #37474F;
+  --color-text-secondary: #78909C;
+  --color-background: #FAFAFA;
+  --color-card-background: #FFFFFF;
+  --color-grid-lines: #E0E6ED;
+  
+  /* Interactive states */
+  --color-hover: rgba(107, 155, 214, 0.1);
+  --color-focus: rgba(107, 155, 214, 0.3);
+  
+  /* Typography (larger sizes for ADHD users) */
+  --font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-size-title: 1.125rem; /* 18px */
+  --font-size-label: 0.875rem; /* 14px */
+  --font-size-legend: 0.8125rem; /* 13px */
+  --font-size-tooltip: 0.75rem; /* 12px */
+  
+  /* Spacing (generous spacing for reduced cognitive load) */
+  --spacing-xs: 0.25rem; /* 4px */
+  --spacing-sm: 0.5rem; /* 8px */
+  --spacing-md: 0.75rem; /* 12px */
+  --spacing-lg: 1rem; /* 16px */
+  --spacing-xl: 1.5rem; /* 24px */
+  --spacing-2xl: 2rem; /* 32px */
+  
+  /* Border radius (gentle, rounded corners) */
+  --border-radius-sm: 6px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-xl: 16px;
+  
+  /* Shadows (subtle depth) */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 8px 20px rgba(0, 0, 0, 0.08);
+  --shadow-focus: 0 0 0 3px var(--color-focus);
+  
+  /* Animation timing (gentle, not distracting) */
+  --animation-duration-fast: 0.2s;
+  --animation-duration-normal: 0.3s;
+  --animation-duration-slow: 0.5s;
+  --animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Screen reader only content */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Charts Container */
+.charts-container {
+  padding: var(--spacing-xl);
+  background-color: var(--color-background);
+  min-height: 100vh;
+  font-family: var(--font-family);
+}
+
+/* Individual Chart Containers */
+.chart-container {
+  background-color: var(--color-card-background);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+  transition: all var(--animation-duration-normal) var(--animation-easing);
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.chart-container:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.chart-container:focus-within {
+  border-color: var(--color-cozy-blue);
+  box-shadow: var(--shadow-focus);
+}
+
+/* Chart Titles */
+.chart-title {
+  font-size: var(--font-size-title);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.chart-title-icon {
+  font-size: 1.25em;
+  opacity: 0.8;
+}
+
+/* Chart Canvas Styling */
+.chart-canvas {
+  width: 100%;
+  height: auto;
+  border-radius: var(--border-radius-sm);
+}
+
+.chart-canvas:focus {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* Chart Controls */
+.chart-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background-color: var(--color-background);
+  border-radius: var(--border-radius-md);
+}
+
+.chart-control-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.chart-control-label {
+  font-size: var(--font-size-label);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.chart-control-input {
+  padding: var(--spacing-sm);
+  border: 2px solid var(--color-grid-lines);
+  border-radius: var(--border-radius-sm);
+  font-family: var(--font-family);
+  font-size: var(--font-size-label);
+  background-color: var(--color-card-background);
+  transition: border-color var(--animation-duration-normal) var(--animation-easing);
+}
+
+.chart-control-input:focus {
+  outline: none;
+  border-color: var(--color-cozy-blue);
+  box-shadow: var(--shadow-focus);
+}
+
+/* Export Button */
+.export-button {
+  background-color: var(--color-cozy-blue);
+  color: white;
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--border-radius-sm);
+  font-family: var(--font-family);
+  font-size: var(--font-size-label);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--animation-duration-normal) var(--animation-easing);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.export-button:hover {
+  background-color: #5A8BC4;
+  transform: translateY(-1px);
+}
+
+.export-button:focus {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+/* Progress Bars Container */
+#progress-bars-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* Progress Goal Cards */
+.progress-goal-card {
+  background-color: var(--color-card-background);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-lg);
+  border: 2px solid var(--color-grid-lines);
+  transition: all var(--animation-duration-normal) var(--animation-easing);
+  cursor: pointer;
+}
+
+.progress-goal-card:hover {
+  border-color: var(--color-cozy-blue);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.progress-goal-card:focus {
+  outline: none;
+  border-color: var(--color-cozy-blue);
+  box-shadow: var(--shadow-focus);
+}
+
+.progress-goal-card.keyboard-focus {
+  border-color: var(--color-cozy-blue);
+  box-shadow: var(--shadow-focus);
+}
+
+/* Progress Goal Card States */
+.progress-goal-card.on-track {
+  border-left: 4px solid var(--color-success-green);
+}
+
+.progress-goal-card.doing-well {
+  border-left: 4px solid var(--color-success-green);
+}
+
+.progress-goal-card.close-to-limit {
+  border-left: 4px solid var(--color-warning-amber);
+}
+
+.progress-goal-card.over-budget {
+  border-left: 4px solid var(--color-soft-red);
+  background-color: rgba(239, 83, 80, 0.02);
+}
+
+/* Progress Goal Header */
+.progress-goal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.progress-goal-title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.progress-goal-icon {
+  font-size: 1.25rem;
+  opacity: 0.8;
+}
+
+.progress-goal-name {
+  font-size: var(--font-size-label);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.progress-goal-status {
+  font-size: var(--font-size-legend);
+  font-weight: 500;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--color-background);
+}
+
+.progress-goal-status.on-track,
+.progress-goal-status.doing-well {
+  color: var(--color-success-green);
+  background-color: rgba(102, 187, 106, 0.1);
+}
+
+.progress-goal-status.close-to-limit {
+  color: var(--color-warning-amber);
+  background-color: rgba(255, 167, 38, 0.1);
+}
+
+.progress-goal-status.over-budget {
+  color: var(--color-soft-red);
+  background-color: rgba(239, 83, 80, 0.1);
+}
+
+/* Progress Goal Amounts */
+.progress-goal-amounts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm) var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  font-size: var(--font-size-legend);
+  color: var(--color-text-secondary);
+}
+
+.progress-current strong,
+.progress-remaining strong {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.progress-remaining.over-budget .over-amount {
+  color: var(--color-soft-red);
+}
+
+/* Progress Bar Wrapper */
+.progress-bar-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.progress-bar-track {
+  flex: 1;
+  height: 24px;
+  background-color: var(--color-grid-lines);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: var(--border-radius-lg);
+  transition: transform var(--animation-duration-slow) var(--animation-easing);
+  transform-origin: left;
+  transform: scaleX(0);
+  position: relative;
+  background-color: var(--progress-color, var(--color-cozy-blue));
+}
+
+/* Progress bar shimmer animation */
+.progress-bar-shimmer {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+.progress-percentage {
+  font-size: var(--font-size-legend);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  min-width: 3rem;
+  text-align: right;
+}
+
+/* Progress Goal Actions */
+.progress-goal-actions {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--color-cozy-blue);
+  font-family: var(--font-family);
+  font-size: var(--font-size-legend);
+  cursor: pointer;
+  padding: var(--spacing-xs) 0;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  transition: all var(--animation-duration-normal) var(--animation-easing);
+}
+
+.btn-link:hover {
+  text-decoration-color: var(--color-cozy-blue);
+  color: #5A8BC4;
+}
+
+.btn-link:focus {
+  outline: none;
+  text-decoration-color: var(--color-cozy-blue);
+  box-shadow: 0 0 0 2px var(--color-focus);
+  border-radius: var(--border-radius-sm);
+}
+
+/* Skeleton Loading Screens */
+.skeleton {
+  animation: skeleton-loading 1.5s ease-in-out infinite alternate;
+  border-radius: var(--border-radius-sm);
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-color: hsl(200, 20%, 85%);
+  }
+  100% {
+    background-color: hsl(200, 20%, 95%);
+  }
+}
+
+.skeleton-text {
+  width: 100%;
+  height: 20px;
+  margin-bottom: var(--spacing-sm);
+}
+
+.skeleton-chart {
+  width: 100%;
+  height: 300px;
+  border-radius: var(--border-radius-lg);
+}
+
+.skeleton-progress-bar {
+  width: 100%;
+  height: 80px;
+  margin-bottom: var(--spacing-lg);
+  border-radius: var(--border-radius-md);
+}
+
+/* Chart Error Message */
+.chart-error-message {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  background-color: var(--color-card-background);
+  border-radius: var(--border-radius-lg);
+  border: 2px dashed var(--color-grid-lines);
+  margin: var(--spacing-xl) 0;
+}
+
+.error-icon {
+  font-size: 3rem;
+  margin-bottom: var(--spacing-lg);
+  opacity: 0.6;
+}
+
+.chart-error-message h3 {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-title);
+  margin-bottom: var(--spacing-sm);
+}
+
+.chart-error-message p {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-label);
+  margin-bottom: var(--spacing-lg);
+}
+
+.btn-primary {
+  background-color: var(--color-cozy-blue);
+  color: white;
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--border-radius-sm);
+  font-family: var(--font-family);
+  font-size: var(--font-size-label);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--animation-duration-normal) var(--animation-easing);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.btn-primary:hover {
+  background-color: #5A8BC4;
+  transform: translateY(-1px);
+}
+
+.btn-primary:focus {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .charts-container {
+    padding: var(--spacing-lg);
+  }
+  
+  .chart-container {
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --font-size-title: 1rem; /* 16px */
+    --font-size-label: 0.8125rem; /* 13px */
+    --font-size-legend: 0.75rem; /* 12px */
+    --font-size-tooltip: 0.6875rem; /* 11px */
+  }
+  
+  .charts-container {
+    padding: var(--spacing-md);
+  }
+  
+  .chart-container {
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .chart-controls {
+    flex-direction: column;
+  }
+  
+  .progress-goal-amounts {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-xs);
+  }
+  
+  .progress-goal-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+  
+  .progress-goal-actions {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+}
+
+@media (max-width: 480px) {
+  .chart-title {
+    font-size: var(--font-size-label);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-xs);
+  }
+  
+  .progress-bar-wrapper {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+  
+  .progress-percentage {
+    text-align: left;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --color-text-primary: #000000;
+    --color-text-secondary: #333333;
+    --color-background: #FFFFFF;
+    --color-card-background: #FFFFFF;
+    --color-grid-lines: #000000;
+    --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  .chart-container {
+    border: 2px solid var(--color-text-primary);
+  }
+  
+  .progress-goal-card {
+    border: 2px solid var(--color-text-primary);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .progress-bar-fill {
+    transition: none;
+  }
+  
+  .skeleton {
+    animation: none;
+    background-color: hsl(200, 20%, 90%);
+  }
+  
+  .progress-bar-shimmer {
+    animation: none;
+  }
+}
+
+/* Focus indicators for keyboard navigation */
+.chart-container:focus-within .chart-canvas {
+  box-shadow: 0 0 0 2px var(--color-cozy-blue);
+}
+
+/* Print styles */
+@media print {
+  .charts-container {
+    background-color: white;
+  }
+  
+  .chart-container {
+    box-shadow: none;
+    border: 1px solid #ccc;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  
+  .chart-controls,
+  .progress-goal-actions,
+  .export-button {
+    display: none;
+  }
+}

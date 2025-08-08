@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="240" fill="#E8F4F8" stroke="#4A90A4" stroke-width="8"/>
+  
+  <!-- Brain shape -->
+  <path d="M180 180 C160 160, 160 200, 180 220 C190 240, 210 250, 230 240 C250 250, 270 240, 280 220 C300 200, 300 160, 280 180 C270 160, 250 160, 240 170 C230 160, 210 160, 200 170 C190 160, 180 160, 180 180 Z" fill="#6BB6D6" opacity="0.8"/>
+  
+  <!-- Brain details -->
+  <path d="M200 190 C210 185, 220 190, 225 195 C235 190, 245 195, 250 200" stroke="#4A90A4" stroke-width="3" fill="none"/>
+  <path d="M210 205 C220 200, 230 205, 235 210 C245 205, 255 210, 260 215" stroke="#4A90A4" stroke-width="3" fill="none"/>
+  
+  <!-- Dollar signs -->
+  <text x="180" y="320" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#2E8B57">$</text>
+  <text x="280" y="320" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#2E8B57">$</text>
+  
+  <!-- Chart/graph element -->
+  <rect x="200" y="340" width="20" height="40" fill="#4A90A4"/>
+  <rect x="225" y="320" width="20" height="60" fill="#6BB6D6"/>
+  <rect x="250" y="330" width="20" height="50" fill="#4A90A4"/>
+  <rect x="275" y="310" width="20" height="70" fill="#6BB6D6"/>
+  
+  <!-- Connecting lines -->
+  <path d="M190 300 L200 340" stroke="#2E8B57" stroke-width="2" opacity="0.6"/>
+  <path d="M290 300 L280 340" stroke="#2E8B57" stroke-width="2" opacity="0.6"/>
+</svg>

@@ -1,0 +1,284 @@
+{% extends "base.html" %}
+
+{% block title %}BrainBudget - ADHD-Friendly Budgeting Made Simple{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="relative bg-gradient-to-b from-primary-50 to-background py-16 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto text-center">
+        <!-- Hero Icon -->
+        <div class="mb-8">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary-500 to-primary-600 rounded-3xl shadow-lg animate-bounce-gentle">
+                <span class="text-4xl">🧠💰</span>
+            </div>
+        </div>
+        
+        <!-- Hero Title -->
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-text-primary mb-6 leading-tight">
+            Budgeting that <span class="text-primary-500">gets</span> your brain
+        </h1>
+        
+        <!-- Hero Subtitle -->
+        <p class="text-xl md:text-2xl text-text-secondary mb-8 max-w-3xl mx-auto leading-relaxed">
+            Finally, a budgeting app designed for ADHD minds. Turn financial overwhelm into financial confidence with gentle AI guidance.
+        </p>
+        
+        <!-- CTA Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+            <a href="/upload" class="inline-flex items-center justify-center px-8 py-4 bg-primary-500 text-white font-semibold rounded-2xl shadow-lg hover:bg-primary-600 gentle-transition focus-ring transform hover:scale-105">
+                <span class="mr-3 text-xl">📊</span>
+                Start Your Analysis
+            </a>
+            <button id="learn-more-btn" class="inline-flex items-center justify-center px-8 py-4 border-2 border-primary-500 text-primary-500 font-semibold rounded-2xl hover:bg-primary-50 gentle-transition focus-ring">
+                <span class="mr-3 text-xl">🤔</span>
+                How It Works
+            </button>
+        </div>
+        
+        <!-- Trust Indicators -->
+        <div class="flex flex-wrap justify-center items-center gap-8 text-text-muted text-sm">
+            <div class="flex items-center space-x-2">
+                <span class="text-success-500">🔒</span>
+                <span>Bank-level security</span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span class="text-success-500">🤖</span>
+                <span>AI-powered insights</span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span class="text-success-500">💜</span>
+                <span>ADHD-friendly design</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="py-16 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold text-text-primary mb-6">
+                Designed for your unique brain
+            </h2>
+            <p class="text-xl text-text-secondary max-w-3xl mx-auto">
+                We understand that traditional budgeting apps feel overwhelming. That's why we built something different.
+            </p>
+        </div>
+        
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Feature 1: Gentle Analysis -->
+            <div class="bg-surface rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md gentle-transition">
+                <div class="w-12 h-12 bg-gradient-to-br from-success-400 to-success-500 rounded-xl flex items-center justify-center mb-6">
+                    <span class="text-2xl">🌱</span>
+                </div>
+                <h3 class="text-xl font-semibold text-text-primary mb-4">Gentle, Non-Judgmental Analysis</h3>
+                <p class="text-text-secondary leading-relaxed">
+                    Upload your bank statements and get insights that encourage rather than shame. No "bad" spending here—just understanding.
+                </p>
+            </div>
+            
+            <!-- Feature 2: Visual Breakdown -->
+            <div class="bg-surface rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md gentle-transition">
+                <div class="w-12 h-12 bg-gradient-to-br from-primary-400 to-primary-500 rounded-xl flex items-center justify-center mb-6">
+                    <span class="text-2xl">📊</span>
+                </div>
+                <h3 class="text-xl font-semibold text-text-primary mb-4">Clear Visual Stories</h3>
+                <p class="text-text-secondary leading-relaxed">
+                    Your spending patterns told through beautiful, easy-to-understand charts that make sense at a glance.
+                </p>
+            </div>
+            
+            <!-- Feature 3: ADHD-Optimized -->
+            <div class="bg-surface rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md gentle-transition">
+                <div class="w-12 h-12 bg-gradient-to-br from-warning-400 to-warning-500 rounded-xl flex items-center justify-center mb-6">
+                    <span class="text-2xl">🧠</span>
+                </div>
+                <h3 class="text-xl font-semibold text-text-primary mb-4">ADHD-Optimized Experience</h3>
+                <p class="text-text-secondary leading-relaxed">
+                    Reduced cognitive load, clear next steps, and gentle reminders that work with your brain, not against it.
+                </p>
+            </div>
+            
+            <!-- Feature 4: AI Coach -->
+            <div class="bg-surface rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md gentle-transition">
+                <div class="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-500 rounded-xl flex items-center justify-center mb-6">
+                    <span class="text-2xl">🤖</span>
+                </div>
+                <h3 class="text-xl font-semibold text-text-primary mb-4">Your Personal AI Coach</h3>
+                <p class="text-text-secondary leading-relaxed">
+                    Get personalized suggestions and gentle nudges that help you build sustainable financial habits.
+                </p>
+            </div>
+            
+            <!-- Feature 5: Real-time Tracking -->
+            <div class="bg-surface rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md gentle-transition">
+                <div class="w-12 h-12 bg-gradient-to-br from-cyan-400 to-cyan-500 rounded-xl flex items-center justify-center mb-6">
+                    <span class="text-2xl">⚡</span>
+                </div>
+                <h3 class="text-xl font-semibold text-text-primary mb-4">Effortless Real-time Tracking</h3>
+                <p class="text-text-secondary leading-relaxed">
+                    Connect your accounts once and let us handle the rest. No manual entry, no forgotten transactions.
+                </p>
+            </div>
+            
+            <!-- Feature 6: Privacy First -->
+            <div class="bg-surface rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md gentle-transition">
+                <div class="w-12 h-12 bg-gradient-to-br from-rose-400 to-rose-500 rounded-xl flex items-center justify-center mb-6">
+                    <span class="text-2xl">🔒</span>
+                </div>
+                <h3 class="text-xl font-semibold text-text-primary mb-4">Your Data Stays Yours</h3>
+                <p class="text-text-secondary leading-relaxed">
+                    Bank-level encryption, zero data selling, and complete control over your information. Privacy by design.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section id="how-it-works" class="bg-gradient-to-b from-primary-50 to-background py-16 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold text-text-primary mb-6">
+                Three simple steps to financial clarity
+            </h2>
+            <p class="text-xl text-text-secondary max-w-3xl mx-auto">
+                No overwhelming setup. No judgment. Just gentle guidance toward better financial understanding.
+            </p>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-8 lg:gap-12">
+            <!-- Step 1 -->
+            <div class="text-center">
+                <div class="relative">
+                    <div class="w-20 h-20 bg-primary-500 rounded-full flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold shadow-lg">
+                        1
+                    </div>
+                    <div class="hidden md:block absolute top-10 left-full w-full h-0.5 bg-primary-200 transform -translate-y-0.5"></div>
+                </div>
+                <h3 class="text-xl font-semibold text-text-primary mb-4">Upload & Relax</h3>
+                <p class="text-text-secondary leading-relaxed">
+                    Simply drag and drop your bank statement. We support PDFs and images. No complicated setup required.
+                </p>
+            </div>
+            
+            <!-- Step 2 -->
+            <div class="text-center">
+                <div class="relative">
+                    <div class="w-20 h-20 bg-success-500 rounded-full flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold shadow-lg">
+                        2
+                    </div>
+                    <div class="hidden md:block absolute top-10 left-full w-full h-0.5 bg-success-200 transform -translate-y-0.5"></div>
+                </div>
+                <h3 class="text-xl font-semibold text-text-primary mb-4">AI Does the Heavy Lifting</h3>
+                <p class="text-text-secondary leading-relaxed">
+                    Our gentle AI analyzes your spending patterns and creates beautiful, easy-to-understand insights.
+                </p>
+            </div>
+            
+            <!-- Step 3 -->
+            <div class="text-center">
+                <div class="w-20 h-20 bg-warning-500 rounded-full flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold shadow-lg">
+                    3
+                </div>
+                <h3 class="text-xl font-semibold text-text-primary mb-4">Understand & Improve</h3>
+                <p class="text-text-secondary leading-relaxed">
+                    Get personalized, non-judgmental insights that help you make informed decisions about your money.
+                </p>
+            </div>
+        </div>
+        
+        <!-- CTA -->
+        <div class="text-center mt-16">
+            <a href="/upload" class="inline-flex items-center justify-center px-8 py-4 bg-primary-500 text-white font-semibold rounded-2xl shadow-lg hover:bg-primary-600 gentle-transition focus-ring transform hover:scale-105">
+                <span class="mr-3 text-xl">🚀</span>
+                Try It Free Right Now
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonial Section -->
+<section class="py-16 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto text-center">
+        <div class="bg-surface rounded-3xl p-8 shadow-sm border border-gray-100">
+            <div class="mb-6">
+                <div class="flex justify-center space-x-1 mb-4">
+                    <span class="text-2xl">⭐</span>
+                    <span class="text-2xl">⭐</span>
+                    <span class="text-2xl">⭐</span>
+                    <span class="text-2xl">⭐</span>
+                    <span class="text-2xl">⭐</span>
+                </div>
+                <blockquote class="text-xl md:text-2xl text-text-secondary italic leading-relaxed">
+                    "Finally, a budgeting app that doesn't make me feel like a failure! BrainBudget helped me understand my spending without the shame."
+                </blockquote>
+            </div>
+            <div class="flex items-center justify-center space-x-3">
+                <div class="w-12 h-12 bg-gradient-to-br from-pink-400 to-pink-500 rounded-full flex items-center justify-center">
+                    <span class="text-white font-semibold">S</span>
+                </div>
+                <div class="text-left">
+                    <p class="font-semibold text-text-primary">Sarah M.</p>
+                    <p class="text-sm text-text-muted">Marketing Professional</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Final CTA Section -->
+<section class="bg-gradient-to-r from-primary-500 to-primary-600 py-16 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto text-center">
+        <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">
+            Ready to transform your relationship with money?
+        </h2>
+        <p class="text-xl text-primary-100 mb-8 max-w-2xl mx-auto">
+            Join thousands of neurodivergent folks who've found financial peace with BrainBudget.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <a href="/upload" class="inline-flex items-center justify-center px-8 py-4 bg-white text-primary-600 font-semibold rounded-2xl shadow-lg hover:bg-gray-50 gentle-transition focus-ring transform hover:scale-105">
+                <span class="mr-3 text-xl">✨</span>
+                Start Your Journey
+            </a>
+            <p class="text-primary-100 text-sm">Free to try • No credit card required</p>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Smooth scrolling for learn more button
+    document.getElementById('learn-more-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('how-it-works').scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start'
+        });
+    });
+    
+    // Add gentle animations on scroll
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+    
+    // Observe all feature cards
+    document.querySelectorAll('.bg-surface').forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+        observer.observe(card);
+    });
+</script>
+{% endblock %}

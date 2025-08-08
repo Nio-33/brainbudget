@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title or 'Oops!' }} - BrainBudget{% endblock %}
+
+{% block content %}
+<section class="py-16 px-4 sm:px-6 lg:px-8 min-h-screen flex items-center">
+    <div class="max-w-2xl mx-auto text-center">
+        <!-- Error Icon -->
+        <div class="mb-8">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-orange-400 to-orange-500 rounded-3xl shadow-lg mb-6">
+                {% if error_code == 404 %}
+                    <span class="text-4xl">🧭</span>
+                {% elif error_code == 500 %}
+                    <span class="text-4xl">🛠️</span>
+                {% elif error_code == 503 %}
+                    <span class="text-4xl">⚙️</span>
+                {% else %}
+                    <span class="text-4xl">😅</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Error Title -->
+        <h1 class="text-3xl md:text-4xl font-bold text-text-primary mb-6">
+            {{ title or 'Something unexpected happened' }}
+        </h1>
+        
+        <!-- Error Message -->
+        <div class="bg-orange-50 rounded-2xl p-6 border border-orange-100 mb-8">
+            <p class="text-lg text-text-secondary leading-relaxed">
+                {{ message or "Don't worry, these things happen! Let's get you back on track." }}
+            </p>
+            {% if suggestion %}
+            <p class="text-sm text-text-muted mt-4">
+                💡 <strong>Suggestion:</strong> {{ suggestion }}
+            </p>
+            {% endif %}
+        </div>
+        
+        <!-- Error Code (if provided) -->
+        {% if error_code %}
+        <div class="text-sm text-text-muted mb-8">
+            Error Code: {{ error_code }}
+        </div>
+        {% endif %}
+        
+        <!-- Action Buttons -->
+        <div class="space-y-4">
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button onclick="history.back()" class="inline-flex items-center justify-center px-8 py-4 bg-primary-500 text-white font-semibold rounded-2xl shadow-lg hover:bg-primary-600 gentle-transition focus-ring transform hover:scale-105">
+                    <span class="mr-3 text-xl">←</span>
+                    Go Back
+                </button>
+                <a href="/" class="inline-flex items-center justify-center px-8 py-4 border-2 border-primary-500 text-primary-500 font-semibold rounded-2xl hover:bg-primary-50 gentle-transition focus-ring">
+                    <span class="mr-3 text-xl">🏠</span>
+                    Home Page
+                </a>
+            </div>
+            
+            <button onclick="location.reload()" class="text-text-muted hover:text-primary-500 gentle-transition focus-ring rounded px-3 py-1 text-sm">
+                🔄 Try Refreshing the Page
+            </button>
+        </div>
+        
+        <!-- Help Section -->
+        <div class="mt-12 bg-primary-50 rounded-2xl p-6 border border-primary-100">
+            <h2 class="text-lg font-semibold text-text-primary mb-3 flex items-center justify-center">
+                <span class="mr-2 text-xl">🤝</span>
+                Need help?
+            </h2>
+            <p class="text-text-secondary text-sm mb-4">
+                If this keeps happening, we're here to help! Our support team understands ADHD challenges and is happy to assist.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                <a href="mailto:{{ support_email or 'help@brainbudget.app' }}" class="inline-flex items-center justify-center px-4 py-2 bg-primary-500 text-white text-sm font-medium rounded-xl hover:bg-primary-600 gentle-transition focus-ring">
+                    📧 Email Support
+                </a>
+                <a href="/settings" class="inline-flex items-center justify-center px-4 py-2 border border-primary-300 text-primary-600 text-sm font-medium rounded-xl hover:bg-primary-50 gentle-transition focus-ring">
+                    ⚙️ Check Settings
+                </a>
+            </div>
+        </div>
+        
+        <!-- Encouragement -->
+        <div class="mt-8">
+            <p class="text-text-muted text-sm italic">
+                Remember: It's not your fault when tech doesn't work perfectly. Take a breath, and try again when you're ready. 💜
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Auto-refresh after a delay for temporary errors
+    {% if error_code == 503 %}
+    setTimeout(() => {
+        const refreshBtn = document.querySelector('[onclick="location.reload()"]');
+        if (refreshBtn) {
+            refreshBtn.innerHTML = '🔄 Refreshing automatically...';
+            refreshBtn.disabled = true;
+        }
+        location.reload();
+    }, 30000); // Refresh after 30 seconds for service unavailable
+    {% endif %}
+    
+    // Track error for analytics (privacy-friendly)
+    {% if error_code %}
+    console.log(`Error ${error_code}: {{ title or 'Unknown error' }}`);
+    {% endif %}
+    
+    // Gentle focus for better accessibility
+    document.addEventListener('DOMContentLoaded', function() {
+        const firstButton = document.querySelector('button, a');
+        if (firstButton) {
+            setTimeout(() => {
+                firstButton.focus();
+            }, 500);
+        }
+    });
+</script>
+{% endblock %}

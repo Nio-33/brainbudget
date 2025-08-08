@@ -1,0 +1,506 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - BrainBudget{% endblock %}
+
+{% block content %}
+<!-- Settings Section -->
+<section class="py-12 px-4 sm:px-6 lg:px-8 min-h-screen">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl shadow-lg mb-6">
+                <span class="text-3xl">⚙️</span>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-bold text-text-primary mb-4">
+                Make BrainBudget work for your brain
+            </h1>
+            <p class="text-xl text-text-secondary max-w-2xl mx-auto">
+                Customize your experience to match your needs and preferences. Every brain is different!
+            </p>
+        </div>
+        
+        <!-- Settings Tabs -->
+        <div class="mb-8">
+            <div class="flex flex-wrap justify-center border-b border-gray-200">
+                <button class="settings-tab active px-6 py-3 font-medium border-b-2 border-primary-500 text-primary-600" data-tab="preferences">
+                    🧠 Preferences
+                </button>
+                <button class="settings-tab px-6 py-3 font-medium border-b-2 border-transparent text-text-muted hover:text-text-primary" data-tab="notifications">
+                    🔔 Notifications
+                </button>
+                <button class="settings-tab px-6 py-3 font-medium border-b-2 border-transparent text-text-muted hover:text-text-primary" data-tab="accounts">
+                    💳 Accounts
+                </button>
+                <button class="settings-tab px-6 py-3 font-medium border-b-2 border-transparent text-text-muted hover:text-text-primary" data-tab="privacy">
+                    🔒 Privacy
+                </button>
+            </div>
+        </div>
+        
+        <!-- Preferences Tab -->
+        <div id="preferences-tab" class="settings-content active">
+            <div class="space-y-8">
+                <!-- ADHD-Specific Preferences -->
+                <div class="bg-surface rounded-2xl p-8 shadow-sm border border-gray-100">
+                    <div class="mb-6">
+                        <h2 class="text-xl font-semibold text-text-primary mb-2 flex items-center">
+                            <span class="mr-3 text-2xl">🧠</span>
+                            ADHD-Friendly Features
+                        </h2>
+                        <p class="text-text-secondary">Customize how information is presented to work with your brain</p>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <!-- Reduced Motion -->
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                            <div>
+                                <h3 class="font-medium text-text-primary">Reduce Animations</h3>
+                                <p class="text-sm text-text-secondary">Minimize moving elements for better focus</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" id="reduce-motion">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                            </label>
+                        </div>
+                        
+                        <!-- Information Density -->
+                        <div class="p-4 bg-gray-50 rounded-xl">
+                            <h3 class="font-medium text-text-primary mb-3">Information Density</h3>
+                            <div class="space-y-3">
+                                <label class="flex items-center">
+                                    <input type="radio" name="density" value="comfortable" class="text-primary-600 focus:ring-primary-500" checked>
+                                    <span class="ml-3">
+                                        <span class="font-medium text-text-primary">Comfortable</span>
+                                        <span class="block text-sm text-text-secondary">Extra spacing, larger elements</span>
+                                    </span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="density" value="compact" class="text-primary-600 focus:ring-primary-500">
+                                    <span class="ml-3">
+                                        <span class="font-medium text-text-primary">Compact</span>
+                                        <span class="block text-sm text-text-secondary">More information on screen</span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Color Coding -->
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                            <div>
+                                <h3 class="font-medium text-text-primary">Enhanced Color Coding</h3>
+                                <p class="text-sm text-text-secondary">Use colors to categorize spending patterns</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" id="color-coding" checked>
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                            </label>
+                        </div>
+                        
+                        <!-- Focus Mode -->
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                            <div>
+                                <h3 class="font-medium text-text-primary">Focus Mode</h3>
+                                <p class="text-sm text-text-secondary">Hide distracting elements during analysis</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" id="focus-mode">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Display Preferences -->
+                <div class="bg-surface rounded-2xl p-8 shadow-sm border border-gray-100">
+                    <div class="mb-6">
+                        <h2 class="text-xl font-semibold text-text-primary mb-2 flex items-center">
+                            <span class="mr-3 text-2xl">🎨</span>
+                            Display Preferences
+                        </h2>
+                        <p class="text-text-secondary">Adjust the visual appearance to your liking</p>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <!-- Theme Selection -->
+                        <div>
+                            <h3 class="font-medium text-text-primary mb-3">Theme</h3>
+                            <div class="grid grid-cols-3 gap-3">
+                                <button class="theme-option active p-4 bg-white border-2 border-primary-500 rounded-xl text-center" data-theme="light">
+                                    <div class="w-8 h-8 bg-gradient-to-br from-white to-gray-100 rounded-lg mx-auto mb-2 border"></div>
+                                    <span class="text-sm font-medium">Light</span>
+                                </button>
+                                <button class="theme-option p-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-center" data-theme="dark">
+                                    <div class="w-8 h-8 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg mx-auto mb-2"></div>
+                                    <span class="text-sm font-medium">Dark</span>
+                                </button>
+                                <button class="theme-option p-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-center" data-theme="auto">
+                                    <div class="w-8 h-8 bg-gradient-to-r from-white via-gray-400 to-gray-800 rounded-lg mx-auto mb-2"></div>
+                                    <span class="text-sm font-medium">Auto</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Font Size -->
+                        <div>
+                            <h3 class="font-medium text-text-primary mb-3">Font Size</h3>
+                            <select id="font-size" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                <option value="small">Small</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="large">Large</option>
+                                <option value="extra-large">Extra Large</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Language & Region -->
+                <div class="bg-surface rounded-2xl p-8 shadow-sm border border-gray-100">
+                    <div class="mb-6">
+                        <h2 class="text-xl font-semibold text-text-primary mb-2 flex items-center">
+                            <span class="mr-3 text-2xl">🌍</span>
+                            Language & Region
+                        </h2>
+                        <p class="text-text-secondary">Set your language and currency preferences</p>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="language" class="block text-sm font-medium text-text-primary mb-2">Language</label>
+                            <select id="language" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                <option value="en" selected>English</option>
+                                <option value="es">Español</option>
+                                <option value="fr">Français</option>
+                                <option value="de">Deutsch</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="currency" class="block text-sm font-medium text-text-primary mb-2">Currency</label>
+                            <select id="currency" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                <option value="USD" selected>USD ($)</option>
+                                <option value="EUR">EUR (€)</option>
+                                <option value="GBP">GBP (£)</option>
+                                <option value="CAD">CAD ($)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Notifications Tab -->
+        <div id="notifications-tab" class="settings-content hidden">
+            <div class="bg-surface rounded-2xl p-8 shadow-sm border border-gray-100">
+                <div class="mb-6">
+                    <h2 class="text-xl font-semibold text-text-primary mb-2 flex items-center">
+                        <span class="mr-3 text-2xl">🔔</span>
+                        Notification Preferences
+                    </h2>
+                    <p class="text-text-secondary">Choose how and when you'd like to be notified</p>
+                </div>
+                
+                <div class="space-y-6">
+                    <!-- Spending Alerts -->
+                    <div class="p-4 bg-gray-50 rounded-xl">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-medium text-text-primary">Gentle Spending Reminders</h3>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" id="spending-alerts" checked>
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                            </label>
+                        </div>
+                        <p class="text-sm text-text-secondary mb-4">Get kind reminders when approaching your budget limits</p>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="text-primary-600 focus:ring-primary-500" checked>
+                                <span class="ml-2 text-sm">When I reach 75% of category budget</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="text-primary-600 focus:ring-primary-500" checked>
+                                <span class="ml-2 text-sm">When I reach 90% of category budget</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="text-primary-600 focus:ring-primary-500">
+                                <span class="ml-2 text-sm">Daily spending summary</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Insights -->
+                    <div class="p-4 bg-gray-50 rounded-xl">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-medium text-text-primary">Weekly Insights</h3>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" id="weekly-insights" checked>
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                            </label>
+                        </div>
+                        <p class="text-sm text-text-secondary">Receive encouraging insights about your financial progress</p>
+                    </div>
+                    
+                    <!-- Notification Timing -->
+                    <div class="p-4 bg-gray-50 rounded-xl">
+                        <h3 class="font-medium text-text-primary mb-3">Notification Timing</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="quiet-start" class="block text-sm font-medium text-text-secondary mb-2">Quiet Hours Start</label>
+                                <input type="time" id="quiet-start" value="22:00" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500">
+                            </div>
+                            <div>
+                                <label for="quiet-end" class="block text-sm font-medium text-text-secondary mb-2">Quiet Hours End</label>
+                                <input type="time" id="quiet-end" value="08:00" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Accounts Tab -->
+        <div id="accounts-tab" class="settings-content hidden">
+            <div class="space-y-6">
+                <div class="bg-surface rounded-2xl p-8 shadow-sm border border-gray-100">
+                    <div class="mb-6">
+                        <h2 class="text-xl font-semibold text-text-primary mb-2 flex items-center">
+                            <span class="mr-3 text-2xl">💳</span>
+                            Connected Accounts
+                        </h2>
+                        <p class="text-text-secondary">Manage your linked bank accounts and credit cards</p>
+                    </div>
+                    
+                    <div class="space-y-4" id="connected-accounts-list">
+                        <!-- Connected account items -->
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
+                                    <span class="text-white font-bold">C</span>
+                                </div>
+                                <div>
+                                    <h3 class="font-medium text-text-primary">Chase Checking</h3>
+                                    <p class="text-sm text-success-500">Connected • Last sync: 5 minutes ago</p>
+                                </div>
+                            </div>
+                            <button class="text-red-500 hover:text-red-600 text-sm focus-ring rounded px-3 py-1">
+                                Disconnect
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <button class="w-full mt-6 flex items-center justify-center px-6 py-4 border-2 border-dashed border-primary-300 rounded-2xl text-primary-600 hover:border-primary-400 hover:bg-primary-50 gentle-transition focus-ring">
+                        <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Add New Account
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Privacy Tab -->
+        <div id="privacy-tab" class="settings-content hidden">
+            <div class="space-y-6">
+                <div class="bg-surface rounded-2xl p-8 shadow-sm border border-gray-100">
+                    <div class="mb-6">
+                        <h2 class="text-xl font-semibold text-text-primary mb-2 flex items-center">
+                            <span class="mr-3 text-2xl">🔒</span>
+                            Privacy & Data Control
+                        </h2>
+                        <p class="text-text-secondary">You have complete control over your financial data</p>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <div class="p-4 bg-gray-50 rounded-xl">
+                            <h3 class="font-medium text-text-primary mb-2">Data Retention</h3>
+                            <p class="text-sm text-text-secondary mb-4">Choose how long we keep your transaction data</p>
+                            <select class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500">
+                                <option value="1year" selected>1 Year</option>
+                                <option value="2years">2 Years</option>
+                                <option value="5years">5 Years</option>
+                                <option value="forever">Keep Forever</option>
+                            </select>
+                        </div>
+                        
+                        <div class="p-4 bg-gray-50 rounded-xl">
+                            <h3 class="font-medium text-text-primary mb-2">Data Sharing</h3>
+                            <div class="space-y-3">
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="text-primary-600 focus:ring-primary-500">
+                                    <span class="ml-3">
+                                        <span class="font-medium">Anonymous Usage Analytics</span>
+                                        <span class="block text-sm text-text-secondary">Help us improve BrainBudget with anonymous usage data</span>
+                                    </span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="text-primary-600 focus:ring-primary-500">
+                                    <span class="ml-3">
+                                        <span class="font-medium">Marketing Communications</span>
+                                        <span class="block text-sm text-text-secondary">Receive updates about new features and tips</span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="p-4 bg-red-50 border border-red-200 rounded-xl">
+                            <h3 class="font-medium text-red-800 mb-2">Danger Zone</h3>
+                            <p class="text-sm text-red-600 mb-4">These actions cannot be undone</p>
+                            <div class="space-y-3">
+                                <button class="w-full px-4 py-2 bg-white border border-red-300 text-red-600 rounded-lg hover:bg-red-50 focus-ring">
+                                    Export All My Data
+                                </button>
+                                <button class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus-ring">
+                                    Delete My Account
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Save Button -->
+        <div class="mt-12 text-center">
+            <button id="save-settings" class="inline-flex items-center justify-center px-8 py-4 bg-primary-500 text-white font-semibold rounded-2xl shadow-lg hover:bg-primary-600 gentle-transition focus-ring transform hover:scale-105">
+                <span class="mr-3 text-xl">💾</span>
+                Save All Settings
+            </button>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tab switching functionality
+        document.querySelectorAll('.settings-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const targetTab = this.dataset.tab;
+                
+                // Remove active class from all tabs
+                document.querySelectorAll('.settings-tab').forEach(t => {
+                    t.classList.remove('active', 'border-primary-500', 'text-primary-600');
+                    t.classList.add('border-transparent', 'text-text-muted');
+                });
+                
+                // Add active class to clicked tab
+                this.classList.add('active', 'border-primary-500', 'text-primary-600');
+                this.classList.remove('border-transparent', 'text-text-muted');
+                
+                // Hide all content
+                document.querySelectorAll('.settings-content').forEach(content => {
+                    content.classList.remove('active');
+                    content.classList.add('hidden');
+                });
+                
+                // Show target content
+                const targetContent = document.getElementById(`${targetTab}-tab`);
+                targetContent.classList.add('active');
+                targetContent.classList.remove('hidden');
+            });
+        });
+        
+        // Theme switching
+        document.querySelectorAll('.theme-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.theme-option').forEach(o => {
+                    o.classList.remove('active', 'border-primary-500');
+                    o.classList.add('border-gray-200');
+                });
+                this.classList.add('active', 'border-primary-500');
+                this.classList.remove('border-gray-200');
+            });
+        });
+        
+        // Save settings
+        document.getElementById('save-settings').addEventListener('click', function() {
+            // Collect all settings
+            const settings = {
+                reduceMotion: document.getElementById('reduce-motion').checked,
+                density: document.querySelector('input[name="density"]:checked').value,
+                colorCoding: document.getElementById('color-coding').checked,
+                focusMode: document.getElementById('focus-mode').checked,
+                theme: document.querySelector('.theme-option.active').dataset.theme,
+                fontSize: document.getElementById('font-size').value,
+                language: document.getElementById('language').value,
+                currency: document.getElementById('currency').value,
+                spendingAlerts: document.getElementById('spending-alerts').checked,
+                weeklyInsights: document.getElementById('weekly-insights').checked,
+                quietStart: document.getElementById('quiet-start').value,
+                quietEnd: document.getElementById('quiet-end').value
+            };
+            
+            // Save to localStorage (in production, this would be an API call)
+            localStorage.setItem('brainbudget-settings', JSON.stringify(settings));
+            
+            // Show success message
+            showSuccessToast('Settings saved successfully! ✨');
+            
+            // Apply settings immediately
+            applySettings(settings);
+        });
+        
+        // Load saved settings
+        const savedSettings = localStorage.getItem('brainbudget-settings');
+        if (savedSettings) {
+            const settings = JSON.parse(savedSettings);
+            applySettings(settings);
+            populateSettings(settings);
+        }
+        
+        function applySettings(settings) {
+            // Apply reduce motion
+            if (settings.reduceMotion) {
+                document.documentElement.style.setProperty('--animation-duration', '0.01ms');
+            }
+            
+            // Apply theme
+            if (settings.theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            
+            // Apply font size
+            const fontSizes = {
+                'small': '14px',
+                'medium': '16px',
+                'large': '18px',
+                'extra-large': '20px'
+            };
+            document.documentElement.style.fontSize = fontSizes[settings.fontSize] || '16px';
+        }
+        
+        function populateSettings(settings) {
+            // Populate form fields with saved values
+            if (settings.reduceMotion) document.getElementById('reduce-motion').checked = true;
+            if (settings.colorCoding !== undefined) document.getElementById('color-coding').checked = settings.colorCoding;
+            if (settings.focusMode) document.getElementById('focus-mode').checked = true;
+            if (settings.spendingAlerts !== undefined) document.getElementById('spending-alerts').checked = settings.spendingAlerts;
+            if (settings.weeklyInsights !== undefined) document.getElementById('weekly-insights').checked = settings.weeklyInsights;
+            if (settings.fontSize) document.getElementById('font-size').value = settings.fontSize;
+            if (settings.language) document.getElementById('language').value = settings.language;
+            if (settings.currency) document.getElementById('currency').value = settings.currency;
+            if (settings.quietStart) document.getElementById('quiet-start').value = settings.quietStart;
+            if (settings.quietEnd) document.getElementById('quiet-end').value = settings.quietEnd;
+            
+            // Update theme selection
+            if (settings.theme) {
+                document.querySelectorAll('.theme-option').forEach(o => {
+                    o.classList.remove('active', 'border-primary-500');
+                    o.classList.add('border-gray-200');
+                });
+                const themeOption = document.querySelector(`[data-theme="${settings.theme}"]`);
+                if (themeOption) {
+                    themeOption.classList.add('active', 'border-primary-500');
+                    themeOption.classList.remove('border-gray-200');
+                }
+            }
+            
+            // Update density selection
+            if (settings.density) {
+                document.querySelector(`input[name="density"][value="${settings.density}"]`).checked = true;
+            }
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,32 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Helper function to check ownership
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    // Rules for statement uploads
+    match /statement-uploads/{userId}/{fileName} {
+      // Users can only upload to their own folder
+      allow write: if isOwner(userId) &&
+                   // Validate file size (e.g., max 10MB)
+                   request.resource.size < 10 * 1024 * 1024 &&
+                   // Validate content type (e.g., images and PDFs)
+                   request.resource.contentType.matches('image/.*|application/pdf');
+      
+      // Users can only read their own files
+      allow read: if isOwner(userId);
+    }
+
+    // Rules for processed data
+    match /processed-data/{userId}/{fileName} {
+      // Users can only read their own processed data
+      allow read: if isOwner(userId);
+      // Only backend functions can write to this bucket
+      allow write: if false;
+    }
+  }
+}
