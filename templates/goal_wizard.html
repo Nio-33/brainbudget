@@ -1,0 +1,422 @@
+{% extends "base.html" %}
+
+{% block title %}Create Your Goal - BrainBudget{% endblock %}
+
+{% block content %}
+<!-- Goal Creation Wizard -->
+<div id="goal-wizard-container" class="py-8 px-4 sm:px-6 lg:px-8 min-h-screen">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl shadow-lg mb-6">
+                <span class="text-3xl">🎯</span>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-bold text-text-primary mb-4">
+                Let's create a goal that works for your brain
+            </h1>
+            <p class="text-xl text-text-secondary max-w-2xl mx-auto">
+                We'll break it into small, manageable steps and celebrate every milestone along the way!
+            </p>
+        </div>
+        
+        <!-- Progress Bar -->
+        <div class="mb-8">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-sm text-text-muted">Progress</span>
+                <span id="wizard-progress-text" class="text-sm text-text-muted">Step 1 of 5</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+                <div id="wizard-progress-bar" class="bg-gradient-to-r from-primary-500 to-primary-600 h-2 rounded-full" style="width: 20%"></div>
+            </div>
+        </div>
+        
+        <!-- Step Indicators -->
+        <div class="flex justify-center mb-8">
+            <div class="flex space-x-4">
+                <div class="step-indicator active w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-sm font-medium">1</div>
+                <div class="step-indicator w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-sm font-medium">2</div>
+                <div class="step-indicator w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-sm font-medium">3</div>
+                <div class="step-indicator w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-sm font-medium">4</div>
+                <div class="step-indicator w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-sm font-medium">5</div>
+            </div>
+        </div>
+        
+        <!-- Wizard Content -->
+        <div class="bg-surface rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            
+            <!-- Step 1: Goal Type Selection -->
+            <div id="step-1" class="wizard-step p-8">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-semibold text-text-primary mb-2">What kind of goal speaks to you?</h2>
+                    <p class="text-text-secondary">Choose the type that feels right for where you are now</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="goal-type-card bg-white border-2 border-gray-200 rounded-xl p-6 text-center cursor-pointer hover:border-primary-500 hover:bg-primary-50 gentle-transition" data-type="spending_reduction">
+                        <div class="w-12 h-12 bg-gradient-to-br from-red-400 to-red-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+                            <span class="text-2xl">💰</span>
+                        </div>
+                        <h3 class="font-semibold text-text-primary mb-2">Spend Less</h3>
+                        <p class="text-sm text-text-secondary">Reduce spending in specific categories like dining or shopping</p>
+                    </div>
+                    
+                    <div class="goal-type-card bg-white border-2 border-gray-200 rounded-xl p-6 text-center cursor-pointer hover:border-primary-500 hover:bg-primary-50 gentle-transition" data-type="savings_target">
+                        <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-green-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+                            <span class="text-2xl">🏦</span>
+                        </div>
+                        <h3 class="font-semibold text-text-primary mb-2">Save Money</h3>
+                        <p class="text-sm text-text-secondary">Build savings for vacations, gadgets, or future plans</p>
+                    </div>
+                    
+                    <div class="goal-type-card bg-white border-2 border-gray-200 rounded-xl p-6 text-center cursor-pointer hover:border-primary-500 hover:bg-primary-50 gentle-transition" data-type="debt_reduction">
+                        <div class="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+                            <span class="text-2xl">🎯</span>
+                        </div>
+                        <h3 class="font-semibold text-text-primary mb-2">Pay Down Debt</h3>
+                        <p class="text-sm text-text-secondary">Tackle credit cards or loans step by step</p>
+                    </div>
+                    
+                    <div class="goal-type-card bg-white border-2 border-gray-200 rounded-xl p-6 text-center cursor-pointer hover:border-primary-500 hover:bg-primary-50 gentle-transition" data-type="emergency_fund">
+                        <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+                            <span class="text-2xl">🛡️</span>
+                        </div>
+                        <h3 class="font-semibold text-text-primary mb-2">Emergency Fund</h3>
+                        <p class="text-sm text-text-secondary">Build a safety net for unexpected expenses</p>
+                    </div>
+                </div>
+                
+                <!-- Template Sections -->
+                <div id="spending_reduction-section" class="template-section hidden">
+                    <h3 class="text-lg font-semibold text-text-primary mb-4 flex items-center">
+                        <span class="mr-2">💰</span>
+                        Choose a spending reduction template
+                    </h3>
+                    <div id="spending-templates" class="grid md:grid-cols-2 gap-4 mb-6"></div>
+                </div>
+                
+                <div id="savings_target-section" class="template-section hidden">
+                    <h3 class="text-lg font-semibold text-text-primary mb-4 flex items-center">
+                        <span class="mr-2">🏦</span>
+                        Choose a savings goal template
+                    </h3>
+                    <div id="savings-templates" class="grid md:grid-cols-2 gap-4 mb-6"></div>
+                </div>
+                
+                <div id="debt_reduction-section" class="template-section hidden">
+                    <h3 class="text-lg font-semibold text-text-primary mb-4 flex items-center">
+                        <span class="mr-2">🎯</span>
+                        Choose a debt reduction template
+                    </h3>
+                    <div id="debt-templates" class="grid md:grid-cols-2 gap-4 mb-6"></div>
+                </div>
+                
+                <div id="emergency_fund-section" class="template-section hidden">
+                    <h3 class="text-lg font-semibold text-text-primary mb-4 flex items-center">
+                        <span class="mr-2">🛡️</span>
+                        Choose an emergency fund template
+                    </h3>
+                    <div id="emergency-templates" class="grid md:grid-cols-2 gap-4 mb-6"></div>
+                </div>
+                
+                <!-- Custom Option -->
+                <div class="mt-6 pt-6 border-t border-gray-200">
+                    <button id="custom-goal-option" class="w-full p-4 border-2 border-dashed border-gray-300 rounded-xl text-text-secondary hover:border-primary-400 hover:text-primary-600 gentle-transition">
+                        <div class="flex items-center justify-center">
+                            <span class="text-2xl mr-3">✨</span>
+                            <span class="font-medium">Or create a custom goal from scratch</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Step 2: Goal Details -->
+            <div id="step-2" class="wizard-step p-8 hidden">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-semibold text-text-primary mb-2">Let's set up your goal details</h2>
+                    <p class="text-text-secondary">Don't worry - you can always adjust these later!</p>
+                </div>
+                
+                <div class="space-y-6">
+                    <div>
+                        <label for="goal-name" class="block text-sm font-medium text-text-primary mb-2">
+                            What would you like to call this goal?
+                        </label>
+                        <input type="text" id="goal-name" class="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="e.g., Save for vacation, Reduce dining out">
+                        <p class="text-xs text-text-muted mt-1">Choose a name that motivates and excites you!</p>
+                    </div>
+                    
+                    <div>
+                        <label for="goal-description" class="block text-sm font-medium text-text-primary mb-2">
+                            Describe your goal (optional)
+                        </label>
+                        <textarea id="goal-description" class="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 h-24" placeholder="Why is this goal important to you?"></textarea>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="target-amount" class="block text-sm font-medium text-text-primary mb-2">
+                                Target Amount ($)
+                            </label>
+                            <input type="number" id="target-amount" class="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="1000" min="0" step="0.01">
+                        </div>
+                        
+                        <div>
+                            <label for="target-date" class="block text-sm font-medium text-text-primary mb-2">
+                                Target Date
+                            </label>
+                            <input type="date" id="target-date" class="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                        </div>
+                    </div>
+                    
+                    <!-- Goal Breakdown Preview -->
+                    <div id="goal-breakdown-preview" class="mt-6">
+                        <p class="text-text-muted text-sm">Enter amount and date to see breakdown</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 3: Difficulty & Customization -->
+            <div id="step-3" class="wizard-step p-8 hidden">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-semibold text-text-primary mb-2">How ambitious are you feeling?</h2>
+                    <p class="text-text-secondary">Choose a difficulty that matches your current energy and motivation</p>
+                </div>
+                
+                <div class="space-y-6">
+                    <div>
+                        <label for="difficulty-level" class="block text-sm font-medium text-text-primary mb-2">
+                            Difficulty Level
+                        </label>
+                        <select id="difficulty-level" class="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            <option value="gentle">🌱 Gentle - Build confidence with very achievable targets</option>
+                            <option value="moderate" selected>🎯 Moderate - Balanced challenge that keeps you motivated</option>
+                            <option value="ambitious">🚀 Ambitious - Stretch goal for when you're feeling motivated</option>
+                        </select>
+                        <div id="difficulty-description" class="mt-2"></div>
+                    </div>
+                    
+                    <!-- ADHD-Specific Customizations -->
+                    <div class="bg-primary-50 border border-primary-200 rounded-xl p-6">
+                        <h3 class="font-semibold text-primary-800 mb-4 flex items-center">
+                            <span class="mr-2">🧠</span>
+                            ADHD-Friendly Features
+                        </h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="font-medium text-primary-700">Flexible Adjustments</h4>
+                                    <p class="text-sm text-primary-600">Allow goal changes without shame</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="allow-adjustments" class="sr-only peer" checked>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                </label>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="font-medium text-primary-700">ADHD Tips & Support</h4>
+                                    <p class="text-sm text-primary-600">Get helpful tips along the way</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="adhd-tips-enabled" class="sr-only peer" checked>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 4: Celebration Settings -->
+            <div id="step-4" class="wizard-step p-8 hidden">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-semibold text-text-primary mb-2">Let's plan your celebrations!</h2>
+                    <p class="text-text-secondary">How would you like to celebrate your wins along the way?</p>
+                </div>
+                
+                <div class="space-y-6">
+                    <div>
+                        <label for="celebration-style" class="block text-sm font-medium text-text-primary mb-2">
+                            Celebration Style
+                        </label>
+                        <select id="celebration-style" class="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            <option value="gentle">🌸 Gentle - Quiet, encouraging celebrations</option>
+                            <option value="enthusiastic">🎉 Enthusiastic - Fun animations and sounds</option>
+                            <option value="minimal">✨ Minimal - Simple progress updates</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Preview of celebration styles -->
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <div class="p-4 bg-pink-50 border border-pink-200 rounded-xl text-center">
+                            <span class="text-2xl mb-2 block">🌸</span>
+                            <h4 class="font-medium text-pink-800 text-sm">Gentle</h4>
+                            <p class="text-xs text-pink-600 mt-1">Soft colors, encouraging messages</p>
+                        </div>
+                        <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-xl text-center">
+                            <span class="text-2xl mb-2 block">🎉</span>
+                            <h4 class="font-medium text-yellow-800 text-sm">Enthusiastic</h4>
+                            <p class="text-xs text-yellow-600 mt-1">Confetti, sounds, big celebrations</p>
+                        </div>
+                        <div class="p-4 bg-gray-50 border border-gray-200 rounded-xl text-center">
+                            <span class="text-2xl mb-2 block">✨</span>
+                            <h4 class="font-medium text-gray-800 text-sm">Minimal</h4>
+                            <p class="text-xs text-gray-600 mt-1">Simple progress bars and text</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Motivation Section -->
+                    <div class="bg-success-50 border border-success-200 rounded-xl p-6">
+                        <h3 class="font-semibold text-success-800 mb-3 flex items-center">
+                            <span class="mr-2">💪</span>
+                            Remember: Every Step Counts!
+                        </h3>
+                        <p class="text-success-700 text-sm">
+                            Your goal will be broken into small, manageable milestones. Each one is worth celebrating because 
+                            progress isn't always linear, and every step forward is a victory for your ADHD brain! 🧠💚
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 5: Review & Create -->
+            <div id="step-5" class="wizard-step p-8 hidden">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-semibold text-text-primary mb-2">You're ready to create your goal!</h2>
+                    <p class="text-text-secondary">Here's a summary of what you've set up</p>
+                </div>
+                
+                <div class="space-y-6">
+                    <!-- Goal Summary Card -->
+                    <div class="bg-gradient-to-r from-primary-50 to-primary-100 border border-primary-200 rounded-xl p-6">
+                        <h3 class="font-semibold text-primary-800 mb-4 flex items-center">
+                            <span class="mr-2">🎯</span>
+                            Your Goal Summary
+                        </h3>
+                        <div id="goal-summary" class="space-y-3">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- Next Steps -->
+                    <div class="bg-success-50 border border-success-200 rounded-xl p-6">
+                        <h3 class="font-semibold text-success-800 mb-3 flex items-center">
+                            <span class="mr-2">🚀</span>
+                            What happens next?
+                        </h3>
+                        <ul class="space-y-2 text-sm text-success-700">
+                            <li class="flex items-center">
+                                <span class="text-success-500 mr-3">✅</span>
+                                Your goal will be broken into small, manageable milestones
+                            </li>
+                            <li class="flex items-center">
+                                <span class="text-success-500 mr-3">✅</span>
+                                You'll get gentle notifications for progress and celebrations
+                            </li>
+                            <li class="flex items-center">
+                                <span class="text-success-500 mr-3">✅</span>
+                                You can adjust your goal anytime without any shame
+                            </li>
+                            <li class="flex items-center">
+                                <span class="text-success-500 mr-3">✅</span>
+                                We'll track your progress automatically based on your transactions
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Encouragement -->
+                    <div class="text-center p-6 bg-purple-50 border border-purple-200 rounded-xl">
+                        <span class="text-4xl mb-3 block">🌟</span>
+                        <h3 class="font-semibold text-purple-800 mb-2">You've got this!</h3>
+                        <p class="text-purple-700 text-sm">
+                            Remember: this goal is designed to work WITH your ADHD brain, not against it. 
+                            Be kind to yourself, celebrate small wins, and adjust as needed. Every step forward is progress! 💜
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Goal Completion Summary (Hidden until goal is created) -->
+            <div id="goal-completion-summary" class="wizard-step p-8 hidden"></div>
+            
+        </div>
+        
+        <!-- Navigation Buttons -->
+        <div class="flex justify-between items-center mt-8">
+            <button id="prev-step" class="px-6 py-3 border-2 border-gray-300 text-gray-600 font-medium rounded-xl hover:bg-gray-50 gentle-transition" style="display: none;">
+                ← Previous
+            </button>
+            
+            <div class="flex-1"></div>
+            
+            <button id="next-step" class="px-8 py-3 bg-primary-500 text-white font-semibold rounded-xl hover:bg-primary-600 gentle-transition">
+                Next Step →
+            </button>
+            
+            <button id="finish-goal" class="px-8 py-3 bg-success-500 text-white font-semibold rounded-xl hover:bg-success-600 gentle-transition" style="display: none;">
+                🎯 Create My Goal
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/goal-wizard.js') }}"></script>
+
+<script>
+    // Populate goal summary in step 5
+    function updateGoalSummary() {
+        const summaryEl = document.getElementById('goal-summary');
+        if (!summaryEl || !window.goalWizard) return;
+        
+        const data = window.goalWizard.goalData;
+        
+        summaryEl.innerHTML = `
+            <div class="grid md:grid-cols-2 gap-4 text-sm">
+                <div class="space-y-2">
+                    <div class="flex justify-between">
+                        <span class="text-primary-600 font-medium">Goal Name:</span>
+                        <span class="text-primary-800">${data.name || 'Not set'}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-primary-600 font-medium">Type:</span>
+                        <span class="text-primary-800 capitalize">${(data.type || '').replace('_', ' ')}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-primary-600 font-medium">Target Amount:</span>
+                        <span class="text-primary-800">$${(data.target_amount || 0).toLocaleString()}</span>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <div class="flex justify-between">
+                        <span class="text-primary-600 font-medium">Target Date:</span>
+                        <span class="text-primary-800">${data.target_date ? new Date(data.target_date).toLocaleDateString() : 'Not set'}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-primary-600 font-medium">Difficulty:</span>
+                        <span class="text-primary-800 capitalize">${data.difficulty || 'Moderate'}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-primary-600 font-medium">Adjustments:</span>
+                        <span class="text-primary-800">${data.allow_adjustments !== false ? 'Allowed' : 'Fixed'}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Update summary when reaching step 5
+    document.addEventListener('DOMContentLoaded', () => {
+        const nextBtn = document.getElementById('next-step');
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                if (window.goalWizard && window.goalWizard.currentStep === 4) {
+                    setTimeout(updateGoalSummary, 100);
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

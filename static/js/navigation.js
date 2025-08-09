@@ -223,11 +223,11 @@ class Breadcrumb {
         const pathParts = path.split('/').filter(part => part);
         
         if (pathParts.length === 0) {
-            this.container.innerHTML = '<span class="text-text-primary font-medium">Home</span>';
+            this.container.innerHTML = '<span class="text-text-primary font-medium">Upload</span>';
             return;
         }
         
-        const breadcrumbs = ['<a href="/" class="text-primary-500 hover:text-primary-600 font-medium">Home</a>'];
+        const breadcrumbs = ['<a href="/upload" class="text-primary-500 hover:text-primary-600 font-medium">Upload</a>'];
         
         let currentPath = '';
         pathParts.forEach((part, index) => {

@@ -4,85 +4,846 @@
 
 {% block extra_head %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/charts.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Hide the top navigation on dashboard */
+        nav[role="navigation"] {
+            display: none !important;
+        }
+        body {
+            background: #f8fafc;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        }
+        
+        .dashboard-container {
+            display: flex;
+            min-h: screen;
+        }
+        
+        /* Dark Sidebar */
+        .sidebar {
+            width: 280px;
+            background: #1a1d29;
+            color: white;
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid #2d3142;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .logo:hover {
+            opacity: 0.8;
+        }
+        
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+        
+        .nav-section {
+            margin-bottom: 32px;
+        }
+        
+        .nav-section-title {
+            color: #6b7280;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0 20px;
+            margin-bottom: 8px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: #9ca3af;
+            text-decoration: none;
+            transition: all 0.2s;
+            margin: 2px 12px;
+            border-radius: 8px;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background: #2d3142;
+            color: white;
+        }
+        
+        .nav-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 24px;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: between;
+            align-items: flex-start;
+            margin-bottom: 32px;
+        }
+        
+        .greeting {
+            flex: 1;
+        }
+        
+        .greeting h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0 0 8px 0;
+        }
+        
+        .greeting p {
+            color: #6b7280;
+            margin: 0;
+        }
+        
+        /* Calendar Widget */
+        .calendar-widget {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            width: 280px;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .calendar-title {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .calendar-nav {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .calendar-nav button {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: #f3f4f6;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .calendar-nav button:hover {
+            background: #e5e7eb;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 16px;
+        }
+        
+        .calendar-day-header {
+            text-align: center;
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 500;
+            padding: 8px 0;
+        }
+        
+        .calendar-day {
+            text-align: center;
+            padding: 8px 4px;
+            font-size: 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .calendar-day:hover {
+            background: #f3f4f6;
+        }
+        
+        .calendar-day.active {
+            background: #1f2937;
+            color: white;
+        }
+        
+        .calendar-day.today {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        /* Gradient Cards */
+        .gradient-card {
+            border-radius: 16px;
+            padding: 24px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .gradient-card.yellow {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        }
+        
+        .gradient-card.purple {
+            background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+        }
+        
+        .gradient-card.green {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        
+        .gradient-card.blue {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        }
+        
+        .gradient-card.pink {
+            background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+        
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        
+        .card-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .card-subtitle {
+            opacity: 0.8;
+            font-size: 14px;
+        }
+        
+        .card-chart {
+            position: absolute;
+            right: -10px;
+            bottom: -10px;
+            opacity: 0.3;
+            width: 120px;
+            height: 60px;
+        }
+        
+        /* White Cards */
+        .white-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .white-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0 0 16px 0;
+        }
+        
+        /* Transaction List */
+        .transaction-list {
+            space-y: 12px;
+        }
+        
+        .transaction-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+        
+        .transaction-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .transaction-info {
+            flex: 1;
+        }
+        
+        .transaction-name {
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0 0 4px 0;
+        }
+        
+        .transaction-details {
+            color: #6b7280;
+            font-size: 14px;
+            margin: 0;
+        }
+        
+        .transaction-amount {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .transaction-amount.positive {
+            color: #10b981;
+        }
+        
+        .transaction-amount.negative {
+            color: #ef4444;
+        }
+        
+        /* Status Badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-badge.completed {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+        
+        .status-badge.pending {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        
+        .status-badge.overdue {
+            background: #fecaca;
+            color: #dc2626;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+                z-index: 1000;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: white;
+            border: none;
+            border-radius: 12px;
+            width: 48px;
+            height: 48px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
-<!-- Dashboard Header -->
-<section class="py-8 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-7xl mx-auto">
-        <!-- Welcome Header -->
-        <div class="mb-8">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
-                <div>
-                    <h1 class="text-2xl md:text-3xl font-bold text-text-primary mb-2">
-                        Welcome back! 👋
-                    </h1>
-                    <p class="text-text-secondary">
-                        Here's how you're doing this month. Remember, progress isn't always linear.
-                    </p>
-                </div>
-                <div class="mt-4 md:mt-0 flex items-center space-x-3">
-                    <div id="last-updated" class="text-sm text-text-muted">
-                        Last updated: 2 minutes ago
+<div class="dashboard-container">
+    <!-- Mobile Menu Button -->
+    <button class="mobile-menu-btn" onclick="toggleSidebar()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path stroke="currentColor" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+    </button>
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="/" class="logo" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 12px; transition: opacity 0.2s;">
+                <div class="logo-icon">🧠</div>
+                <span>BrainBudget</span>
+            </a>
+        </div>
+        
+        <div class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">General</div>
+                <a href="/dashboard" class="nav-item active">
+                    <div class="nav-icon">📊</div>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/upload" class="nav-item">
+                    <div class="nav-icon">📋</div>
+                    <span>Upload</span>
+                </a>
+                <a href="/goals/create" class="nav-item">
+                    <div class="nav-icon">🎯</div>
+                    <span>Goals</span>
+                </a>
+                <a href="/insights" class="nav-item">
+                    <div class="nav-icon">🧠</div>
+                    <span>Insights</span>
+                </a>
+                <a href="/advice" class="nav-item">
+                    <div class="nav-icon">💡</div>
+                    <span>Advice</span>
+                </a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">AI Tools</div>
+                <a href="/coach" class="nav-item">
+                    <div class="nav-icon">🤖</div>
+                    <span>AI Coach</span>
+                </a>
+                <a href="/charts-demo" class="nav-item">
+                    <div class="nav-icon">📈</div>
+                    <span>Charts & Analytics</span>
+                </a>
+                <a href="/connect-bank" class="nav-item">
+                    <div class="nav-icon">🏦</div>
+                    <span>Connect Bank</span>
+                </a>
+                <a href="/settings" class="nav-item">
+                    <div class="nav-icon">⚙️</div>
+                    <span>Settings</span>
+                </a>
+            </div>
+            
+            <div class="nav-section">
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">🚪</div>
+                    <span>Log out</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="dashboard-grid">
+            <div>
+                <!-- Header -->
+                <div class="dashboard-header">
+                    <div class="greeting">
+                        <h1>Good morning, <span id="user-name">Alex</span>! 👋</h1>
+                        <p>Here's your financial overview. Today is perfect to check your spending and plan your financial goals.</p>
                     </div>
-                    <button id="refresh-data" class="p-2 text-text-muted hover:text-primary-500 focus-ring rounded-lg gentle-transition">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                        </svg>
-                    </button>
+                </div>
+                
+                <!-- Stats Cards Grid -->
+                <div class="cards-grid">
+                    <!-- Balance Card -->
+                    <div class="gradient-card yellow">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">Balance:</div>
+                                <div class="card-value" id="total-balance">$4,850</div>
+                                <div class="card-subtitle">Available funds</div>
+                            </div>
+                            <div class="card-icon">💰</div>
+                        </div>
+                        <canvas class="card-chart" id="balance-chart"></canvas>
+                    </div>
+                    
+                    <!-- Spending Summary Card -->
+                    <div class="gradient-card purple">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">Spending summary:</div>
+                                <div class="card-value" id="monthly-spending">$1,240</div>
+                                <div class="card-subtitle">This month</div>
+                            </div>
+                            <div class="card-icon">📊</div>
+                        </div>
+                        <canvas class="card-chart" id="spending-chart"></canvas>
+                    </div>
+                    
+                    <!-- Budget Goals Card -->
+                    <div class="gradient-card green">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">By goals:</div>
+                                <div class="card-value">73%</div>
+                                <div class="card-subtitle">Goals achieved</div>
+                            </div>
+                            <div class="card-icon">🎯</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sessions/Activities Card -->
+                    <div class="gradient-card blue">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">Activities:</div>
+                                <div class="card-value">15</div>
+                                <div class="card-subtitle">Financial tasks completed</div>
+                            </div>
+                            <div class="card-icon">✅</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Transaction List and Details -->
+                <div class="cards-grid">
+                    <div class="white-card">
+                        <h3>Recent Transactions</h3>
+                        <div class="transaction-list" id="transaction-list">
+                            <div class="transaction-item">
+                                <div class="transaction-avatar" style="background: #fef3c7; color: #d97706;">🛒</div>
+                                <div class="transaction-info">
+                                    <div class="transaction-name">Grocery Shopping</div>
+                                    <div class="transaction-details">Whole Foods • Today</div>
+                                </div>
+                                <div class="transaction-amount negative">-$85.50</div>
+                            </div>
+                            <div class="transaction-item">
+                                <div class="transaction-avatar" style="background: #dcfce7; color: #16a34a;">💼</div>
+                                <div class="transaction-info">
+                                    <div class="transaction-name">Salary Deposit</div>
+                                    <div class="transaction-details">Employer • Yesterday</div>
+                                </div>
+                                <div class="transaction-amount positive">+$2,500.00</div>
+                            </div>
+                            <div class="transaction-item">
+                                <div class="transaction-avatar" style="background: #fecaca; color: #dc2626;">⚡</div>
+                                <div class="transaction-info">
+                                    <div class="transaction-name">Electric Bill</div>
+                                    <div class="transaction-details">City Power • 2 days ago</div>
+                                </div>
+                                <div class="transaction-amount negative">-$120.00</div>
+                            </div>
+                            <div class="transaction-item">
+                                <div class="transaction-avatar" style="background: #e0e7ff; color: #4f46e5;">☕</div>
+                                <div class="transaction-info">
+                                    <div class="transaction-name">Coffee Shop</div>
+                                    <div class="transaction-details">Starbucks • 3 days ago</div>
+                                </div>
+                                <div class="transaction-amount negative">-$5.75</div>
+                            </div>
+                        </div>
+                        <div style="text-align: center; margin-top: 16px;">
+                            <button style="background: #1f2937; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 14px;">View all details</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Goals Details -->
+                    <div class="white-card">
+                        <h3>Financial Goals</h3>
+                        <div class="transaction-list">
+                            <div class="transaction-item">
+                                <div class="transaction-avatar" style="background: #dcfce7; color: #16a34a;">🎯</div>
+                                <div class="transaction-info">
+                                    <div class="transaction-name">Emergency Fund</div>
+                                    <div class="transaction-details">$2,800 of $5,000</div>
+                                </div>
+                                <div class="status-badge completed">56%</div>
+                            </div>
+                            <div class="transaction-item">
+                                <div class="transaction-avatar" style="background: #fef3c7; color: #d97706;">🏠</div>
+                                <div class="transaction-info">
+                                    <div class="transaction-name">House Down Payment</div>
+                                    <div class="transaction-details">$8,400 of $15,000</div>
+                                </div>
+                                <div class="status-badge pending">56%</div>
+                            </div>
+                            <div class="transaction-item">
+                                <div class="transaction-avatar" style="background: #fecaca; color: #dc2626;">🚗</div>
+                                <div class="transaction-info">
+                                    <div class="transaction-name">New Car Fund</div>
+                                    <div class="transaction-details">$1,200 of $8,000</div>
+                                </div>
+                                <div class="status-badge overdue">15%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Sidebar with Calendar -->
+            <div>
+                <div class="calendar-widget">
+                    <div class="calendar-header">
+                        <div class="calendar-title">May 2024</div>
+                        <div class="calendar-nav">
+                            <button onclick="previousMonth()">‹</button>
+                            <button onclick="nextMonth()">›</button>
+                        </div>
+                    </div>
+                    
+                    <div class="calendar-grid">
+                        <div class="calendar-day-header">Su</div>
+                        <div class="calendar-day-header">Mo</div>
+                        <div class="calendar-day-header">Tu</div>
+                        <div class="calendar-day-header">We</div>
+                        <div class="calendar-day-header">Th</div>
+                        <div class="calendar-day-header">Fr</div>
+                        <div class="calendar-day-header">Sa</div>
+                        
+                        <div class="calendar-day"></div>
+                        <div class="calendar-day"></div>
+                        <div class="calendar-day"></div>
+                        <div class="calendar-day">1</div>
+                        <div class="calendar-day">2</div>
+                        <div class="calendar-day">3</div>
+                        <div class="calendar-day">4</div>
+                        <div class="calendar-day">5</div>
+                        <div class="calendar-day">6</div>
+                        <div class="calendar-day">7</div>
+                        <div class="calendar-day">8</div>
+                        <div class="calendar-day">9</div>
+                        <div class="calendar-day">10</div>
+                        <div class="calendar-day">11</div>
+                        <div class="calendar-day">12</div>
+                        <div class="calendar-day">13</div>
+                        <div class="calendar-day">14</div>
+                        <div class="calendar-day today">15</div>
+                        <div class="calendar-day">16</div>
+                        <div class="calendar-day">17</div>
+                        <div class="calendar-day">18</div>
+                        <div class="calendar-day">19</div>
+                        <div class="calendar-day">20</div>
+                        <div class="calendar-day">21</div>
+                        <div class="calendar-day">22</div>
+                        <div class="calendar-day">23</div>
+                        <div class="calendar-day">24</div>
+                        <div class="calendar-day">25</div>
+                        <div class="calendar-day">26</div>
+                        <div class="calendar-day">27</div>
+                        <div class="calendar-day">28</div>
+                        <div class="calendar-day">29</div>
+                        <div class="calendar-day">30</div>
+                        <div class="calendar-day">31</div>
+                    </div>
+                    
+                    <div style="margin-top: 16px;">
+                        <button style="background: #1f2937; color: white; border: none; padding: 8px 16px; border-radius: 8px; width: 100%; font-size: 14px;">Add event</button>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="white-card" style="margin-top: 16px;">
+                    <h3>Today's Timeline</h3>
+                    <div style="font-size: 14px; color: #6b7280; margin-top: 16px;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <div style="width: 8px; height: 8px; background: #10b981; border-radius: 50%;"></div>
+                            <div>
+                                <div style="font-weight: 500; color: #1f2937;">Budget review</div>
+                                <div>Monthly spending check</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <div style="width: 8px; height: 8px; background: #f59e0b; border-radius: 50%;"></div>
+                            <div>
+                                <div style="font-weight: 500; color: #1f2937;">Bill payment</div>
+                                <div>Internet bill due today</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 8px; height: 8px; background: #3b82f6; border-radius: 50%;"></div>
+                            <div>
+                                <div style="font-weight: 500; color: #1f2937;">Savings goal</div>
+                                <div>Emergency fund update</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <!-- Chart Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Spending Categories (Donut Chart) -->
-            <div class="chart-container lg:col-span-2">
-                <h2 class="chart-title">Spending Categories</h2>
-                <div id="category-chart-container">
-                    <canvas id="category-chart" class="chart-canvas"></canvas>
-                </div>
-                <div id="category-chart-skeleton" class="skeleton skeleton-chart"></div>
-            </div>
-
-            <!-- Budget Goals (Progress Bars) -->
-            <div class="chart-container">
-                <h2 class="chart-title">Budget Goals</h2>
-                <div id="progress-bars-container">
-                    <!-- Progress bars will be dynamically inserted here -->
-                </div>
-                <div id="progress-bars-skeleton" class="skeleton skeleton-text"></div>
-            </div>
-
-            <!-- Spending Trends (Line Chart) -->
-            <div class="chart-container lg:col-span-3">
-                <h2 class="chart-title">Spending Trends</h2>
-                <div id="trends-chart-container">
-                    <canvas id="trends-chart" class="chart-canvas"></canvas>
-                </div>
-                <div id="trends-chart-skeleton" class="skeleton skeleton-chart"></div>
-            </div>
-
-            <!-- Monthly Comparison (Bar Chart) -->
-            <div class="chart-container lg:col-span-3">
-                <h2 class="chart-title">Monthly Comparison</h2>
-                <div id="monthly-chart-container">
-                    <canvas id="monthly-chart" class="chart-canvas"></canvas>
-                </div>
-                <div id="monthly-chart-skeleton" class="skeleton skeleton-chart"></div>
-            </div>
-        </div>
-    </div>
-</section>
+    </main>
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
 <script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.toggle('open');
+    }
+    
+    function previousMonth() {
+        // Calendar navigation logic
+        console.log('Previous month');
+    }
+    
+    function nextMonth() {
+        // Calendar navigation logic
+        console.log('Next month');
+    }
+    
+    // Initialize mini charts
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialize charts
-        const charts = new BrainBudgetCharts();
-        charts.init();
+        // Initialize small charts for cards
+        initializeMiniCharts();
     });
+    
+    function initializeMiniCharts() {
+        // Balance trend mini chart
+        const balanceCtx = document.getElementById('balance-chart');
+        if (balanceCtx) {
+            new Chart(balanceCtx, {
+                type: 'line',
+                data: {
+                    labels: ['', '', '', '', '', ''],
+                    datasets: [{
+                        data: [3200, 3800, 3400, 4200, 4600, 4850],
+                        borderColor: 'rgba(255, 255, 255, 0.8)',
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { 
+                        x: { display: false },
+                        y: { display: false }
+                    }
+                }
+            });
+        }
+        
+        // Spending trend mini chart
+        const spendingCtx = document.getElementById('spending-chart');
+        if (spendingCtx) {
+            new Chart(spendingCtx, {
+                type: 'line',
+                data: {
+                    labels: ['', '', '', '', '', ''],
+                    datasets: [{
+                        data: [1800, 1200, 1500, 1100, 900, 1240],
+                        borderColor: 'rgba(255, 255, 255, 0.8)',
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { 
+                        x: { display: false },
+                        y: { display: false }
+                    }
+                }
+            });
+        }
+    }
 </script>
 {% endblock %}

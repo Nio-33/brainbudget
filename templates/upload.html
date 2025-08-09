@@ -3,8 +3,8 @@
 {% block title %}Upload Statement - BrainBudget{% endblock %}
 
 {% block content %}
-<!-- Upload Section -->
-<section class="py-12 px-4 sm:px-6 lg:px-8 min-h-screen">
+<!-- Hero Upload Section -->
+<section class="relative bg-gradient-to-b from-primary-50 to-background py-16 px-4 sm:px-6 lg:px-8">
     <div class="max-w-4xl mx-auto">
         <!-- Header -->
         <div class="text-center mb-12">
@@ -129,7 +129,7 @@
         </div>
         
         <!-- Action Buttons -->
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <div class="flex justify-center mb-12">
             <button 
                 id="analyze-btn" 
                 class="inline-flex items-center justify-center px-8 py-4 bg-primary-500 text-white font-semibold rounded-2xl shadow-lg hover:bg-primary-600 gentle-transition focus-ring disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 disabled:hover:scale-100"
@@ -138,47 +138,93 @@
                 <span class="mr-3 text-xl">🤖</span>
                 Analyze My Spending
             </button>
-            <a 
-                href="/" 
-                class="inline-flex items-center justify-center px-8 py-4 border-2 border-gray-300 text-text-secondary font-semibold rounded-2xl hover:bg-gray-50 gentle-transition focus-ring"
-            >
-                <span class="mr-3 text-xl">🏠</span>
-                Back to Home
-            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="py-16 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold text-text-primary mb-6">
+                Designed for your unique brain
+            </h2>
+            <p class="text-xl text-text-secondary max-w-3xl mx-auto">
+                We understand that traditional budgeting apps feel overwhelming. That's why we built something different.
+            </p>
         </div>
         
-        <!-- Help Section -->
-        <div class="mt-12 bg-warning-50 rounded-2xl p-6 border border-warning-100">
-            <h3 class="font-semibold text-text-primary mb-4 flex items-center">
-                <span class="mr-2 text-xl">💡</span>
-                Need help finding your bank statement?
-            </h3>
-            <div class="grid md:grid-cols-2 gap-4 text-sm text-text-secondary">
-                <div>
-                    <h4 class="font-medium text-text-primary mb-2">Most banks:</h4>
-                    <ul class="space-y-1">
-                        <li>• Log into online banking</li>
-                        <li>• Go to "Statements" or "Documents"</li>
-                        <li>• Download your latest monthly statement</li>
-                    </ul>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Feature 1: Gentle Analysis -->
+            <div class="bg-surface rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md gentle-transition">
+                <div class="w-12 h-12 bg-gradient-to-br from-success-400 to-success-500 rounded-xl flex items-center justify-center mb-6">
+                    <span class="text-2xl">🌱</span>
                 </div>
-                <div>
-                    <h4 class="font-medium text-text-primary mb-2">Mobile banking apps:</h4>
-                    <ul class="space-y-1">
-                        <li>• Look for "Statements" or "Documents"</li>
-                        <li>• Select your account</li>
-                        <li>• Download or share the PDF</li>
-                    </ul>
-                </div>
+                <h3 class="text-xl font-semibold text-text-primary mb-4">Gentle, Non-Judgmental Analysis</h3>
+                <p class="text-text-secondary leading-relaxed">
+                    Upload your bank statements and get insights that encourage rather than shame. No "bad" spending here—just understanding.
+                </p>
             </div>
-            <div class="mt-4 p-4 bg-white rounded-xl border border-warning-200">
-                <p class="text-sm text-text-secondary">
-                    <strong class="text-text-primary">Tip:</strong> Screenshot your transaction list works too! Just make sure all transactions are visible and readable.
+            
+            <!-- Feature 2: Visual Breakdown -->
+            <div class="bg-surface rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md gentle-transition">
+                <div class="w-12 h-12 bg-gradient-to-br from-primary-400 to-primary-500 rounded-xl flex items-center justify-center mb-6">
+                    <span class="text-2xl">📊</span>
+                </div>
+                <h3 class="text-xl font-semibold text-text-primary mb-4">Clear Visual Stories</h3>
+                <p class="text-text-secondary leading-relaxed">
+                    Your spending patterns told through beautiful, easy-to-understand charts that make sense at a glance.
+                </p>
+            </div>
+            
+            <!-- Feature 3: ADHD-Optimized -->
+            <div class="bg-surface rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md gentle-transition">
+                <div class="w-12 h-12 bg-gradient-to-br from-warning-400 to-warning-500 rounded-xl flex items-center justify-center mb-6">
+                    <span class="text-2xl">🧠</span>
+                </div>
+                <h3 class="text-xl font-semibold text-text-primary mb-4">ADHD-Optimized Experience</h3>
+                <p class="text-text-secondary leading-relaxed">
+                    Reduced cognitive load, clear next steps, and gentle reminders that work with your brain, not against it.
+                </p>
+            </div>
+            
+            <!-- Feature 4: AI Coach -->
+            <div class="bg-surface rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md gentle-transition">
+                <div class="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-500 rounded-xl flex items-center justify-center mb-6">
+                    <span class="text-2xl">🤖</span>
+                </div>
+                <h3 class="text-xl font-semibold text-text-primary mb-4">Your Personal AI Coach</h3>
+                <p class="text-text-secondary leading-relaxed">
+                    Get personalized suggestions and gentle nudges that help you build sustainable financial habits.
+                </p>
+            </div>
+            
+            <!-- Feature 5: Real-time Tracking -->
+            <div class="bg-surface rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md gentle-transition">
+                <div class="w-12 h-12 bg-gradient-to-br from-cyan-400 to-cyan-500 rounded-xl flex items-center justify-center mb-6">
+                    <span class="text-2xl">⚡</span>
+                </div>
+                <h3 class="text-xl font-semibold text-text-primary mb-4">Effortless Real-time Tracking</h3>
+                <p class="text-text-secondary leading-relaxed">
+                    Connect your accounts once and let us handle the rest. No manual entry, no forgotten transactions.
+                </p>
+            </div>
+            
+            <!-- Feature 6: Privacy First -->
+            <div class="bg-surface rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md gentle-transition">
+                <div class="w-12 h-12 bg-gradient-to-br from-rose-400 to-rose-500 rounded-xl flex items-center justify-center mb-6">
+                    <span class="text-2xl">🔒</span>
+                </div>
+                <h3 class="text-xl font-semibold text-text-primary mb-4">Your Data Stays Yours</h3>
+                <p class="text-text-secondary leading-relaxed">
+                    Bank-level encryption, zero data selling, and complete control over your information. Privacy by design.
                 </p>
             </div>
         </div>
     </div>
 </section>
+
+
 {% endblock %}
 
 {% block scripts %}

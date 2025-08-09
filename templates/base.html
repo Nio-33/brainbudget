@@ -177,19 +177,23 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <!-- Logo -->
-                <div class="flex items-center space-x-3">
+                <a href="/" class="flex items-center space-x-3 hover:opacity-80 transition-opacity focus-ring rounded-lg px-2 py-1">
                     <div class="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center">
                         <span class="text-white font-bold text-sm">🧠</span>
                     </div>
                     <span class="font-semibold text-xl text-text-primary">BrainBudget</span>
-                </div>
+                </a>
                 
                 <!-- Navigation Links (Desktop) -->
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="/" class="nav-link text-text-secondary hover:text-primary-500 gentle-transition focus-ring rounded px-2 py-1">Home</a>
-                    <a href="/upload" class="nav-link text-text-secondary hover:text-primary-500 gentle-transition focus-ring rounded px-2 py-1">Upload</a>
-                    <a href="/dashboard" class="nav-link text-text-secondary hover:text-primary-500 gentle-transition focus-ring rounded px-2 py-1">Dashboard</a>
-                    <a href="/settings" class="nav-link text-text-secondary hover:text-primary-500 gentle-transition focus-ring rounded px-2 py-1">Settings</a>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="/upload" class="nav-link text-text-secondary hover:text-primary-500 gentle-transition focus-ring rounded px-2 py-1">📁 Upload</a>
+                    <a href="/dashboard" class="nav-link text-text-secondary hover:text-primary-500 gentle-transition focus-ring rounded px-2 py-1">📊 Dashboard</a>
+                    <a href="/goals/create" class="nav-link text-text-secondary hover:text-primary-500 gentle-transition focus-ring rounded px-2 py-1">🎯 Goals</a>
+                    <a href="/advice" class="nav-link text-text-secondary hover:text-primary-500 gentle-transition focus-ring rounded px-2 py-1">💡 Advice</a>
+                    <a href="/insights" class="nav-link text-text-secondary hover:text-primary-500 gentle-transition focus-ring rounded px-2 py-1">🧠 Insights</a>
+                    <a href="/coach" class="nav-link text-text-secondary hover:text-primary-500 gentle-transition focus-ring rounded px-2 py-1">🤖 AI Coach</a>
+                    <a href="/community" class="nav-link text-text-secondary hover:text-primary-500 gentle-transition focus-ring rounded px-2 py-1">🤗 Community</a>
+                    <a href="/settings" class="nav-link text-text-secondary hover:text-primary-500 gentle-transition focus-ring rounded px-2 py-1">⚙️ Settings</a>
                 </div>
                 
                 <!-- Mobile menu button -->
@@ -206,10 +210,13 @@
         <!-- Mobile menu -->
         <div id="mobile-menu" class="md:hidden hidden bg-surface border-t border-gray-100">
             <div class="px-4 py-3 space-y-2">
-                <a href="/" class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50 hover:text-primary-500 focus-ring">Home</a>
-                <a href="/upload" class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50 hover:text-primary-500 focus-ring">Upload</a>
-                <a href="/dashboard" class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50 hover:text-primary-500 focus-ring">Dashboard</a>
-                <a href="/settings" class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50 hover:text-primary-500 focus-ring">Settings</a>
+                <a href="/upload" class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50 hover:text-primary-500 focus-ring">📁 Upload</a>
+                <a href="/dashboard" class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50 hover:text-primary-500 focus-ring">📊 Dashboard</a>
+                <a href="/goals/create" class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50 hover:text-primary-500 focus-ring">🎯 Goals</a>
+                <a href="/advice" class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50 hover:text-primary-500 focus-ring">💡 Advice</a>
+                <a href="/insights" class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50 hover:text-primary-500 focus-ring">🧠 Insights</a>
+                <a href="/coach" class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50 hover:text-primary-500 focus-ring">🤖 AI Coach</a>
+                <a href="/settings" class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50 hover:text-primary-500 focus-ring">⚙️ Settings</a>
             </div>
         </div>
     </nav>
@@ -260,6 +267,8 @@
     <!-- Core JavaScript -->
     <script src="{{ url_for('static', filename='js/core.js') }}"></script>
     <script src="{{ url_for('static', filename='js/navigation.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/celebration.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
     
     {% block scripts %}{% endblock %}
     

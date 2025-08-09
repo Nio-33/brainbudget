@@ -1,0 +1,737 @@
+{% extends "base.html" %}
+
+{% block title %}Connect Your Bank - BrainBudget{% endblock %}
+
+{% block extra_head %}
+    <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
+    <style>
+        /* ADHD-friendly connection page styles */
+        .connection-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        
+        .connection-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 2.5rem;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            text-align: center;
+        }
+        
+        .connection-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+        }
+        
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin: 2rem 0;
+            position: relative;
+        }
+        
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #e5e7eb;
+            z-index: 1;
+        }
+        
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        .step.active .step-number {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: white;
+        }
+        
+        .step.completed .step-number {
+            background: #10b981;
+            border-color: #10b981;
+            color: white;
+        }
+        
+        .step-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            max-width: 100px;
+            line-height: 1.2;
+        }
+        
+        .security-badges {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .security-badge {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 0.75rem;
+            min-width: 120px;
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .security-badge:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            background: #ffffff;
+        }
+        
+        .security-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f2937;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            white-space: nowrap;
+            max-width: 200px;
+            white-space: normal;
+            text-align: center;
+            z-index: 10;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .security-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 8px solid transparent;
+            border-top-color: #1f2937;
+        }
+        
+        .hover-card:hover .security-tooltip,
+        .hover-card:focus .security-tooltip {
+            display: block !important;
+        }
+        
+        .security-icon {
+            width: 48px;
+            height: 48px;
+            background: #ddd6fe;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .connection-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .btn-primary {
+            flex: 1;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 0.75rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-height: 60px;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn-secondary {
+            flex: 1;
+            background: #f1f5f9;
+            color: #475569;
+            border: 2px solid #e2e8f0;
+            padding: 1rem 2rem;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-height: 60px;
+        }
+        
+        .btn-secondary:hover {
+            background: #e2e8f0;
+            border-color: #cbd5e1;
+        }
+        
+        .plaid-progress-container {
+            background: #f8fafc;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            display: none;
+        }
+        
+        .plaid-progress-container.active {
+            display: block;
+        }
+        
+        .progress-bar-container {
+            background: #e5e7eb;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        
+        .plaid-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6 0%, #10b981 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .faq-section {
+            margin-top: 3rem;
+            text-align: left;
+        }
+        
+        .faq-item {
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            background: #f8fafc;
+            border-radius: 0.75rem;
+        }
+        
+        .faq-question {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .faq-answer {
+            color: #4b5563;
+            line-height: 1.6;
+        }
+        
+        /* Smart Benefits Carousel */
+        .smart-benefits-container {
+            position: relative;
+            height: 100px;
+            overflow: hidden;
+        }
+        
+        .benefit-card {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-radius: 0.75rem;
+            border: 2px solid #e0f2fe;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+        
+        .benefit-card.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .benefit-icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: white;
+            border-radius: 50%;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        }
+        
+        .benefit-content {
+            flex: 1;
+            text-align: left;
+        }
+        
+        .benefit-content h4 {
+            margin: 0 0 0.25rem 0;
+            font-size: 1rem;
+        }
+        
+        .benefit-content p {
+            margin: 0;
+        }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 640px) {
+            .connection-card {
+                padding: 1.5rem;
+                margin: 0.5rem;
+            }
+            
+            .connection-buttons {
+                flex-direction: column;
+            }
+            
+            .security-badges {
+                gap: 1rem;
+            }
+            
+            .step-label {
+                font-size: 0.75rem;
+                max-width: 80px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="connection-container">
+    <div class="connection-card">
+        <!-- Header -->
+        <div class="connection-icon">
+            🏦
+        </div>
+        
+        <h1 class="text-3xl font-bold text-gray-900 mb-4">
+            Connect Your Bank Account
+        </h1>
+        
+        <p class="text-xl text-gray-600 mb-6">
+            Get automatic transaction updates and real-time insights! 
+            It's secure, private, and takes less than 2 minutes.
+        </p>
+        
+        <!-- ADHD-Friendly Reassurance -->
+        <div class="bg-green-50 border-l-4 border-green-400 p-4 mb-6 text-left">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <span class="text-2xl">💙</span>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-green-800">
+                        <strong>For our ADHD community:</strong> We know financial stuff can feel overwhelming! 
+                        This connection is 100% safe, takes just 2 clicks, and you can disconnect anytime. 
+                        No judgment, just helpful insights! ✨
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Progress Steps -->
+        <div class="progress-steps">
+            <div class="step active" data-step="1">
+                <div class="step-number">1</div>
+                <div class="step-label">Choose Bank</div>
+            </div>
+            <div class="step" data-step="2">
+                <div class="step-number">2</div>
+                <div class="step-label">Login Safely</div>
+            </div>
+            <div class="step" data-step="3">
+                <div class="step-number">3</div>
+                <div class="step-label">Select Accounts</div>
+            </div>
+            <div class="step" data-step="4">
+                <div class="step-number">✓</div>
+                <div class="step-label">Start Syncing!</div>
+            </div>
+        </div>
+        
+        <!-- Enhanced Security Badges -->
+        <div class="security-badges">
+            <div class="security-badge hover-card" tabindex="0">
+                <div class="security-icon">🔒</div>
+                <div class="text-sm font-semibold">Bank-Level Security</div>
+                <div class="text-xs text-gray-500">Military-grade 256-bit encryption</div>
+                <div class="security-tooltip hidden">
+                    Same security as online banking. Your data is scrambled with the strongest encryption available!
+                </div>
+            </div>
+            <div class="security-badge hover-card" tabindex="0">
+                <div class="security-icon">🛡️</div>
+                <div class="text-sm font-semibold">Zero Password Storage</div>
+                <div class="text-xs text-gray-500">We literally never see them</div>
+                <div class="security-tooltip hidden">
+                    Your passwords go directly to your bank through Plaid's encrypted tunnel. We never store or see them!
+                </div>
+            </div>
+            <div class="security-badge hover-card" tabindex="0">
+                <div class="security-icon">👀</div>
+                <div class="text-sm font-semibold">Read-Only Access</div>
+                <div class="text-xs text-gray-500">Can only view, never touch</div>
+                <div class="security-tooltip hidden">
+                    We can only read your transactions - we can't transfer money, change settings, or access anything else!
+                </div>
+            </div>
+            <div class="security-badge hover-card" tabindex="0">
+                <div class="security-icon">⚡</div>
+                <div class="text-sm font-semibold">Instant Disconnect</div>
+                <div class="text-xs text-gray-500">Stop access anytime</div>
+                <div class="security-tooltip hidden">
+                    Change your mind? One click disconnects us immediately. You stay in control!
+                </div>
+            </div>
+        </div>
+        
+        <!-- Progress Container (Hidden initially) -->
+        <div class="plaid-progress-container" id="plaid-progress">
+            <div class="text-lg font-semibold text-gray-900 mb-2">
+                Connecting Your Bank...
+            </div>
+            <div class="progress-bar-container">
+                <div class="plaid-progress-bar" id="progress-bar"></div>
+            </div>
+            <div class="plaid-progress-text text-gray-600" id="progress-text">
+                Getting ready...
+            </div>
+        </div>
+        
+        <!-- Smart Benefits Carousel -->
+        <div class="smart-benefits-container mb-6">
+            <div class="benefit-card active" id="benefit-1">
+                <div class="benefit-icon">🧠</div>
+                <div class="benefit-content">
+                    <h4 class="font-semibold text-gray-900">ADHD-Aware Insights</h4>
+                    <p class="text-sm text-gray-600">Automatic detection of impulse purchases, hyperfocus spending, and emotional patterns</p>
+                </div>
+            </div>
+            <div class="benefit-card" id="benefit-2">
+                <div class="benefit-icon">⚡</div>
+                <div class="benefit-content">
+                    <h4 class="font-semibold text-gray-900">Instant Organization</h4>
+                    <p class="text-sm text-gray-600">No more spreadsheet overwhelm - transactions auto-categorized and ready for review</p>
+                </div>
+            </div>
+            <div class="benefit-card" id="benefit-3">
+                <div class="benefit-icon">🎯</div>
+                <div class="benefit-content">
+                    <h4 class="font-semibold text-gray-900">Gentle Goal Tracking</h4>
+                    <p class="text-sm text-gray-600">Real-time progress updates without shame or pressure - celebrate every small win!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="connection-buttons">
+            <button class="btn-primary connect-bank-btn" id="connect-btn">
+                <div class="flex items-center justify-center gap-2">
+                    <span>Connect My Bank</span>
+                    <span>🚀</span>
+                </div>
+            </button>
+            <button class="btn-secondary skip-banking-btn">
+                <div class="flex items-center justify-center gap-2">
+                    <span>Upload Statement Instead</span>
+                    <span>📄</span>
+                </div>
+            </button>
+        </div>
+        
+        <!-- FAQ Section -->
+        <div class="faq-section">
+            <h3 class="text-xl font-bold text-gray-900 mb-4 text-center">
+                Quick Questions? We've Got You! 💡
+            </h3>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    🔒 Is my banking information safe?
+                </div>
+                <div class="faq-answer">
+                    Absolutely! We use Plaid, the same security technology trusted by major apps like Venmo and Robinhood. Your login credentials are encrypted and never stored on our servers.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    💳 What can you see in my account?
+                </div>
+                <div class="faq-answer">
+                    We only see transaction history and account balances - never your login details. We can't move money, change settings, or access anything else in your account.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    🔄 Can I disconnect anytime?
+                </div>
+                <div class="faq-answer">
+                    Of course! You can disconnect your bank at any time from your settings. We'll stop accessing your account immediately, and you can still use BrainBudget by uploading statements.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    🏦 What if my bank isn't supported?
+                </div>
+                <div class="faq-answer">
+                    No problem at all! You can upload bank statements manually (PDF or images work great), and you'll still get all the same AI-powered insights about your spending.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    🧠 Will this feel overwhelming like other financial tools?
+                </div>
+                <div class="faq-answer">
+                    Absolutely not! BrainBudget is built specifically for ADHD brains. We use gentle colors, clear language, celebration animations, and bite-sized insights. No financial jargon or shame-inducing charts here!
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    ⚡ What if I forget to check it regularly?
+                </div>
+                <div class="faq-answer">
+                    That's totally normal with ADHD! Once connected, everything happens automatically. We'll send gentle, optional reminders (you control frequency), and your insights are always waiting when you remember to check.
+                </div>
+            </div>
+        </div>
+        
+        <!-- Alternative Option -->
+        <div class="mt-8 p-4 bg-blue-50 rounded-lg">
+            <div class="text-blue-800 text-center">
+                <div class="font-semibold mb-2">Prefer to start manually? 📋</div>
+                <div class="text-sm">
+                    You can always upload bank statements and get amazing insights right away. 
+                    Connect your bank later when you're ready!
+                </div>
+                <button class="mt-3 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors manual-upload-btn">
+                    Upload Statement Instead
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Success Modal (Hidden initially) -->
+<div id="success-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg p-8 max-w-md mx-4 text-center">
+        <div class="text-6xl mb-4">🎉</div>
+        <h2 class="text-2xl font-bold mb-4 text-gray-900">Bank Connected Successfully!</h2>
+        <p class="text-gray-600 mb-6">
+            Your transactions will now sync automatically. We're setting everything up and you'll 
+            be redirected to your dashboard in a moment!
+        </p>
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/plaid-link.js') }}"></script>
+<script>
+    // Initialize page-specific functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        // Update progress steps based on Plaid events
+        const updateProgressStep = (step) => {
+            const steps = document.querySelectorAll('.step');
+            steps.forEach((stepEl, index) => {
+                const stepNumber = index + 1;
+                if (stepNumber <= step) {
+                    stepEl.classList.add('completed');
+                    stepEl.classList.remove('active');
+                } else if (stepNumber === step + 1) {
+                    stepEl.classList.add('active');
+                    stepEl.classList.remove('completed');
+                } else {
+                    stepEl.classList.remove('active', 'completed');
+                }
+            });
+        };
+        
+        // Show/hide progress container
+        const progressContainer = document.getElementById('plaid-progress');
+        const connectBtn = document.getElementById('connect-btn');
+        
+        // Custom success handler
+        window.brainBudgetPlaid.onSuccess = async function(public_token, metadata) {
+            updateProgressStep(4);
+            
+            // Show success modal
+            document.getElementById('success-modal').classList.remove('hidden');
+            
+            // Call the default success handler
+            await window.brainBudgetPlaid.defaultOnSuccess(public_token, metadata);
+        };
+        
+        // Custom event handler for visual updates
+        const originalOnEvent = window.brainBudgetPlaid.onEvent;
+        window.brainBudgetPlaid.onEvent = function(eventName, metadata) {
+            // Update progress steps based on events
+            switch (eventName) {
+                case 'OPEN':
+                    progressContainer.classList.add('active');
+                    updateProgressStep(1);
+                    break;
+                case 'SELECT_INSTITUTION':
+                    updateProgressStep(2);
+                    break;
+                case 'SUBMIT_CREDENTIALS':
+                    updateProgressStep(3);
+                    break;
+                case 'TRANSITION_VIEW':
+                    if (metadata.view_name === 'CONNECTED') {
+                        updateProgressStep(4);
+                    }
+                    break;
+            }
+            
+            // Call original handler
+            originalOnEvent.call(this, eventName, metadata);
+        };
+        
+        // Handle connection start
+        connectBtn.addEventListener('click', function() {
+            this.innerHTML = `
+                <div class="flex items-center justify-center gap-2">
+                    <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    <span>Setting up secure connection...</span>
+                </div>
+            `;
+            this.disabled = true;
+            
+            // Reset after a delay if something goes wrong
+            setTimeout(() => {
+                if (this.disabled) {
+                    this.innerHTML = `
+                        <div class="flex items-center justify-center gap-2">
+                            <span>Connect My Bank</span>
+                            <span>🚀</span>
+                        </div>
+                    `;
+                    this.disabled = false;
+                }
+            }, 30000); // 30 seconds timeout
+        });
+        
+        // Animate elements on page load
+        const card = document.querySelector('.connection-card');
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'all 0.6s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, 100);
+        
+        // Add some encouraging interactivity
+        const securityBadges = document.querySelectorAll('.security-badge');
+        securityBadges.forEach((badge, index) => {
+            setTimeout(() => {
+                badge.style.opacity = '0';
+                badge.style.transform = 'translateY(10px)';
+                badge.style.transition = 'all 0.4s ease';
+                
+                setTimeout(() => {
+                    badge.style.opacity = '1';
+                    badge.style.transform = 'translateY(0)';
+                }, 50);
+            }, 200 + (index * 100));
+        });
+        
+        // Benefits carousel rotation
+        const benefitCards = document.querySelectorAll('.benefit-card');
+        let currentBenefit = 0;
+        
+        function rotateBenefits() {
+            // Hide current benefit
+            benefitCards[currentBenefit].classList.remove('active');
+            
+            // Move to next benefit
+            currentBenefit = (currentBenefit + 1) % benefitCards.length;
+            
+            // Show new benefit
+            benefitCards[currentBenefit].classList.add('active');
+        }
+        
+        // Start rotation after initial load
+        const benefitInterval = setInterval(rotateBenefits, 4000);
+        
+        // Pause rotation on hover for accessibility
+        const benefitsContainer = document.querySelector('.smart-benefits-container');
+        benefitsContainer.addEventListener('mouseenter', () => {
+            clearInterval(benefitInterval);
+        });
+        
+        // Add click handlers for manual navigation
+        benefitCards.forEach((card, index) => {
+            card.addEventListener('click', () => {
+                benefitCards[currentBenefit].classList.remove('active');
+                currentBenefit = index;
+                benefitCards[currentBenefit].classList.add('active');
+            });
+        });
+        
+        // Add celebration micro-interaction when hovering security badges
+        securityBadges.forEach(badge => {
+            badge.addEventListener('mouseenter', () => {
+                if (window.celebrations) {
+                    window.celebrations.microCelebration('✨');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

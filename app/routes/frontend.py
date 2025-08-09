@@ -14,11 +14,11 @@ frontend_bp = Blueprint('frontend', __name__, template_folder='../../templates',
 
 @frontend_bp.route('/')
 def index():
-    """Serve the landing page."""
+    """Serve the BrainBudget home page showcasing all features."""
     try:
-        return render_template('index.html')
+        return render_template('home.html')
     except Exception as e:
-        logger.error(f"Error serving index page: {e}")
+        logger.error(f"Error serving home page: {e}")
         return render_template('error.html', message="Unable to load the home page"), 500
 
 
@@ -221,6 +221,66 @@ def install_page():
     except Exception as e:
         logger.error(f"Error serving install page: {e}")
         return render_template('error.html', message="Unable to load installation guide"), 500
+
+
+@frontend_bp.route('/connect-bank')
+def connect_bank_page():
+    """Serve the bank connection onboarding page."""
+    try:
+        return render_template('connect_bank.html')
+    except Exception as e:
+        logger.error(f"Error serving bank connection page: {e}")
+        return render_template('error.html', message="Unable to load bank connection page"), 500
+
+
+@frontend_bp.route('/goals/create')
+def create_goal_page():
+    """Serve the ADHD-friendly goal creation wizard."""
+    try:
+        return render_template('goal_wizard.html')
+    except Exception as e:
+        logger.error(f"Error serving goal creation page: {e}")
+        return render_template('error.html', message="Unable to load goal creation page"), 500
+
+
+@frontend_bp.route('/coach')
+def ai_coach_page():
+    """Serve the AI financial coach chat interface."""
+    try:
+        return render_template('ai_coach.html')
+    except Exception as e:
+        logger.error(f"Error serving AI coach page: {e}")
+        return render_template('error.html', message="Unable to load AI coach page"), 500
+
+
+@frontend_bp.route('/insights')
+def insights_page():
+    """Serve the ML-powered spending insights dashboard."""
+    try:
+        return render_template('insights.html')
+    except Exception as e:
+        logger.error(f"Error serving insights page: {e}")
+        return render_template('error.html', message="Unable to load insights page"), 500
+
+
+@frontend_bp.route('/advice')
+def advice_page():
+    """Serve the personalized financial advice dashboard."""
+    try:
+        return render_template('advice.html')
+    except Exception as e:
+        logger.error(f"Error serving advice page: {e}")
+        return render_template('error.html', message="Unable to load advice page"), 500
+
+
+@frontend_bp.route('/community')
+def community_page():
+    """Serve the ADHD community page (coming soon)."""
+    try:
+        return render_template('community.html')
+    except Exception as e:
+        logger.error(f"Error serving community page: {e}")
+        return render_template('error.html', message="Unable to load community page"), 500
 
 
 # Health check specifically for frontend

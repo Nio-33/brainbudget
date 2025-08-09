@@ -189,14 +189,339 @@
         
         <!-- Notifications Tab -->
         <div id="notifications-tab" class="settings-content hidden">
-            <div class="bg-surface rounded-2xl p-8 shadow-sm border border-gray-100">
-                <div class="mb-6">
-                    <h2 class="text-xl font-semibold text-text-primary mb-2 flex items-center">
-                        <span class="mr-3 text-2xl">🔔</span>
-                        Notification Preferences
-                    </h2>
-                    <p class="text-text-secondary">Choose how and when you'd like to be notified</p>
+            <div class="space-y-8">
+                <!-- Notification Status -->
+                <div class="bg-surface rounded-2xl p-8 shadow-sm border border-gray-100">
+                    <div class="mb-6">
+                        <h2 class="text-xl font-semibold text-text-primary mb-2 flex items-center">
+                            <span class="mr-3 text-2xl">🔔</span>
+                            Gentle Financial Reminders
+                        </h2>
+                        <p class="text-text-secondary">Get kind, helpful notifications that work with your ADHD brain</p>
+                    </div>
+                    
+                    <!-- Permission Status & Enable -->
+                    <div id="notification-permission-status" class="mb-6">
+                        <div class="p-4 bg-orange-50 border border-orange-200 rounded-xl">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <span class="text-2xl mr-3">📱</span>
+                                    <div>
+                                        <h3 class="font-medium text-orange-800">Enable Browser Notifications</h3>
+                                        <p class="text-sm text-orange-600">Get gentle reminders even when the app isn't open</p>
+                                    </div>
+                                </div>
+                                <button id="enable-notifications-btn" class="bg-primary-500 text-white px-6 py-2 rounded-xl font-medium hover:bg-primary-600 gentle-transition">
+                                    Enable Notifications
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Master Toggle -->
+                    <div class="flex items-center justify-between p-4 bg-primary-50 rounded-xl mb-6">
+                        <div>
+                            <h3 class="font-medium text-text-primary">All Notifications</h3>
+                            <p class="text-sm text-text-secondary">Master switch for all BrainBudget notifications</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" class="sr-only peer" id="notifications-master-toggle" checked>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                        </label>
+                    </div>
                 </div>
+                
+                <!-- Notification Types -->
+                <div class="bg-surface rounded-2xl p-8 shadow-sm border border-gray-100">
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-text-primary mb-2">What would you like to be reminded about?</h3>
+                        <p class="text-text-secondary">Choose the types of gentle nudges that help you most</p>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <!-- Spending Alerts -->
+                        <div class="notification-type-card p-6 bg-gray-50 rounded-xl">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex items-start">
+                                    <span class="text-3xl mr-4">💰</span>
+                                    <div>
+                                        <h4 class="font-semibold text-text-primary">Spending Alerts</h4>
+                                        <p class="text-sm text-text-secondary mt-1">Get gentle heads-ups when you're approaching budget limits</p>
+                                    </div>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer notification-type-toggle" data-type="spending_alert" checked>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                </label>
+                            </div>
+                            <div class="ml-16">
+                                <label class="block text-sm font-medium text-text-primary mb-2">Alert me when I reach:</label>
+                                <select class="notification-threshold" data-type="spending_alert">
+                                    <option value="70">70% of budget</option>
+                                    <option value="80" selected>80% of budget</option>
+                                    <option value="90">90% of budget</option>
+                                    <option value="100">100% of budget (over budget)</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Goal Achievements -->
+                        <div class="notification-type-card p-6 bg-gray-50 rounded-xl">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex items-start">
+                                    <span class="text-3xl mr-4">🎉</span>
+                                    <div>
+                                        <h4 class="font-semibold text-text-primary">Goal Celebrations</h4>
+                                        <p class="text-sm text-text-secondary mt-1">Celebrate your wins! You deserve recognition for your progress</p>
+                                    </div>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer notification-type-toggle" data-type="goal_achievement" checked>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Weekly Summaries -->
+                        <div class="notification-type-card p-6 bg-gray-50 rounded-xl">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex items-start">
+                                    <span class="text-3xl mr-4">📊</span>
+                                    <div>
+                                        <h4 class="font-semibold text-text-primary">Weekly Summaries</h4>
+                                        <p class="text-sm text-text-secondary mt-1">Kind, encouraging reviews of your spending week</p>
+                                    </div>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer notification-type-toggle" data-type="weekly_summary" checked>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                </label>
+                            </div>
+                            <div class="ml-16">
+                                <div class="flex items-center space-x-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-text-primary mb-1">Day:</label>
+                                        <select class="notification-setting" data-type="weekly_summary" data-setting="day">
+                                            <option value="sunday" selected>Sunday</option>
+                                            <option value="monday">Monday</option>
+                                            <option value="saturday">Saturday</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-text-primary mb-1">Time:</label>
+                                        <select class="notification-setting" data-type="weekly_summary" data-setting="time">
+                                            <option value="09:00" selected>9:00 AM</option>
+                                            <option value="12:00">12:00 PM</option>
+                                            <option value="18:00">6:00 PM</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Unusual Patterns -->
+                        <div class="notification-type-card p-6 bg-gray-50 rounded-xl">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex items-start">
+                                    <span class="text-3xl mr-4">🔍</span>
+                                    <div>
+                                        <h4 class="font-semibold text-text-primary">Unusual Spending Patterns</h4>
+                                        <p class="text-sm text-text-secondary mt-1">Gentle alerts when your spending looks different than usual</p>
+                                    </div>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer notification-type-toggle" data-type="unusual_pattern">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Encouragement -->
+                        <div class="notification-type-card p-6 bg-gray-50 rounded-xl">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex items-start">
+                                    <span class="text-3xl mr-4">💜</span>
+                                    <div>
+                                        <h4 class="font-semibold text-text-primary">Daily Encouragement</h4>
+                                        <p class="text-sm text-text-secondary mt-1">Supportive messages to help you stay motivated</p>
+                                    </div>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer notification-type-toggle" data-type="encouragement" checked>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Bill Reminders -->
+                        <div class="notification-type-card p-6 bg-gray-50 rounded-xl">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex items-start">
+                                    <span class="text-3xl mr-4">📅</span>
+                                    <div>
+                                        <h4 class="font-semibold text-text-primary">Bill Reminders</h4>
+                                        <p class="text-sm text-text-secondary mt-1">Gentle nudges about upcoming bills (opt-in)</p>
+                                    </div>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer notification-type-toggle" data-type="bill_reminder">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                </label>
+                            </div>
+                            <div class="ml-16">
+                                <label class="block text-sm font-medium text-text-primary mb-2">Remind me:</label>
+                                <div class="space-y-2">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="text-primary-600 focus:ring-primary-500 mr-2" checked>
+                                        <span class="text-sm">3 days before due date</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="text-primary-600 focus:ring-primary-500 mr-2" checked>
+                                        <span class="text-sm">1 day before due date</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="text-primary-600 focus:ring-primary-500 mr-2">
+                                        <span class="text-sm">On due date</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quiet Hours & ADHD Settings -->
+                <div class="bg-surface rounded-2xl p-8 shadow-sm border border-gray-100">
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-text-primary mb-2 flex items-center">
+                            <span class="mr-3">😴</span>
+                            Quiet Hours & Boundaries
+                        </h3>
+                        <p class="text-text-secondary">Respect your brain's need for rest and focus time</p>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <!-- Quiet Hours -->
+                        <div class="p-4 bg-gray-50 rounded-xl">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h4 class="font-medium text-text-primary">Enable Quiet Hours</h4>
+                                    <p class="text-sm text-text-secondary">No notifications during your rest time</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer" id="quiet-hours-toggle" checked>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                </label>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-text-primary mb-1">Start Time:</label>
+                                    <select id="quiet-hours-start" class="w-full">
+                                        <option value="20">8:00 PM</option>
+                                        <option value="21">9:00 PM</option>
+                                        <option value="22" selected>10:00 PM</option>
+                                        <option value="23">11:00 PM</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-text-primary mb-1">End Time:</label>
+                                    <select id="quiet-hours-end" class="w-full">
+                                        <option value="6">6:00 AM</option>
+                                        <option value="7">7:00 AM</option>
+                                        <option value="8" selected>8:00 AM</option>
+                                        <option value="9">9:00 AM</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Notification Tone -->
+                        <div class="p-4 bg-gray-50 rounded-xl">
+                            <h4 class="font-medium text-text-primary mb-3">Communication Style</h4>
+                            <div class="space-y-3">
+                                <label class="flex items-center">
+                                    <input type="radio" name="notification-tone" value="gentle" class="text-primary-600 focus:ring-primary-500" checked>
+                                    <span class="ml-3">
+                                        <span class="font-medium text-text-primary">Gentle & Encouraging</span>
+                                        <span class="block text-sm text-text-secondary">"Hey there! Just a friendly heads up..."</span>
+                                    </span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="notification-tone" value="direct" class="text-primary-600 focus:ring-primary-500">
+                                    <span class="ml-3">
+                                        <span class="font-medium text-text-primary">Direct & Clear</span>
+                                        <span class="block text-sm text-text-secondary">"You've reached 80% of your dining budget"</span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Daily Limit -->
+                        <div class="p-4 bg-gray-50 rounded-xl">
+                            <h4 class="font-medium text-text-primary mb-3">Daily Notification Limit</h4>
+                            <div class="flex items-center space-x-4">
+                                <span class="text-sm text-text-secondary">Maximum per day:</span>
+                                <select id="daily-notification-limit" class="flex-1">
+                                    <option value="3">3 notifications</option>
+                                    <option value="5">5 notifications</option>
+                                    <option value="10" selected>10 notifications</option>
+                                    <option value="unlimited">No limit</option>
+                                </select>
+                            </div>
+                            <p class="text-xs text-text-muted mt-2">Prevents notification overwhelm for ADHD brains</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Test & Actions -->
+                <div class="bg-surface rounded-2xl p-8 shadow-sm border border-gray-100">
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-text-primary mb-2">Test Your Settings</h3>
+                        <p class="text-text-secondary">Make sure everything works the way you want</p>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-3 mb-6">
+                        <button id="test-encouragement" class="bg-success-500 text-white px-4 py-2 rounded-xl font-medium hover:bg-success-600 gentle-transition">
+                            💜 Test Encouragement
+                        </button>
+                        <button id="test-spending-alert" class="bg-warning-500 text-white px-4 py-2 rounded-xl font-medium hover:bg-warning-600 gentle-transition">
+                            💰 Test Spending Alert
+                        </button>
+                        <button id="test-goal-celebration" class="bg-primary-500 text-white px-4 py-2 rounded-xl font-medium hover:bg-primary-600 gentle-transition">
+                            🎉 Test Celebration
+                        </button>
+                    </div>
+                    
+                    <div class="border-t border-gray-200 pt-6">
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <button id="save-notification-settings" class="flex-1 bg-primary-500 text-white font-semibold py-3 px-6 rounded-xl hover:bg-primary-600 gentle-transition">
+                                💾 Save Preferences
+                            </button>
+                            <button id="reset-notification-settings" class="flex-1 border-2 border-gray-200 text-text-secondary font-semibold py-3 px-6 rounded-xl hover:bg-gray-50 gentle-transition">
+                                🔄 Reset to Defaults
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Emergency Options -->
+                    <div class="mt-6 p-4 bg-orange-50 border border-orange-200 rounded-xl">
+                        <h4 class="font-medium text-orange-800 mb-2 flex items-center">
+                            <span class="mr-2">⚠️</span>
+                            Need a Break?
+                        </h4>
+                        <p class="text-sm text-orange-700 mb-3">
+                            Sometimes we all need to pause notifications. That's completely okay!
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <button id="snooze-notifications" class="bg-orange-500 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-orange-600 gentle-transition">
+                                😴 Snooze for 24 hours
+                            </button>
+                            <button id="disable-all-notifications" class="border border-orange-300 text-orange-700 px-4 py-2 rounded-xl text-sm font-medium hover:bg-orange-50 gentle-transition">
+                                ⏸️ Turn off all notifications
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
                 
                 <div class="space-y-6">
                     <!-- Spending Alerts -->
@@ -502,5 +827,20 @@
             }
         }
     });
+    
+    // Load notification settings JavaScript when needed
+    const notificationTab = document.querySelector('[data-tab="notifications"]');
+    if (notificationTab) {
+        notificationTab.addEventListener('click', () => {
+            if (!window.notificationSettingsLoaded) {
+                const script = document.createElement('script');
+                script.src = "{{ url_for('static', filename='js/notification-settings.js') }}";
+                script.onload = () => {
+                    window.notificationSettingsLoaded = true;
+                };
+                document.head.appendChild(script);
+            }
+        });
+    }
 </script>
 {% endblock %}

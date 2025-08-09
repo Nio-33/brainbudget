@@ -273,64 +273,443 @@ async function syncSettingsData() {
     }
 }
 
-// Push notification handler
+// Push notification handler with ADHD-friendly messaging
 self.addEventListener('push', (event) => {
     console.log('[SW] Push notification received');
     
-    const options = {
-        body: 'You have new insights about your spending!',
-        icon: '/static/icons/icon-192x192.png',
-        badge: '/static/icons/badge-72x72.png',
-        tag: 'spending-insight',
+    // Default ADHD-friendly notification
+    let notificationData = {
+        title: '🧠💰 BrainBudget',
+        body: 'You have a gentle update about your finances!',
+        icon: '/static/icons/brainbudget-icon-192.png',
+        badge: '/static/icons/brainbudget-badge.png',
+        tag: 'brainbudget-general',
         requireInteraction: false,
-        actions: [
-            {
-                action: 'view-dashboard',
-                title: 'View Dashboard',
-                icon: '/static/icons/action-dashboard.png'
-            },
-            {
-                action: 'dismiss',
-                title: 'Not Now',
-                icon: '/static/icons/action-dismiss.png'
-            }
-        ],
+        silent: false,
+        vibrate: [200, 100, 200], // Gentle vibration pattern
         data: {
-            url: '/dashboard'
+            url: '/dashboard',
+            type: 'general',
+            timestamp: Date.now()
         }
     };
     
+    // Parse notification payload if available
     if (event.data) {
         try {
             const payload = event.data.json();
-            options.body = payload.message || options.body;
-            options.data.url = payload.url || options.data.url;
+            console.log('[SW] Push payload:', payload);
+            
+            // Override with payload data
+            if (payload.notification) {
+                notificationData.title = payload.notification.title || notificationData.title;
+                notificationData.body = payload.notification.body || notificationData.body;
+                notificationData.icon = payload.notification.icon || notificationData.icon;
+            }
+            
+            // Handle data payload
+            if (payload.data) {
+                notificationData.data = { ...notificationData.data, ...payload.data };
+            }
+            
+            // Set notification type-specific properties
+            const notificationType = payload.data?.type || 'general';
+            notificationData = configureNotificationByType(notificationData, notificationType);
+            
         } catch (error) {
             console.error('[SW] Error parsing push payload:', error);
         }
     }
     
     event.waitUntil(
-        self.registration.showNotification('BrainBudget', options)
+        showBrainBudgetNotification(notificationData)
     );
 });
 
-// Notification click handler
+// Configure notification based on type for ADHD-friendly experience
+function configureNotificationByType(baseConfig, type) {
+    const typeConfigs = {
+        'spending_alert': {
+            tag: 'spending-alert',
+            requireInteraction: true, // Important financial alerts need attention
+            vibrate: [300, 100, 300, 100, 300], // More noticeable vibration
+            actions: [
+                {
+                    action: 'view-spending',
+                    title: '💳 Check Spending',
+                    icon: '/static/icons/action-spending.png'
+                },
+                {
+                    action: 'adjust-budget',
+                    title: '⚖️ Adjust Budget',
+                    icon: '/static/icons/action-budget.png'
+                }
+            ]
+        },
+        'goal_achievement': {
+            tag: 'goal-celebration',
+            requireInteraction: false,
+            vibrate: [100, 50, 100, 50, 100, 50, 200], // Celebratory vibration
+            actions: [
+                {
+                    action: 'celebrate',
+                    title: '🎉 Celebrate!',
+                    icon: '/static/icons/action-celebrate.png'
+                },
+                {
+                    action: 'set-new-goal',
+                    title: '🎯 New Goal',
+                    icon: '/static/icons/action-goal.png'
+                }
+            ]
+        },
+        'weekly_summary': {
+            tag: 'weekly-summary',
+            requireInteraction: false,
+            vibrate: [200, 100, 200], // Standard gentle vibration
+            actions: [
+                {
+                    action: 'view-summary',
+                    title: '📊 View Summary',
+                    icon: '/static/icons/action-summary.png'
+                },
+                {
+                    action: 'dismiss',
+                    title: '👍 Got it',
+                    icon: '/static/icons/action-dismiss.png'
+                }
+            ]
+        },
+        'unusual_pattern': {
+            tag: 'pattern-alert',
+            requireInteraction: false,
+            vibrate: [200, 100, 200], // Gentle attention-getter
+            actions: [
+                {
+                    action: 'review-transactions',
+                    title: '🔍 Review',
+                    icon: '/static/icons/action-review.png'
+                },
+                {
+                    action: 'dismiss',
+                    title: '✅ All good',
+                    icon: '/static/icons/action-dismiss.png'
+                }
+            ]
+        },
+        'encouragement': {
+            tag: 'encouragement',
+            requireInteraction: false,
+            vibrate: [100, 50, 100], // Very gentle vibration
+            silent: false,
+            actions: [
+                {
+                    action: 'view-progress',
+                    title: '💪 See Progress',
+                    icon: '/static/icons/action-progress.png'
+                },
+                {
+                    action: 'dismiss',
+                    title: '💜 Thanks',
+                    icon: '/static/icons/action-thanks.png'
+                }
+            ]
+        },
+        'bill_reminder': {
+            tag: 'bill-reminder',
+            requireInteraction: true, // Bills are important
+            vibrate: [300, 200, 300], // Attention-getting but not harsh
+            actions: [
+                {
+                    action: 'pay-bill',
+                    title: '💰 Handle Bill',
+                    icon: '/static/icons/action-pay.png'
+                },
+                {
+                    action: 'remind-later',
+                    title: '⏰ Remind Later',
+                    icon: '/static/icons/action-snooze.png'
+                }
+            ]
+        }
+    };
+    
+    const typeConfig = typeConfigs[type] || {};
+    
+    return {
+        ...baseConfig,
+        ...typeConfig,
+        data: {
+            ...baseConfig.data,
+            type: type
+        }
+    };
+}
+
+// Show notification with error handling and accessibility
+async function showBrainBudgetNotification(config) {
+    try {
+        // Check if notifications are still enabled
+        if (Notification.permission !== 'granted') {
+            console.log('[SW] Notifications not granted, skipping display');
+            return;
+        }
+        
+        // Show the notification
+        await self.registration.showNotification(config.title, {
+            body: config.body,
+            icon: config.icon,
+            badge: config.badge,
+            tag: config.tag,
+            requireInteraction: config.requireInteraction,
+            silent: config.silent,
+            vibrate: config.vibrate,
+            actions: config.actions || [],
+            data: config.data,
+            timestamp: Date.now(),
+            // Accessibility improvements
+            lang: 'en',
+            dir: 'ltr'
+        });
+        
+        console.log('[SW] Notification displayed successfully');
+        
+        // Track notification display for analytics
+        await trackNotificationEvent('displayed', config.data?.type, config.data);
+        
+    } catch (error) {
+        console.error('[SW] Error displaying notification:', error);
+        
+        // Fallback for older browsers - show basic notification
+        try {
+            await self.registration.showNotification(config.title, {
+                body: config.body,
+                icon: config.icon,
+                tag: 'brainbudget-fallback'
+            });
+        } catch (fallbackError) {
+            console.error('[SW] Fallback notification also failed:', fallbackError);
+        }
+    }
+}
+
+// Enhanced notification click handler for ADHD-friendly interactions
 self.addEventListener('notificationclick', (event) => {
-    console.log('[SW] Notification clicked');
+    console.log('[SW] Notification clicked:', event.action);
     
     event.notification.close();
     
     const action = event.action;
-    const url = event.notification.data?.url || '/dashboard';
+    const notificationData = event.notification.data || {};
+    const type = notificationData.type || 'general';
     
-    if (action === 'view-dashboard' || !action) {
-        event.waitUntil(
-            clients.openWindow(url)
-        );
-    }
-    // 'dismiss' action doesn't need handling - notification is already closed
+    // Track notification interaction
+    trackNotificationEvent('clicked', type, { action, ...notificationData });
+    
+    // Handle different actions
+    const actionPromise = handleNotificationAction(action, type, notificationData);
+    
+    event.waitUntil(actionPromise);
 });
+
+// Handle notification actions with appropriate responses
+async function handleNotificationAction(action, type, data) {
+    try {
+        // Default URL routing based on notification type
+        const defaultUrls = {
+            'spending_alert': '/dashboard?tab=spending',
+            'goal_achievement': '/dashboard?tab=goals',
+            'weekly_summary': '/dashboard?tab=summary',
+            'unusual_pattern': '/dashboard?tab=transactions',
+            'encouragement': '/dashboard',
+            'bill_reminder': '/dashboard?tab=bills',
+            'general': '/dashboard'
+        };
+        
+        let targetUrl = data.url || defaultUrls[type] || '/dashboard';
+        
+        // Handle specific actions
+        switch (action) {
+            case 'view-spending':
+            case 'view-dashboard':
+                targetUrl = '/dashboard?tab=spending';
+                break;
+                
+            case 'adjust-budget':
+                targetUrl = '/settings?tab=budgets';
+                break;
+                
+            case 'celebrate':
+                targetUrl = '/dashboard?tab=goals&celebrate=true';
+                break;
+                
+            case 'set-new-goal':
+                targetUrl = '/settings?tab=goals&action=new';
+                break;
+                
+            case 'view-summary':
+                targetUrl = '/dashboard?tab=summary';
+                break;
+                
+            case 'review-transactions':
+                targetUrl = '/dashboard?tab=transactions&highlight=unusual';
+                break;
+                
+            case 'view-progress':
+                targetUrl = '/dashboard?tab=progress';
+                break;
+                
+            case 'pay-bill':
+                targetUrl = '/dashboard?tab=bills&action=pay';
+                break;
+                
+            case 'remind-later':
+                // Schedule a reminder for later (this would integrate with the notification system)
+                await scheduleReminder(data);
+                return; // Don't open window for reminder scheduling
+                
+            case 'dismiss':
+                // Just track the dismissal - no window opening needed
+                return;
+                
+            default:
+                // No action specified - open dashboard
+                break;
+        }
+        
+        // Open the appropriate window/tab
+        const client = await openOrFocusWindow(targetUrl);
+        
+        // Send message to client with notification context
+        if (client) {
+            client.postMessage({
+                type: 'NOTIFICATION_CLICKED',
+                notification: { action, type, data },
+                url: targetUrl
+            });
+        }
+        
+    } catch (error) {
+        console.error('[SW] Error handling notification action:', error);
+        
+        // Fallback - just open dashboard
+        await openOrFocusWindow('/dashboard');
+    }
+}
+
+// Open window or focus existing one
+async function openOrFocusWindow(url) {
+    try {
+        // Check if there's already a window open with this URL
+        const clients = await self.clients.matchAll({
+            type: 'window',
+            includeUncontrolled: true
+        });
+        
+        // Look for existing window with the same origin
+        for (const client of clients) {
+            const clientUrl = new URL(client.url);
+            const targetUrl = new URL(url, self.location.origin);
+            
+            if (clientUrl.origin === targetUrl.origin) {
+                // Focus existing window and navigate if needed
+                if (clientUrl.pathname !== targetUrl.pathname || 
+                    clientUrl.search !== targetUrl.search) {
+                    client.navigate(url);
+                }
+                return client.focus();
+            }
+        }
+        
+        // No existing window found - open new one
+        return await self.clients.openWindow(url);
+        
+    } catch (error) {
+        console.error('[SW] Error opening/focusing window:', error);
+        
+        // Fallback - try to open new window
+        try {
+            return await self.clients.openWindow(url);
+        } catch (fallbackError) {
+            console.error('[SW] Fallback window opening failed:', fallbackError);
+            return null;
+        }
+    }
+}
+
+// Schedule a reminder for later (integrates with notification system)
+async function scheduleReminder(data) {
+    try {
+        // This would typically integrate with your backend to schedule a reminder
+        console.log('[SW] Scheduling reminder for:', data);
+        
+        // For now, just set a simple timeout reminder (not persistent across browser restarts)
+        // In production, this would save to IndexedDB and integrate with the notification service
+        
+        const reminderTime = 1000 * 60 * 60 * 2; // 2 hours from now
+        
+        setTimeout(async () => {
+            await showBrainBudgetNotification({
+                title: '🔔 Gentle Reminder',
+                body: 'You asked me to remind you about your bill. No pressure! 💙',
+                icon: '/static/icons/brainbudget-icon-192.png',
+                badge: '/static/icons/brainbudget-badge.png',
+                tag: 'reminder-' + Date.now(),
+                data: {
+                    type: 'bill_reminder',
+                    url: '/dashboard?tab=bills',
+                    isReminder: true,
+                    originalData: data
+                }
+            });
+        }, reminderTime);
+        
+        // Show confirmation that reminder is set
+        await showBrainBudgetNotification({
+            title: '⏰ Reminder Set',
+            body: 'I\'ll gently remind you about this in 2 hours. You\'ve got this! 💪',
+            icon: '/static/icons/brainbudget-icon-192.png',
+            tag: 'reminder-confirmation',
+            requireInteraction: false,
+            vibrate: [100, 50, 100],
+            data: {
+                type: 'encouragement',
+                url: '/dashboard'
+            }
+        });
+        
+    } catch (error) {
+        console.error('[SW] Error scheduling reminder:', error);
+    }
+}
+
+// Track notification events for analytics and improvement
+async function trackNotificationEvent(eventType, notificationType, data = {}) {
+    try {
+        const eventData = {
+            event: eventType,
+            notification_type: notificationType,
+            timestamp: Date.now(),
+            user_agent: navigator.userAgent,
+            data: data
+        };
+        
+        // Store event in IndexedDB for later sync
+        await storeAnalyticsEvent(eventData);
+        
+        console.log('[SW] Tracked notification event:', eventType, notificationType);
+        
+    } catch (error) {
+        console.error('[SW] Error tracking notification event:', error);
+    }
+}
+
+// Store analytics events in IndexedDB (simplified implementation)
+async function storeAnalyticsEvent(eventData) {
+    // This would typically use IndexedDB to store analytics events
+    // For now, just log to console
+    console.log('[SW] Analytics event:', eventData);
+}
 
 // Message handler for communication with main thread
 self.addEventListener('message', (event) => {

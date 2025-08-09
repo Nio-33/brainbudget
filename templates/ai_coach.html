@@ -1,0 +1,383 @@
+{% extends "base.html" %}
+
+{% block title %}AI Financial Coach - BrainBudget{% endblock %}
+
+{% block content %}
+<!-- AI Coach Chat Interface -->
+<div id="ai-coach-container" class="min-h-screen bg-gray-50 flex flex-col">
+    <!-- Header -->
+    <div class="bg-white border-b border-gray-200 px-4 py-4 sm:px-6">
+        <div class="flex items-center justify-between max-w-4xl mx-auto">
+            <div class="flex items-center">
+                <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg mr-4">
+                    <span class="text-2xl">🤖</span>
+                </div>
+                <div>
+                    <h1 class="text-xl font-semibold text-gray-900">Your AI Financial Coach</h1>
+                    <p class="text-sm text-gray-500" id="coach-status">Ready to help with your finances</p>
+                </div>
+            </div>
+            
+            <!-- Options Menu -->
+            <div class="relative">
+                <button id="options-menu" class="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
+                    </svg>
+                </button>
+                <div id="options-dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 hidden z-10">
+                    <a href="#" id="new-conversation" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">🔄 New Conversation</a>
+                    <a href="#" id="conversation-history" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">📚 History</a>
+                    <a href="#" id="feedback-button" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">⭐ Rate Conversation</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Messages Container -->
+    <div class="flex-1 overflow-hidden">
+        <div class="max-w-4xl mx-auto h-full flex flex-col">
+            
+            <!-- Messages Area -->
+            <div id="messages-container" class="flex-1 overflow-y-auto px-4 py-6 space-y-4" role="main" aria-label="Chat messages">
+                
+                <!-- Welcome Message (placeholder) -->
+                <div class="flex justify-center mb-6">
+                    <div class="bg-purple-50 border border-purple-200 rounded-xl p-6 max-w-2xl text-center">
+                        <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span class="text-3xl">💜</span>
+                        </div>
+                        <h2 class="text-lg font-semibold text-purple-800 mb-2">Welcome to your AI Financial Coach!</h2>
+                        <p class="text-purple-700">I'm here to provide warm, judgment-free support for your financial journey. Let's chat about whatever's on your mind! 🌟</p>
+                    </div>
+                </div>
+                
+            </div>
+
+            <!-- Quick Actions Bar -->
+            <div id="quick-actions-bar" class="px-4 py-3 bg-white border-t border-gray-200">
+                <div class="flex flex-wrap gap-2 justify-center" id="quick-actions-container">
+                    <!-- Quick action buttons will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Message Input Area -->
+            <div class="bg-white border-t border-gray-200 px-4 py-4">
+                <form id="message-form" class="flex items-end space-x-3">
+                    <div class="flex-1">
+                        <label for="message-input" class="sr-only">Type your message</label>
+                        <textarea
+                            id="message-input"
+                            name="message"
+                            rows="1"
+                            class="w-full resize-none border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm"
+                            placeholder="Ask me anything about your finances..."
+                            aria-describedby="input-help"
+                            maxlength="2000"
+                        ></textarea>
+                        <div id="input-help" class="text-xs text-gray-500 mt-1 hidden">
+                            <span id="char-count">0/2000</span> characters
+                        </div>
+                    </div>
+                    
+                    <button
+                        type="submit"
+                        id="send-button"
+                        class="bg-purple-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-600 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        aria-label="Send message"
+                    >
+                        <span class="flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                            </svg>
+                            Send
+                        </span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg p-6 flex items-center space-x-4">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+        <span class="text-gray-700">Your coach is thinking...</span>
+    </div>
+</div>
+
+<!-- Conversation History Modal -->
+<div id="history-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+            <h3 class="text-lg font-semibold text-gray-900">Conversation History</h3>
+            <button id="close-history" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <div id="history-content" class="p-6 overflow-y-auto max-h-96">
+            <!-- History will be loaded here -->
+        </div>
+    </div>
+</div>
+
+<!-- Feedback Modal -->
+<div id="feedback-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg max-w-md w-full mx-4">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Rate this conversation</h3>
+            <p class="text-sm text-gray-600 mt-1">Your feedback helps me improve!</p>
+        </div>
+        <div class="p-6">
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">How helpful was I?</label>
+                <div class="flex space-x-2" id="rating-stars">
+                    <button class="star text-2xl text-gray-300 hover:text-yellow-400 transition-colors" data-rating="1">⭐</button>
+                    <button class="star text-2xl text-gray-300 hover:text-yellow-400 transition-colors" data-rating="2">⭐</button>
+                    <button class="star text-2xl text-gray-300 hover:text-yellow-400 transition-colors" data-rating="3">⭐</button>
+                    <button class="star text-2xl text-gray-300 hover:text-yellow-400 transition-colors" data-rating="4">⭐</button>
+                    <button class="star text-2xl text-gray-300 hover:text-yellow-400 transition-colors" data-rating="5">⭐</button>
+                </div>
+            </div>
+            
+            <div class="mb-6">
+                <label for="feedback-text" class="block text-sm font-medium text-gray-700 mb-2">Additional feedback (optional)</label>
+                <textarea
+                    id="feedback-text"
+                    rows="3"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    placeholder="Let me know how I can improve..."
+                ></textarea>
+            </div>
+            
+            <div class="flex space-x-3">
+                <button id="submit-feedback" class="flex-1 bg-purple-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-purple-600 transition-colors disabled:opacity-50">
+                    Submit Feedback
+                </button>
+                <button id="cancel-feedback" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Error Toast -->
+<div id="error-toast" class="fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform z-50">
+    <div class="flex items-center">
+        <span class="mr-2">❌</span>
+        <span id="error-message">Something went wrong</span>
+    </div>
+</div>
+
+<!-- Success Toast -->
+<div id="success-toast" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform z-50">
+    <div class="flex items-center">
+        <span class="mr-2">✅</span>
+        <span id="success-message">Success!</span>
+    </div>
+</div>
+
+<!-- Accessibility Features -->
+<div class="sr-only" aria-live="polite" id="screen-reader-announcements"></div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/ai-coach.js') }}"></script>
+
+<script>
+    // Initialize AI Coach interface
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.AICoachInterface) {
+            window.aiCoach = new AICoachInterface();
+        } else {
+            console.error('AI Coach interface not loaded');
+        }
+    });
+
+    // Auto-resize textarea
+    const messageInput = document.getElementById('message-input');
+    messageInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        
+        // Update character count
+        const charCount = this.value.length;
+        const charCountEl = document.getElementById('char-count');
+        if (charCountEl) {
+            charCountEl.textContent = `${charCount}/2000`;
+            
+            // Show/hide character count
+            const helpEl = document.getElementById('input-help');
+            if (charCount > 1500) {
+                helpEl.classList.remove('hidden');
+                if (charCount > 2000) {
+                    helpEl.classList.add('text-red-500');
+                } else {
+                    helpEl.classList.remove('text-red-500');
+                }
+            } else {
+                helpEl.classList.add('hidden');
+            }
+        }
+    });
+
+    // Keyboard shortcuts
+    messageInput.addEventListener('keydown', function(e) {
+        // Send on Ctrl+Enter or Cmd+Enter
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('message-form').dispatchEvent(new Event('submit'));
+        }
+    });
+
+    // Options dropdown
+    document.getElementById('options-menu').addEventListener('click', function(e) {
+        e.preventDefault();
+        const dropdown = document.getElementById('options-dropdown');
+        dropdown.classList.toggle('hidden');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        const menu = document.getElementById('options-menu');
+        const dropdown = document.getElementById('options-dropdown');
+        
+        if (!menu.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.classList.add('hidden');
+        }
+    });
+
+    // Accessibility: Focus management
+    const messagesContainer = document.getElementById('messages-container');
+    
+    // Announce new messages to screen readers
+    const announceMessage = (message, isFromUser = false) => {
+        const announcer = document.getElementById('screen-reader-announcements');
+        const speaker = isFromUser ? 'You said' : 'AI Coach said';
+        announcer.textContent = `${speaker}: ${message}`;
+    };
+
+    // Focus on input when page loads
+    setTimeout(() => {
+        messageInput.focus();
+    }, 100);
+</script>
+
+<style>
+/* Custom styles for AI coach interface */
+.message-bubble {
+    animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Smooth scrolling for messages */
+#messages-container {
+    scroll-behavior: smooth;
+}
+
+/* Loading animation */
+.typing-indicator {
+    display: inline-flex;
+    align-items: center;
+}
+
+.typing-indicator span {
+    height: 8px;
+    width: 8px;
+    border-radius: 50%;
+    background-color: #9CA3AF;
+    display: inline-block;
+    margin-right: 4px;
+    animation: typing 1.4s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.typing-indicator span:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes typing {
+    0%, 80%, 100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Focus styles for accessibility */
+.quick-action-btn:focus,
+button:focus,
+textarea:focus {
+    outline: 2px solid #8B5CF6;
+    outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .bg-purple-500 {
+        background-color: #6D28D9;
+    }
+    
+    .text-gray-500 {
+        color: #374151;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .message-bubble {
+        animation: none;
+    }
+    
+    .typing-indicator span {
+        animation: none;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    #ai-coach-container {
+        background-color: #111827;
+    }
+    
+    .bg-white {
+        background-color: #1F2937;
+        color: #F9FAFB;
+    }
+    
+    .border-gray-200 {
+        border-color: #374151;
+    }
+    
+    .text-gray-900 {
+        color: #F9FAFB;
+    }
+    
+    .text-gray-500 {
+        color: #9CA3AF;
+    }
+}
+</style>
+
+{% endblock %}

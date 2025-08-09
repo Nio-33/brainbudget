@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+
+{% block title %}ADHD Community - BrainBudget{% endblock %}
+
+{% block content %}
+<!-- ADHD-Friendly Community Space -->
+<div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <div class="bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="py-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg mr-4">
+                            <span class="text-2xl">🤗</span>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-900">ADHD Community</h1>
+                            <p class="text-sm text-gray-500">Safe space for neurodivergent financial growth</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Coming Soon Banner -->
+        <div class="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-2xl p-8 mb-8 text-center">
+            <div class="text-4xl mb-4">🚀</div>
+            <h2 class="text-2xl font-bold mb-4">Community Coming Soon!</h2>
+            <p class="text-lg mb-6">
+                We're building a safe, supportive space where ADHD individuals can share financial wins, 
+                challenges, and strategies without judgment.
+            </p>
+            <div class="bg-white bg-opacity-20 rounded-lg p-4 text-sm">
+                <p class="font-medium mb-2">What to expect:</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="flex items-center">
+                        <span class="text-yellow-300 mr-2">✓</span>
+                        <span>Anonymous sharing options</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="text-yellow-300 mr-2">✓</span>
+                        <span>Success story celebrations</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="text-yellow-300 mr-2">✓</span>
+                        <span>ADHD-specific tips & tricks</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="text-yellow-300 mr-2">✓</span>
+                        <span>Peer support & encouragement</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Preview of Community Features -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            <!-- Success Stories -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center mb-4">
+                    <span class="text-2xl mr-3">🌟</span>
+                    <h3 class="text-lg font-semibold text-gray-900">Success Stories</h3>
+                </div>
+                <div class="space-y-4">
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <div class="text-sm font-medium text-green-800 mb-2">Anonymous User</div>
+                        <p class="text-green-700 text-sm">
+                            "After 3 months using BrainBudget, I finally have a $1000 emergency fund! 
+                            The ADHD-friendly approach made all the difference. Small steps really work! 🎉"
+                        </p>
+                        <div class="mt-2 text-xs text-green-600">23 reactions • 8 supportive comments</div>
+                    </div>
+                    
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div class="text-sm font-medium text-blue-800 mb-2">Community Member</div>
+                        <p class="text-blue-700 text-sm">
+                            "Paid off my credit card using the ADHD debt snowball method! The visual progress 
+                            tracker kept me motivated through hyperfocus periods. 💪"
+                        </p>
+                        <div class="mt-2 text-xs text-blue-600">31 reactions • 12 supportive comments</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ADHD Tips -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center mb-4">
+                    <span class="text-2xl mr-3">🧠</span>
+                    <h3 class="text-lg font-semibold text-gray-900">ADHD Money Tips</h3>
+                </div>
+                <div class="space-y-4">
+                    <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                        <div class="text-sm font-medium text-purple-800 mb-2">Weekly Tip</div>
+                        <p class="text-purple-700 text-sm">
+                            💡 <strong>Executive Function Hack:</strong> Set up automatic transfers on payday 
+                            BEFORE your brain has time to make other spending decisions. Future you will thank present you!
+                        </p>
+                    </div>
+                    
+                    <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                        <div class="text-sm font-medium text-orange-800 mb-2">Hyperfocus Strategy</div>
+                        <p class="text-orange-700 text-sm">
+                            🎯 Use hyperfocus periods productively! When you're obsessed with something expensive, 
+                            research it thoroughly first. Often the research scratches the dopamine itch without the purchase.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support Groups -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center mb-4">
+                    <span class="text-2xl mr-3">🤝</span>
+                    <h3 class="text-lg font-semibold text-gray-900">Support Groups</h3>
+                </div>
+                <div class="space-y-3">
+                    <div class="border border-gray-200 rounded-lg p-3">
+                        <div class="font-medium text-gray-900">Debt Freedom Seekers</div>
+                        <div class="text-sm text-gray-600">142 members • Daily check-ins</div>
+                        <div class="text-xs text-gray-500 mt-1">Supportive accountability for debt reduction</div>
+                    </div>
+                    
+                    <div class="border border-gray-200 rounded-lg p-3">
+                        <div class="font-medium text-gray-900">Emergency Fund Builders</div>
+                        <div class="text-sm text-gray-600">89 members • Weekly progress</div>
+                        <div class="text-xs text-gray-500 mt-1">Building financial security one dollar at a time</div>
+                    </div>
+                    
+                    <div class="border border-gray-200 rounded-lg p-3">
+                        <div class="font-medium text-gray-900">ADHD Side Hustlers</div>
+                        <div class="text-sm text-gray-600">67 members • Ideas & motivation</div>
+                        <div class="text-xs text-gray-500 mt-1">Leveraging ADHD creativity for extra income</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Q&A Forum -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center mb-4">
+                    <span class="text-2xl mr-3">❓</span>
+                    <h3 class="text-lg font-semibold text-gray-900">Ask & Answer</h3>
+                </div>
+                <div class="space-y-3">
+                    <div class="bg-gray-50 rounded-lg p-3">
+                        <div class="text-sm font-medium text-gray-900 mb-1">
+                            "How do I stop impulse buying during hyperfocus episodes?"
+                        </div>
+                        <div class="text-xs text-gray-500">8 helpful answers • 15 people following</div>
+                    </div>
+                    
+                    <div class="bg-gray-50 rounded-lg p-3">
+                        <div class="text-sm font-medium text-gray-900 mb-1">
+                            "Best apps for ADHD-friendly budgeting beyond BrainBudget?"
+                        </div>
+                        <div class="text-xs text-gray-500">12 helpful answers • 22 people following</div>
+                    </div>
+                    
+                    <div class="bg-gray-50 rounded-lg p-3">
+                        <div class="text-sm font-medium text-gray-900 mb-1">
+                            "Managing finances with irregular ADHD work schedule?"
+                        </div>
+                        <div class="text-xs text-gray-500">6 helpful answers • 31 people following</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification Signup -->
+        <div class="mt-8 bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Be the First to Know!</h3>
+            <p class="text-gray-600 mb-6">
+                Get notified when our ADHD community launches. We'll send you early access and special features.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
+                <input type="email" placeholder="your@email.com" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                <button class="bg-purple-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-purple-600 transition-colors">
+                    Notify Me!
+                </button>
+            </div>
+            <div class="text-xs text-gray-500 mt-3">
+                No spam, just community updates. Unsubscribe anytime.
+            </div>
+        </div>
+        
+        <!-- Current Alternative -->
+        <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <div class="text-center">
+                <h3 class="text-lg font-semibold text-blue-800 mb-2">In the meantime...</h3>
+                <p class="text-blue-700 mb-4">
+                    Connect with other ADHD individuals in these existing communities:
+                </p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <a href="https://reddit.com/r/ADHD" target="_blank" class="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-600 transition-colors">
+                        r/ADHD Reddit
+                    </a>
+                    <a href="https://reddit.com/r/ADHDmemes" target="_blank" class="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-600 transition-colors">
+                        ADHD Memes
+                    </a>
+                    <a href="#" class="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-600 transition-colors">
+                        ADHD Discord
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<style>
+/* Community-specific styles */
+.community-card {
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+
+.community-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Reaction buttons (for future implementation) */
+.reaction-btn {
+    transition: all 0.2s ease;
+}
+
+.reaction-btn:hover {
+    transform: scale(1.1);
+}
+
+/* ADHD-friendly focus styles */
+*:focus {
+    outline: 2px solid #8B5CF6;
+    outline-offset: 2px;
+}
+</style>
+{% endblock %}

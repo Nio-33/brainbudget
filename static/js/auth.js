@@ -137,9 +137,9 @@ class BrainBudgetAuth {
         localStorage.setItem('authEmail', email);
       }
       
-      // Redirect to dashboard
+      // Redirect to homepage
       setTimeout(() => {
-        window.location.href = '/dashboard';
+        window.location.href = '/';
       }, 1500);
       
     } catch (error) {
@@ -174,9 +174,9 @@ class BrainBudgetAuth {
       
       this.showMessage('success', 'Account created successfully! Welcome to BrainBudget! 🎉');
       
-      // Redirect to dashboard
+      // Redirect to homepage
       setTimeout(() => {
-        window.location.href = '/dashboard?welcome=true';
+        window.location.href = '/?welcome=true';
       }, 2000);
       
     } catch (error) {
@@ -199,7 +199,7 @@ class BrainBudgetAuth {
       this.showMessage('success', 'Signed in with Google successfully! 🎉');
       
       setTimeout(() => {
-        window.location.href = '/dashboard';
+        window.location.href = '/';
       }, 1500);
       
     } catch (error) {

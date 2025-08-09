@@ -106,6 +106,14 @@ def register_blueprints(app):
     from app.routes.frontend import frontend_bp
     from app.routes.analysis import analysis_bp
     from app.routes.analysis_test import analysis_test_bp
+    from app.routes.plaid import plaid_bp
+    from app.routes.plaid_webhooks import plaid_webhooks_bp
+    from app.routes.notifications import notifications_bp
+    from app.routes.goals import goals_bp
+    from app.routes.ai_coach import ai_coach_bp
+    from app.routes.ml_analytics import ml_analytics_bp
+    from app.routes.advice_engine import advice_engine_bp
+    from app.routes.guest import guest_bp
     
     # Register API blueprints
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
@@ -113,6 +121,14 @@ def register_blueprints(app):
     app.register_blueprint(dashboard_bp, url_prefix='/api/dashboard')
     app.register_blueprint(analysis_bp, url_prefix='/api/analysis')
     app.register_blueprint(analysis_test_bp, url_prefix='/api/analysis-test')
+    app.register_blueprint(plaid_bp, url_prefix='/api/plaid')
+    app.register_blueprint(plaid_webhooks_bp, url_prefix='/api/plaid/webhooks')
+    app.register_blueprint(notifications_bp)  # Already has /api/notifications prefix
+    app.register_blueprint(goals_bp)  # Already has /api/goals prefix
+    app.register_blueprint(ai_coach_bp)  # Already has /api/coach prefix
+    app.register_blueprint(ml_analytics_bp)  # Already has /api/analytics prefix
+    app.register_blueprint(advice_engine_bp)  # Already has /api/advice prefix
+    app.register_blueprint(guest_bp)  # Already has /api/guest prefix
     
     # Register frontend blueprint (no prefix for main routes)
     app.register_blueprint(frontend_bp)

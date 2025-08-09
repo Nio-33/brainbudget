@@ -31,6 +31,17 @@ class Config:
     PLAID_CLIENT_ID = os.environ.get('PLAID_CLIENT_ID')
     PLAID_SECRET = os.environ.get('PLAID_SECRET')
     PLAID_ENV = os.environ.get('PLAID_ENV', 'sandbox')
+    PLAID_WEBHOOK_SECRET = os.environ.get('PLAID_WEBHOOK_SECRET')
+    
+    # Firebase Cloud Messaging configuration
+    FCM_SERVER_KEY = os.environ.get('FCM_SERVER_KEY')  # For server-to-server communication
+    VAPID_PUBLIC_KEY = os.environ.get('VAPID_PUBLIC_KEY')  # For web push
+    VAPID_PRIVATE_KEY = os.environ.get('VAPID_PRIVATE_KEY')
+    
+    # Notification system configuration
+    NOTIFICATION_RATE_LIMIT_DAILY = int(os.environ.get('NOTIFICATION_RATE_LIMIT_DAILY', '10'))
+    NOTIFICATION_QUIET_HOURS_START = int(os.environ.get('NOTIFICATION_QUIET_HOURS_START', '22'))  # 10 PM
+    NOTIFICATION_QUIET_HOURS_END = int(os.environ.get('NOTIFICATION_QUIET_HOURS_END', '8'))  # 8 AM
     
     # File upload configuration
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file size

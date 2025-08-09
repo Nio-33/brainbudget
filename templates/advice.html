@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+
+{% block title %}Personalized Advice - BrainBudget{% endblock %}
+
+{% block content %}
+<!-- ADHD-Friendly Financial Advice Dashboard -->
+<div id="advice-container" class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <div class="bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="py-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-blue-500 rounded-xl flex items-center justify-center shadow-lg mr-4">
+                            <span class="text-2xl">💡</span>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-900">Your Financial Advice</h1>
+                            <p class="text-sm text-gray-500">Personalized guidance for your ADHD brain</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Controls -->
+                    <div class="flex items-center space-x-4">
+                        <select id="advice-category" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500">
+                            <option value="">All Categories</option>
+                            <option value="budgeting">📊 Budgeting</option>
+                            <option value="debt_reduction">💪 Debt Reduction</option>
+                            <option value="savings">🏦 Savings</option>
+                            <option value="investment">📈 Investment</option>
+                            <option value="emergency_fund">🛡️ Emergency Fund</option>
+                        </select>
+                        
+                        <button id="refresh-advice" class="bg-green-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-600 transition-colors">
+                            <span class="flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                </svg>
+                                Get New Advice
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Quick Actions Bar -->
+        <div class="mb-8 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <button id="urgent-advice-btn" class="flex items-center justify-center bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg p-4 transition-colors">
+                    <span class="text-2xl mr-3">🚨</span>
+                    <span class="font-medium text-red-800">Urgent Priorities</span>
+                </button>
+                
+                <button id="quick-tips-btn" class="flex items-center justify-center bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg p-4 transition-colors">
+                    <span class="text-2xl mr-3">⚡</span>
+                    <span class="font-medium text-blue-800">Quick Tips</span>
+                </button>
+                
+                <button id="progress-check-btn" class="flex items-center justify-center bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg p-4 transition-colors">
+                    <span class="text-2xl mr-3">📈</span>
+                    <span class="font-medium text-purple-800">Check Progress</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading-state" class="hidden">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+                <div class="flex items-center justify-center">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500 mr-4"></div>
+                    <span class="text-gray-600">Generating personalized advice...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Advice Content -->
+        <div id="main-content" class="space-y-8">
+            
+            <!-- Personalized Advice Cards -->
+            <div id="advice-cards" class="space-y-6">
+                <!-- Advice cards will be populated here -->
+            </div>
+
+            <!-- User Profile Summary -->
+            <div id="profile-summary" class="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Your Financial Profile</h3>
+                <div id="profile-content">
+                    <p class="text-gray-600">Loading your personalized profile...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- No Data State -->
+        <div id="no-data-state" class="hidden">
+            <div class="text-center py-12">
+                <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <span class="text-4xl">🎯</span>
+                </div>
+                <h2 class="text-xl font-semibold text-gray-900 mb-2">Getting to Know You</h2>
+                <p class="text-gray-600 max-w-md mx-auto mb-6">
+                    We need a bit more information about your spending patterns to provide personalized advice. Keep using BrainBudget and we'll have great suggestions soon!
+                </p>
+                <div class="bg-green-50 rounded-lg p-4 max-w-md mx-auto">
+                    <p class="text-green-700 text-sm">
+                        💡 <strong>Quick Start:</strong> Upload some transaction data or set a financial goal to get started!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Progress Check Modal -->
+<div id="progress-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg max-w-md w-full mx-4 max-h-[80vh] overflow-y-auto">
+        <div class="p-6">
+            <div class="flex justify-between items-start mb-4">
+                <h3 class="text-xl font-semibold text-gray-900">How's It Going?</h3>
+                <button id="close-progress-modal" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <p class="text-gray-600">Tell us about your progress with any financial advice you've been working on:</p>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">How are things going?</label>
+                    <select id="progress-status" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                        <option value="">Select your progress...</option>
+                        <option value="not_started">Haven't started yet</option>
+                        <option value="in_progress">Making progress!</option>
+                        <option value="completed">Completed something!</option>
+                        <option value="stuck">Feeling stuck</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tell us more (optional)</label>
+                    <textarea id="progress-notes" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2" placeholder="What's working? What's challenging?"></textarea>
+                </div>
+                
+                <div class="flex space-x-3">
+                    <button id="submit-progress" class="flex-1 bg-green-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-600 transition-colors">
+                        Share Progress
+                    </button>
+                    <button id="cancel-progress" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                        Not Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Success Toast -->
+<div id="success-toast" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform z-50">
+    <div class="flex items-center">
+        <span class="mr-2">✅</span>
+        <span id="success-message">Success!</span>
+    </div>
+</div>
+
+<!-- Error Toast -->
+<div id="error-toast" class="fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform z-50">
+    <div class="flex items-center">
+        <span class="mr-2">❌</span>
+        <span id="error-message">Something went wrong</span>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/advice-dashboard.js') }}"></script>
+
+<script>
+    // Initialize advice dashboard
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.AdviceDashboard) {
+            window.adviceDashboard = new AdviceDashboard();
+        } else {
+            console.error('Advice dashboard not loaded');
+        }
+    });
+</script>
+
+<style>
+/* Custom styles for advice dashboard */
+.advice-card {
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+
+.advice-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.advice-card.urgency-critical {
+    border-left: 4px solid #DC2626;
+    background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%);
+}
+
+.advice-card.urgency-high {
+    border-left: 4px solid #F59E0B;
+    background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+}
+
+.advice-card.urgency-medium {
+    border-left: 4px solid #3B82F6;
+    background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+}
+
+.advice-card.urgency-low {
+    border-left: 4px solid #10B981;
+    background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
+}
+
+/* Category colors */
+.category-budgeting { color: #6B46C1; }
+.category-debt_reduction { color: #DC2626; }
+.category-savings { color: #059669; }
+.category-investment { color: #2563EB; }
+.category-emergency_fund { color: #D97706; }
+
+/* Progress indicators */
+.confidence-bar {
+    background: linear-gradient(90deg, #EF4444 0%, #F59E0B 50%, #10B981 100%);
+    border-radius: 4px;
+}
+
+/* ADHD-friendly focus styles */
+*:focus {
+    outline: 2px solid #10B981;
+    outline-offset: 2px;
+}
+
+/* Action button styles */
+.action-btn {
+    transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+    transform: scale(1.02);
+}
+
+.action-btn.completed {
+    background: #10B981;
+    color: white;
+}
+
+.action-btn.in-progress {
+    background: #F59E0B;
+    color: white;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .advice-card {
+        transition: none;
+    }
+    
+    .action-btn {
+        transition: none;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .advice-card {
+        border: 2px solid #000;
+    }
+    
+    .text-gray-500 {
+        color: #374151;
+    }
+}
+
+/* Print styles */
+@media print {
+    .advice-card {
+        break-inside: avoid;
+        border: 1px solid #d1d5db !important;
+        box-shadow: none !important;
+    }
+    
+    .bg-gradient-to-br {
+        background: #f9fafb !important;
+        color: #111827 !important;
+    }
+}
+</style>
+
+{% endblock %}
