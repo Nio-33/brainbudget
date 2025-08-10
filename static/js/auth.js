@@ -94,6 +94,14 @@ class BrainBudgetAuth {
       this.rememberMe = e.target.checked;
     });
     
+    // Logout buttons
+    document.querySelectorAll('[data-action="logout"]').forEach(button => {
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.handleLogout();
+      });
+    });
+    
     // Real-time validation
     this.setupRealTimeValidation();
     
@@ -186,6 +194,60 @@ class BrainBudgetAuth {
     }
   }
   
+  /**
+   * Handle logout
+   */
+  async handleLogout() {
+    try {
+      // Show loading state if there's a logout button
+      const logoutBtn = document.querySelector('[data-action="logout"]');
+      if (logoutBtn) {
+        this.setButtonLoading(logoutBtn.id || 'logout-btn', true);
+      }
+
+      // First, call backend logout if user is authenticated
+      if (window.firebase && firebase.auth && firebase.auth().currentUser) {
+        try {
+          const idToken = await firebase.auth().currentUser.getIdToken();
+          await fetch('/api/auth/logout', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${idToken}`,
+              'Content-Type': 'application/json'
+            }
+          });
+        } catch (error) {
+          console.warn('Backend logout failed, proceeding with Firebase logout:', error);
+        }
+
+        // Firebase sign out
+        await firebase.auth().signOut();
+      }
+
+      // Clear local storage
+      localStorage.removeItem('authRememberMe');
+      localStorage.removeItem('authEmail');
+      localStorage.removeItem('authFailedAttempts');
+      localStorage.removeItem('authLockoutTime');
+
+      this.showMessage('success', 'You\'ve been logged out successfully. Thanks for using BrainBudget! 👋');
+
+      // Redirect to login page
+      setTimeout(() => {
+        window.location.href = '/auth/login';
+      }, 1500);
+
+    } catch (error) {
+      console.error('Logout error:', error);
+      this.showMessage('error', 'Logout completed anyway! See you soon! 👋');
+      
+      // Still redirect even if there was an error
+      setTimeout(() => {
+        window.location.href = '/auth/login';
+      }, 2000);
+    }
+  }
+
   /**
    * Handle Google Sign-In
    */

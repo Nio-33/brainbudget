@@ -286,6 +286,50 @@ class FirebaseService:
             
         except Exception as e:
             logger.error(f"Failed to upload file {filename}: {e}")
+            
+            # Check if it's a "bucket does not exist" error
+            if "bucket does not exist" in str(e).lower() or "notfound" in str(e).lower():
+                logger.warning("Firebase Storage bucket not found. Using local storage fallback for development.")
+                return self._upload_file_locally(file_data, filename, uid)
+            
+            return None
+    
+    def _upload_file_locally(self, file_data: bytes, filename: str, uid: str) -> Optional[str]:
+        """
+        Fallback: Upload file to local storage for development.
+        
+        Args:
+            file_data: File data as bytes
+            filename: Original filename
+            uid: Firebase user UID
+            
+        Returns:
+            Local file URL if successful, None otherwise
+        """
+        import os
+        
+        try:
+            # Create uploads directory
+            upload_dir = os.path.join("uploads", uid)
+            os.makedirs(upload_dir, exist_ok=True)
+            
+            # Create unique filename
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            local_filename = f"{timestamp}_{filename}"
+            file_path = os.path.join(upload_dir, local_filename)
+            
+            # Save file locally
+            with open(file_path, 'wb') as f:
+                f.write(file_data)
+            
+            # Return local file URL (for development)
+            local_url = f"/uploads/{uid}/{local_filename}"
+            logger.info(f"File uploaded locally: {file_path}")
+            
+            return local_url
+            
+        except Exception as e:
+            logger.error(f"Failed to upload file locally {filename}: {e}")
             return None
     
     def delete_file(self, file_url: str) -> bool:

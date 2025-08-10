@@ -96,17 +96,17 @@ class BrainBudgetNotifications {
             const permission = await Notification.requestPermission();
             
             if (permission === 'granted') {
-                this.showSuccessMessage('🎉 Great! You\\'ll get gentle reminders to help manage your money.');
+                this.showSuccessMessage('🎉 Great! You\'ll get gentle reminders to help manage your money.');
                 await this.registerForNotifications();
                 return true;
             } else if (permission === 'denied') {
-                this.showNotificationError('No worries! You can still use all of BrainBudget\\'s features. You can always enable notifications later in your browser settings if you change your mind.');
+                this.showNotificationError('No worries! You can still use all of BrainBudget\'s features. You can always enable notifications later in your browser settings if you change your mind.');
                 return false;
             }
             
         } catch (error) {
             console.error('Error requesting notification permission:', error);
-            this.showNotificationError('Something went wrong with notifications, but don\\'t worry - BrainBudget works perfectly without them!');
+            this.showNotificationError('Something went wrong with notifications, but don\'t worry - BrainBudget works perfectly without them!');
         }
         
         return false;

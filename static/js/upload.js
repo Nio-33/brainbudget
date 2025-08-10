@@ -18,7 +18,7 @@ class FileUploader {
         this.analyzeBtn = document.getElementById(options.analyzeBtn);
         this.dropContent = document.getElementById(options.dropContent);
         
-        this.apiEndpoint = options.apiEndpoint || '/api/upload';
+        this.apiEndpoint = options.apiEndpoint || '/api/upload/statement';
         this.maxFileSize = options.maxFileSize || 16 * 1024 * 1024; // 16MB
         this.allowedTypes = options.allowedTypes || ['pdf', 'jpg', 'jpeg', 'png'];
         
@@ -46,9 +46,13 @@ class FileUploader {
         this.dropZone.addEventListener('drop', (e) => this.handleDrop(e));
         
         // Click to browse
-        this.browseBtn?.addEventListener('click', () => this.fileInput?.click());
+        this.browseBtn?.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent event from bubbling to drop zone
+            this.fileInput?.click();
+        });
         this.dropZone.addEventListener('click', (e) => {
-            if (e.target === this.dropZone || this.dropContent?.contains(e.target)) {
+            // Only trigger file picker if clicking the drop zone itself, not child elements
+            if (e.target === this.dropZone || (this.dropContent?.contains(e.target) && !this.browseBtn?.contains(e.target))) {
                 this.fileInput?.click();
             }
         });
@@ -271,9 +275,14 @@ class FileUploader {
         } catch (error) {
             console.error('Upload error:', error);
             
-            // Show error with helpful message
-            const friendlyMessage = this.getFriendlyErrorMessage(error.message);
-            showErrorToast(friendlyMessage);
+            // Check if this is an authentication error
+            if (error.message.includes('log in')) {
+                this.showLoginPrompt();
+            } else {
+                // Show error with helpful message
+                const friendlyMessage = this.getFriendlyErrorMessage(error.message);
+                showErrorToast(friendlyMessage);
+            }
             
             // Reset UI
             this.hideProgress();
@@ -284,7 +293,7 @@ class FileUploader {
     }
     
     async uploadFile() {
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             const formData = new FormData();
             formData.append('file', this.currentFile);
             
@@ -336,8 +345,28 @@ class FileUploader {
                 reject(new Error('Upload timed out'));
             });
             
-            xhr.timeout = 60000; // 60 seconds timeout
+            xhr.timeout = 120000; // 120 seconds timeout (2 minutes) for AI analysis
             xhr.open('POST', this.apiEndpoint);
+            
+            // Add authentication header after open
+            try {
+                const token = await this.getAuthToken();
+                if (token) {
+                    xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+                } else {
+                    // If no auth token, prompt user to log in
+                    console.info('No auth token found, user needs to log in');
+                    xhr.abort();
+                    reject(new Error('Please log in to analyze your bank statement. Click "Login" to get started!'));
+                    return;
+                }
+            } catch (error) {
+                console.warn('Could not get auth token:', error);
+                xhr.abort();
+                reject(new Error('Please log in to analyze your bank statement. Click "Login" to get started!'));
+                return;
+            }
+            
             xhr.send(formData);
         });
     }
@@ -381,7 +410,8 @@ class FileUploader {
             'File too large': 'This file is too big. Please try a smaller file (under 16MB).',
             'Invalid file type': 'This file type isn\'t supported. Please use PDF, JPG, or PNG files.',
             'Upload failed': 'Something went wrong with the upload. Please try again.',
-            'Analysis failed': 'We couldn\'t analyze your statement. Please try again or contact support.'
+            'Analysis failed': 'We couldn\'t analyze your statement. Please try again or contact support.',
+            'Please log in': 'To analyze bank statements, you need to create a free account first. It\'s quick and easy!'
         };
         
         // Find matching error message
@@ -393,6 +423,38 @@ class FileUploader {
         
         // Default friendly message
         return 'Something didn\'t work as expected. Please try again, or contact us if the problem continues.';
+    }
+    
+    async getAuthToken() {
+        if (window.firebase && window.firebase.auth && window.firebase.auth().currentUser) {
+            return await window.firebase.auth().currentUser.getIdToken();
+        }
+        return null;
+    }
+    
+    showLoginPrompt() {
+        // Create a custom modal or use existing toast system
+        const message = `
+            <div class="text-center">
+                <div class="text-xl mb-4">🔐 Account Required</div>
+                <p class="mb-4">To analyze bank statements with AI, you need to create a free account first. It's quick and easy!</p>
+                <div class="space-x-4">
+                    <a href="/auth/login" class="inline-block bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors">Login</a>
+                    <a href="/auth/signup" class="inline-block bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition-colors">Sign Up Free</a>
+                </div>
+            </div>
+        `;
+        
+        // If there's a showInfoToast function, use it, otherwise fallback to alert
+        if (typeof showInfoToast === 'function') {
+            showInfoToast(message);
+        } else if (typeof showErrorToast === 'function') {
+            showErrorToast('To analyze bank statements, please log in first. You can create a free account!');
+        } else {
+            // Fallback to browser alert
+            alert('To analyze bank statements, you need to log in first. Click OK to go to the login page.');
+            window.location.href = '/auth/login';
+        }
     }
     
     updateUI() {

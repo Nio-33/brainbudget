@@ -64,6 +64,13 @@ def upload_statement():
         
         # Upload file to Firebase Storage
         firebase_service: FirebaseService = current_app.firebase
+        if not firebase_service:
+            return jsonify({
+                'success': False,
+                'error': "File storage is not configured yet. Please set up Firebase! 🔥",
+                'details': "Contact the administrator to configure Firebase environment variables."
+            }), 503
+        
         file_url = firebase_service.upload_file(file_content, filename, uid)
         
         if not file_url:
@@ -73,7 +80,15 @@ def upload_statement():
             }), 500
         
         # Analyze file with Gemini AI
-        gemini_service = GeminiAIService(current_app.config['GEMINI_API_KEY'])
+        gemini_api_key = current_app.config.get('GEMINI_API_KEY')
+        if not gemini_api_key:
+            return jsonify({
+                'success': False,
+                'error': "AI analysis is not configured yet. Please set up your Gemini API key! 🔑",
+                'details': "Contact the administrator to configure the GEMINI_API_KEY environment variable."
+            }), 503
+        
+        gemini_service = GeminiAIService(gemini_api_key)
         analysis_result = gemini_service.analyze_bank_statement(file_content, file_type, filename)
         
         if not analysis_result['success']:

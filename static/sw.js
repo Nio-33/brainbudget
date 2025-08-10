@@ -241,7 +241,7 @@ async function syncUploadData() {
         
         for (const upload of pendingUploads) {
             try {
-                const response = await fetch('/api/upload', {
+                const response = await fetch('/api/upload/statement', {
                     method: 'POST',
                     body: upload.formData
                 });

@@ -36,10 +36,10 @@ class GeminiAIService:
             genai.configure(api_key=self.api_key)
             
             # Text model for analysis
-            self.model = genai.GenerativeModel('gemini-pro')
+            self.model = genai.GenerativeModel('gemini-1.5-flash')
             
-            # Vision model for image/PDF processing
-            self.vision_model = genai.GenerativeModel('gemini-pro-vision')
+            # Vision model for image/PDF processing  
+            self.vision_model = genai.GenerativeModel('gemini-1.5-flash')
             
             logger.info("Gemini AI models initialized successfully")
             
