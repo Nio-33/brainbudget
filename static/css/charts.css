@@ -5,11 +5,13 @@
 
 /* CSS Custom Properties for ADHD-friendly theming */
 :root {
-  /* ADHD-friendly color palette */
-  --color-cozy-blue: #6B9BD6;
+  /* ADHD-friendly color palette - Updated from new design */
+  --color-cozy-blue: #6976c6;
+  --color-light-blue: #8eb5e3;
+  --color-bright-blue: #b2f1ff;
   --color-warm-green: #81C784;
   --color-sunny-orange: #FFB74D;
-  --color-soft-purple: #BA68C8;
+  --color-soft-purple: #4749a0;
   --color-gentle-pink: #F48FB1;
   --color-earthy-brown: #A1887F;
   
@@ -19,16 +21,16 @@
   --color-soft-red: #EF5350;
   --color-neutral-gray: #90A4AE;
   
-  /* Text and background */
-  --color-text-primary: #37474F;
-  --color-text-secondary: #78909C;
-  --color-background: #FAFAFA;
-  --color-card-background: #FFFFFF;
-  --color-grid-lines: #E0E6ED;
+  /* Text and background - Updated with design colors */
+  --color-text-primary: #03102f;
+  --color-text-secondary: #4749a0;
+  --color-background: #b2f1ff;
+  --color-card-background: #e9f0f3;
+  --color-grid-lines: #c5cacf;
   
   /* Interactive states */
-  --color-hover: rgba(107, 155, 214, 0.1);
-  --color-focus: rgba(107, 155, 214, 0.3);
+  --color-hover: rgba(105, 118, 198, 0.1);
+  --color-focus: rgba(105, 118, 198, 0.3);
   
   /* Typography (larger sizes for ADHD users) */
   --font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -75,6 +77,26 @@
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* Beautiful gradient from the new design */
+.brain-budget-gradient {
+  background: linear-gradient(135deg, 
+    var(--color-bright-blue) 0%, 
+    var(--color-light-blue) 25%, 
+    var(--color-cozy-blue) 50%, 
+    var(--color-soft-purple) 75%, 
+    var(--color-text-primary) 100%);
+}
+
+.brain-budget-gradient-text {
+  background: linear-gradient(135deg, 
+    var(--color-cozy-blue) 0%, 
+    var(--color-soft-purple) 50%, 
+    var(--color-text-primary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* Charts Container */

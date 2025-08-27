@@ -21,16 +21,16 @@
                     colors: {
                         // ADHD-friendly warm color palette
                         primary: {
-                            50: '#f0f8ff',
-                            100: '#e0f2fe', 
-                            200: '#bae6fd',
-                            300: '#7dd3fc',
-                            400: '#38bdf8',
-                            500: '#4A90E2', // Main brand blue
-                            600: '#0284c7',
-                            700: '#0369a1',
-                            800: '#075985',
-                            900: '#0c4a6e'
+                            50: '#b2f1ff',
+                            100: '#8eb5e3', 
+                            200: '#7d98d6',
+                            300: '#6976c6',
+                            400: '#5555b7',
+                            500: '#4749a0', // Main brand blue from design
+                            600: '#3d408f',
+                            700: '#33387f',
+                            800: '#252d67',
+                            900: '#03102f'
                         },
                         success: {
                             50: '#f0fdf4',
@@ -79,7 +79,7 @@
                         'bounce-gentle': 'bounce 2s infinite',
                         'pulse-soft': 'pulse 3s infinite',
                         'wiggle': 'wiggle 1s ease-in-out infinite',
-                        'celebration': 'celebration 0.6s ease-in-out',
+                        'celebration': 'celebration 0.6s ease-out',
                     }
                 }
             }
@@ -101,94 +101,58 @@
             50% { transform: scale(1.1); }
         }
         
-        /* Focus indicators for accessibility */
+        .gentle-transition {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
         .focus-ring:focus {
-            outline: 2px solid #4A90E2;
+            outline: 2px solid #4749a0;
             outline-offset: 2px;
         }
         
-        /* Gentle transitions */
-        .gentle-transition {
-            transition: all 0.3s ease-out;
+        .gentle-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(71, 73, 160, 0.15);
         }
         
-        /* Reduced motion for users who prefer it */
+        /* ADHD-friendly focus indicators */
+        .focus-visible:focus-visible {
+            outline: 3px solid #4749a0;
+            outline-offset: 2px;
+            border-radius: 0.5rem;
+        }
+        
+        /* Reduced motion support */
         @media (prefers-reduced-motion: reduce) {
-            * {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
+            .gentle-transition,
+            .gentle-hover:hover {
+                transition: none;
+                transform: none;
             }
-        }
-        
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
         }
     </style>
     
-    <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#4A90E2">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="BrainBudget">
-    
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
-    
-    <!-- Icons -->
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='icons/favicon-32x32.png') }}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='icons/favicon-16x16.png') }}">
-    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/apple-touch-icon.png') }}">
-    
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/charts.css') }}">
     {% block extra_head %}{% endblock %}
 </head>
-
-<body class="bg-background min-h-screen text-text-primary antialiased">
-    <!-- Skip to main content for screen readers -->
-    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary-500 text-white px-4 py-2 rounded-lg z-50">
-        Skip to main content
-    </a>
-    
-    <!-- Loading indicator -->
-    <div id="loading-overlay" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 hidden items-center justify-center">
-        <div class="text-center">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto mb-4"></div>
-            <p class="text-text-secondary">Loading your financial insights...</p>
-        </div>
-    </div>
-    
-    <!-- Navigation -->
-    <nav class="bg-surface shadow-sm border-b border-gray-100" role="navigation">
+<body class="bg-background text-text-primary font-sans antialiased min-h-screen flex flex-col">
+    <!-- Navigation - Only show for authenticated users or specific app pages -->
+    {% if request.endpoint and request.endpoint not in ['frontend.index', 'frontend.login_page', 'frontend.register_page', 'frontend.signup_page'] %}
+    <nav role="navigation" class="bg-surface border-b border-gray-100 sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
-                <!-- Logo -->
-                <a href="/" class="flex items-center space-x-3 hover:opacity-80 transition-opacity focus-ring rounded-lg px-2 py-1">
-                    <div class="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center">
-                        <span class="text-white font-bold text-sm">🧠</span>
-                    </div>
-                    <span class="font-semibold text-xl text-text-primary">BrainBudget</span>
-                </a>
+                <!-- Logo and Brand -->
+                <div class="flex items-center">
+                    <a href="/dashboard" class="flex items-center space-x-2 text-xl font-bold text-primary-600">
+                        <span class="text-2xl">🧠💰</span>
+                        <span>BrainBudget</span>
+                    </a>
+                </div>
                 
-                <!-- Navigation Links (Desktop) -->
-                <div class="hidden md:flex items-center space-x-6">
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-8">
                     <a href="/upload" class="nav-link text-text-secondary hover:text-primary-500 gentle-transition focus-ring rounded px-2 py-1">📁 Upload</a>
                     <a href="/dashboard" class="nav-link text-text-secondary hover:text-primary-500 gentle-transition focus-ring rounded px-2 py-1">📊 Dashboard</a>
-                    <a href="/goals/create" class="nav-link text-text-secondary hover:text-primary-500 gentle-transition focus-ring rounded px-2 py-1">🎯 Goals</a>
+                    <a href="/goals" class="nav-link text-text-secondary hover:text-primary-500 gentle-transition focus-ring rounded px-2 py-1">🎯 Goals</a>
                     <a href="/advice" class="nav-link text-text-secondary hover:text-primary-500 gentle-transition focus-ring rounded px-2 py-1">💡 Advice</a>
                     <a href="/insights" class="nav-link text-text-secondary hover:text-primary-500 gentle-transition focus-ring rounded px-2 py-1">🧠 Insights</a>
                     <a href="/coach" class="nav-link text-text-secondary hover:text-primary-500 gentle-transition focus-ring rounded px-2 py-1">🤖 AI Coach</a>
@@ -212,29 +176,22 @@
             <div class="px-4 py-3 space-y-2">
                 <a href="/upload" class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50 hover:text-primary-500 focus-ring">📁 Upload</a>
                 <a href="/dashboard" class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50 hover:text-primary-500 focus-ring">📊 Dashboard</a>
-                <a href="/goals/create" class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50 hover:text-primary-500 focus-ring">🎯 Goals</a>
+                <a href="/goals" class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50 hover:text-primary-500 focus-ring">🎯 Goals</a>
                 <a href="/advice" class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50 hover:text-primary-500 focus-ring">💡 Advice</a>
                 <a href="/insights" class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50 hover:text-primary-500 focus-ring">🧠 Insights</a>
                 <a href="/coach" class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50 hover:text-primary-500 focus-ring">🤖 AI Coach</a>
+                <a href="/community" class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50 hover:text-primary-500 focus-ring">🤗 Community</a>
                 <a href="/settings" class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50 hover:text-primary-500 focus-ring">⚙️ Settings</a>
             </div>
         </div>
     </nav>
+    {% endif %}
     
     <!-- Main Content -->
     <main id="main-content" class="flex-1">
         {% block content %}{% endblock %}
     </main>
     
-    <!-- Footer -->
-    <footer class="bg-surface border-t border-gray-100 mt-12">
-        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-            <div class="text-center text-text-secondary">
-                <p class="mb-2">Made with 💜 for the neurodivergent community</p>
-                <p class="text-sm">BrainBudget - Making budgeting accessible and kind</p>
-            </div>
-        </div>
-    </footer>
     
     <!-- Success Toast Notification -->
     <div id="success-toast" class="fixed bottom-4 right-4 bg-success-500 text-white px-6 py-4 rounded-xl shadow-lg transform translate-y-full transition-transform duration-300 z-50 hidden">

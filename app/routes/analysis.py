@@ -15,7 +15,7 @@ try:
     PYPDF2_AVAILABLE = True
 except ImportError:
     PYPDF2_AVAILABLE = False
-    
+
 try:
     import fitz  # PyMuPDF for better PDF handling
     PYMUPDF_AVAILABLE = True
@@ -65,7 +65,7 @@ def analyze_statement():
             }), 400
 
         file = request.files['file']
-        
+
         if file.filename == '':
             return jsonify({
                 'error': True,
@@ -91,13 +91,13 @@ def analyze_statement():
             }), 500
 
         analyzer = StatementAnalyzer(gemini_api_key)
-        
+
         # Process based on file type
         filename = secure_filename(file.filename)
         file_ext = filename.rsplit('.', 1)[1].lower()
-        
+
         logger.info(f"Processing {file_ext} file: {filename}")
-        
+
         if file_ext == 'pdf':
             analysis_result = _process_pdf_statement(file, analyzer)
         elif file_ext in ['png', 'jpg', 'jpeg']:
@@ -113,10 +113,10 @@ def analyze_statement():
 
         # Validate analysis results
         validation = analyzer.validate_analysis_result(analysis_result)
-        
+
         # Format for frontend consumption
         response_data = _format_analysis_response(analysis_result, validation)
-        
+
         # Optional: Save to Firebase if configured
         try:
             if hasattr(current_app, 'firebase') and current_app.firebase:
@@ -126,7 +126,7 @@ def analyze_statement():
             # Continue without Firebase - this is not critical
 
         logger.info(f"Successfully analyzed statement with {len(analysis_result.transactions)} transactions")
-        
+
         return jsonify(response_data), 200
 
     except Exception as e:
@@ -146,7 +146,7 @@ def manual_categorize():
     """
     try:
         data = request.get_json()
-        
+
         if not data:
             return jsonify({
                 'error': True,
@@ -155,7 +155,7 @@ def manual_categorize():
             }), 400
 
         transaction_updates = data.get('transactions', [])
-        
+
         if not transaction_updates:
             return jsonify({
                 'error': True,
@@ -168,16 +168,16 @@ def manual_categorize():
             'Housing', 'Transportation', 'Food & Dining', 'Entertainment',
             'Shopping', 'Healthcare', 'Bills & Utilities', 'Income', 'Other'
         ]
-        
+
         updated_transactions = []
-        
+
         for update in transaction_updates:
             transaction_id = update.get('id')
             new_category = update.get('category')
-            
+
             if not transaction_id or not new_category:
                 continue
-                
+
             if new_category not in valid_categories:
                 return jsonify({
                     'error': True,
@@ -185,7 +185,7 @@ def manual_categorize():
                     'code': 'INVALID_CATEGORY',
                     'valid_categories': valid_categories
                 }), 400
-            
+
             updated_transactions.append({
                 'id': transaction_id,
                 'category': new_category,
@@ -194,7 +194,7 @@ def manual_categorize():
 
         # In a real implementation, you would update the stored analysis
         # For now, return success with the updates
-        
+
         return jsonify({
             'success': True,
             'message': f'Successfully updated {len(updated_transactions)} transactions! 🎉',
@@ -218,7 +218,7 @@ def get_insights(analysis_id):
     try:
         # In a real implementation, retrieve from database/Firebase
         # For now, return a success message
-        
+
         return jsonify({
             'success': True,
             'message': 'Insights endpoint ready for implementation',
@@ -240,7 +240,7 @@ def export_analysis(analysis_id):
     """
     try:
         export_format = request.args.get('format', 'csv').lower()
-        
+
         if export_format not in ['csv', 'json', 'pdf']:
             return jsonify({
                 'error': True,
@@ -254,7 +254,7 @@ def export_analysis(analysis_id):
             'success': True,
             'message': f'Export in {export_format} format ready for implementation',
             'analysis_id': analysis_id,
-            'format': export_format
+            'format': export_forma
         }), 200
 
     except Exception as e:
@@ -273,50 +273,50 @@ def _process_pdf_statement(file, analyzer):
         # Check if PDF processing libraries are available
         if not PYMUPDF_AVAILABLE and not PYPDF2_AVAILABLE:
             raise ValueError("PDF processing libraries not installed. Please install PyMuPDF or PyPDF2.")
-        
-        # Read PDF content
+
+        # Read PDF conten
         file_content = file.read()
         text_content = ""
-        
+
         # Try PyMuPDF first (better for complex layouts)
         if PYMUPDF_AVAILABLE:
             try:
                 pdf_document = fitz.open(stream=file_content, filetype="pdf")
-                
+
                 for page_num in range(pdf_document.page_count):
                     page = pdf_document[page_num]
                     text_content += page.get_text() + "\n"
-                
+
                 pdf_document.close()
-                
+
                 if text_content.strip():
                     return analyzer.analyze_text_statement(text_content)
-                    
+
             except Exception as e:
                 logger.warning(f"PyMuPDF failed: {e}")
-        
+
         # Fallback to PyPDF2
         if PYPDF2_AVAILABLE and not text_content.strip():
             try:
                 file.seek(0)  # Reset file pointer
                 reader = PyPDF2.PdfReader(BytesIO(file_content))
-                
+
                 for page in reader.pages:
                     text_content += page.extract_text() + "\n"
-                
+
                 if text_content.strip():
                     return analyzer.analyze_text_statement(text_content)
-                    
+
             except Exception as e:
                 logger.warning(f"PyPDF2 failed: {e}")
-        
+
         # If text extraction failed, try as image using Gemini Vision
         if not text_content.strip():
             logger.info("Text extraction failed, processing PDF as image")
             return analyzer.analyze_image_statement(file_content, "application/pdf")
-        
+
         raise ValueError("Could not extract text from PDF")
-        
+
     except Exception as e:
         logger.error(f"Error processing PDF: {e}")
         raise ValueError(f"Could not process PDF file: {str(e)}")
@@ -325,7 +325,7 @@ def _process_image_statement(file, analyzer):
     """Process image bank statement."""
     try:
         image_data = file.read()
-        
+
         # Validate image if PIL is available
         if PILLOW_AVAILABLE:
             try:
@@ -333,7 +333,7 @@ def _process_image_statement(file, analyzer):
                 img.verify()  # Verify it's a valid image
             except Exception:
                 raise ValueError("Invalid image file")
-        
+
         # Determine MIME type
         file_ext = file.filename.rsplit('.', 1)[1].lower()
         mime_types = {
@@ -341,11 +341,11 @@ def _process_image_statement(file, analyzer):
             'jpg': 'image/jpeg',
             'jpeg': 'image/jpeg'
         }
-        
+
         mime_type = mime_types.get(file_ext, 'image/jpeg')
-        
+
         return analyzer.analyze_image_statement(image_data, mime_type)
-        
+
     except Exception as e:
         logger.error(f"Error processing image: {e}")
         raise ValueError(f"Could not process image file: {str(e)}")
@@ -354,33 +354,34 @@ def _process_spreadsheet_statement(file, analyzer):
     """Process CSV/Excel bank statement."""
     try:
         if not PANDAS_AVAILABLE:
-            raise ValueError("Pandas library not installed. Please install pandas and openpyxl for spreadsheet processing.")
-        
+            raise ValueError("Pandas library not installed. Please install pandas and "
+                             "openpyxl for spreadsheet processing.")
+
         file_ext = file.filename.rsplit('.', 1)[1].lower()
-        
-        # Read spreadsheet
+
+        # Read spreadshee
         if file_ext == 'csv':
             df = pd.read_csv(file)
         else:  # xlsx, xls
             df = pd.read_excel(file)
-        
+
         # Convert to text format for analysis
         text_content = "Bank Statement Transactions:\n\n"
-        
+
         for _, row in df.iterrows():
             row_text = " | ".join([f"{col}: {val}" for col, val in row.items() if pd.notna(val)])
             text_content += row_text + "\n"
-        
+
         return analyzer.analyze_text_statement(text_content)
-        
+
     except Exception as e:
         logger.error(f"Error processing spreadsheet: {e}")
         raise ValueError(f"Could not process spreadsheet file: {str(e)}")
 
 def _format_analysis_response(analysis: AnalysisResult, validation: dict) -> dict:
     """Format analysis results for frontend consumption."""
-    
-    # Convert transactions to JSON-serializable format
+
+    # Convert transactions to JSON-serializable forma
     transactions = []
     for i, txn in enumerate(analysis.transactions):
         transactions.append({
@@ -393,8 +394,8 @@ def _format_analysis_response(analysis: AnalysisResult, validation: dict) -> dic
             'confidence': txn.confidence,
             'manually_categorized': False
         })
-    
-    # Convert insights to JSON-serializable format
+
+    # Convert insights to JSON-serializable forma
     insights = []
     for insight in analysis.insights:
         insights.append({
@@ -407,11 +408,11 @@ def _format_analysis_response(analysis: AnalysisResult, validation: dict) -> dic
             'recommendation': insight.recommendation,
             'icon': _get_insight_icon(insight.insight_type)
         })
-    
+
     # Create spending breakdown for charts
     analyzer = StatementAnalyzer("")  # Temporary instance for chart data
     chart_data = analyzer.get_category_breakdown_for_charts(analysis)
-    
+
     return {
         'success': True,
         'analysis': {
@@ -453,19 +454,19 @@ def _get_insight_icon(insight_type: str) -> str:
 
 def _generate_monthly_trend_data(transactions) -> dict:
     """Generate monthly spending trend data for charts."""
-    from collections import defaultdict
+    from collections import defaultdic
     from datetime import datetime
-    
+
     monthly_data = defaultdict(float)
-    
+
     for txn in transactions:
         if txn.transaction_type == 'debit':
             month_key = txn.date.strftime('%Y-%m')
-            monthly_data[month_key] += txn.amount
-    
+            monthly_data[month_key] += txn.amoun
+
     # Sort by month and prepare for Chart.js
     sorted_months = sorted(monthly_data.keys())
-    
+
     return {
         'labels': [datetime.strptime(month, '%Y-%m').strftime('%b %Y') for month in sorted_months],
         'data': [monthly_data[month] for month in sorted_months],
@@ -475,22 +476,22 @@ def _generate_monthly_trend_data(transactions) -> dict:
 def _generate_category_insights_data(spending_breakdown) -> list:
     """Generate category-specific insights for visualization."""
     insights = []
-    
+
     if not spending_breakdown:
         return insights
-    
+
     total_spending = sum(spending_breakdown.values())
-    
+
     for category, amount in spending_breakdown.items():
         percentage = (amount / total_spending * 100) if total_spending > 0 else 0
-        
+
         insights.append({
             'category': category,
             'amount': amount,
             'percentage': round(percentage, 1),
             'status': 'high' if percentage > 30 else 'medium' if percentage > 15 else 'low'
         })
-    
+
     return sorted(insights, key=lambda x: x['amount'], reverse=True)
 
 def _save_analysis_to_firebase(analysis_data):
@@ -498,20 +499,20 @@ def _save_analysis_to_firebase(analysis_data):
     try:
         if hasattr(current_app, 'firebase') and current_app.firebase:
             firebase_service: FirebaseService = current_app.firebase
-            
+
             # Create document reference
             doc_ref = firebase_service.db.collection('analyses').document()
-            
+
             # Add timestamp and user info if available
             analysis_data['created_at'] = datetime.now()
             # analysis_data['user_id'] = get_current_user_id()  # Implement user auth
-            
+
             # Save to Firestore
             doc_ref.set(analysis_data)
-            
+
             logger.info(f"Analysis saved to Firebase: {doc_ref.id}")
             return doc_ref.id
-            
+
     except Exception as e:
         logger.warning(f"Failed to save to Firebase: {e}")
         return None

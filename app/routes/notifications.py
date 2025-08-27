@@ -11,7 +11,7 @@ from app.services.firebase_service import FirebaseService
 
 logger = logging.getLogger(__name__)
 
-# Create blueprint
+# Create blueprin
 notifications_bp = Blueprint('notifications', __name__, url_prefix='/api/notifications')
 
 def require_auth(f):
@@ -22,18 +22,18 @@ def require_auth(f):
             auth_header = request.headers.get('Authorization')
             if not auth_header or not auth_header.startswith('Bearer '):
                 return jsonify({'error': 'Missing or invalid authorization header'}), 401
-            
+
             id_token = auth_header.split('Bearer ')[1]
-            
+
             # Verify the ID token
             decoded_token = auth.verify_id_token(id_token)
             request.user_id = decoded_token['uid']
-            
+
             return f(*args, **kwargs)
         except Exception as e:
             logger.error(f"Authentication error: {str(e)}")
             return jsonify({'error': 'Invalid authentication token'}), 401
-    
+
     decorated_function.__name__ = f.__name__
     return decorated_function
 
@@ -46,12 +46,12 @@ def register_fcm_token():
         data = request.get_json()
         token = data.get('token')
         device_info = data.get('device_info', {})
-        
+
         if not token:
             return jsonify({'error': 'FCM token is required'}), 400
-        
+
         firebase_service = FirebaseService()
-        
+
         # Store or update FCM token
         token_data = {
             'token': token,
@@ -59,33 +59,33 @@ def register_fcm_token():
             'registered_at': datetime.utcnow(),
             'active': True
         }
-        
+
         # Use user_id as document ID and store tokens in a subcollection or map
         tokens_ref = firebase_service.db.collection('user_fcm_tokens').document(request.user_id)
-        
+
         # Get existing tokens
         tokens_doc = tokens_ref.get()
         if tokens_doc.exists:
             existing_tokens = tokens_doc.to_dict().get('tokens', {})
         else:
             existing_tokens = {}
-        
+
         # Add or update this token
         existing_tokens[token] = token_data
-        
-        # Update document
+
+        # Update documen
         tokens_ref.set({
             'user_id': request.user_id,
             'tokens': existing_tokens,
             'updated_at': datetime.utcnow()
         })
-        
+
         return jsonify({
             'success': True,
             'message': 'FCM token registered successfully',
             'token_count': len(existing_tokens)
         })
-        
+
     except Exception as e:
         logger.error(f"Error registering FCM token: {str(e)}")
         return jsonify({'error': 'Failed to register token'}), 500
@@ -99,7 +99,7 @@ def get_notification_preferences():
         firebase_service = FirebaseService()
         prefs_ref = firebase_service.db.collection('user_preferences').document(request.user_id)
         prefs_doc = prefs_ref.get()
-        
+
         if not prefs_doc.exists:
             # Return ADHD-friendly defaults
             default_prefs = {
@@ -139,19 +139,19 @@ def get_notification_preferences():
                         'end': 8     # 8 AM
                     },
                     'timezone': 'UTC',
-                    'tone': 'gentle',  # gentle, encouraging, direct
-                    'frequency': 'moderate',  # minimal, moderate, frequent
+                    'tone': 'gentle',  # gentle, encouraging, direc
+                    'frequency': 'moderate',  # minimal, moderate, frequen
                     'max_daily': 10
                 }
             }
-            
+
             # Save defaults
             prefs_ref.set(default_prefs)
             return jsonify(default_prefs['notifications'])
-        
+
         notifications_prefs = prefs_doc.to_dict().get('notifications', {})
         return jsonify(notifications_prefs)
-        
+
     except Exception as e:
         logger.error(f"Error getting notification preferences: {str(e)}")
         return jsonify({'error': 'Failed to get preferences'}), 500
@@ -163,38 +163,38 @@ def update_notification_preferences():
     """Update user's notification preferences."""
     try:
         data = request.get_json()
-        
+
         if not data:
             return jsonify({'error': 'Notification preferences data is required'}), 400
-        
+
         firebase_service = FirebaseService()
         prefs_ref = firebase_service.db.collection('user_preferences').document(request.user_id)
-        
+
         # Get existing preferences
         prefs_doc = prefs_ref.get()
         if prefs_doc.exists:
             existing_prefs = prefs_doc.to_dict()
         else:
             existing_prefs = {}
-        
+
         # Update notification preferences
         existing_prefs['notifications'] = data
         existing_prefs['updated_at'] = datetime.utcnow()
-        
+
         prefs_ref.set(existing_prefs)
-        
+
         # Log preference change for analytics
         firebase_service.db.collection('notification_preference_changes').add({
             'user_id': request.user_id,
             'changes': data,
             'timestamp': datetime.utcnow()
         })
-        
+
         return jsonify({
             'success': True,
             'message': 'Notification preferences updated successfully'
         })
-        
+
     except Exception as e:
         logger.error(f"Error updating notification preferences: {str(e)}")
         return jsonify({'error': 'Failed to update preferences'}), 500
@@ -207,9 +207,9 @@ def send_test_notification():
     try:
         data = request.get_json() or {}
         notification_type = data.get('type', 'encouragement')
-        
+
         notification_service = NotificationService()
-        
+
         # Send test notification based on type
         if notification_type == 'spending_alert':
             success = notification_service.send_spending_alert(
@@ -230,12 +230,12 @@ def send_test_notification():
                 request.user_id,
                 message_type="daily"
             )
-        
+
         return jsonify({
             'success': success,
             'message': 'Test notification sent' if success else 'Failed to send test notification'
         })
-        
+
     except Exception as e:
         logger.error(f"Error sending test notification: {str(e)}")
         return jsonify({'error': 'Failed to send test notification'}), 500
@@ -247,42 +247,42 @@ def get_notification_history():
     """Get user's notification history."""
     try:
         firebase_service = FirebaseService()
-        
+
         # Get pagination parameters
         limit = min(int(request.args.get('limit', 20)), 100)
         offset = int(request.args.get('offset', 0))
         notification_type = request.args.get('type')
-        
+
         # Build query
         query = firebase_service.db.collection('notification_logs').where('user_id', '==', request.user_id)
-        
+
         if notification_type:
             query = query.where('type', '==', notification_type)
-        
+
         query = query.order_by('timestamp', direction='DESCENDING')
         query = query.limit(limit).offset(offset)
-        
+
         # Execute query
         docs = query.stream()
         notifications = []
-        
+
         for doc in docs:
             notification_data = doc.to_dict()
             notification_data['id'] = doc.id
-            
+
             # Convert timestamp to ISO string
             if 'timestamp' in notification_data:
                 notification_data['timestamp'] = notification_data['timestamp'].isoformat()
-            
+
             notifications.append(notification_data)
-        
+
         return jsonify({
             'notifications': notifications,
             'total': len(notifications),
             'offset': offset,
-            'limit': limit
+            'limit': limi
         })
-        
+
     except Exception as e:
         logger.error(f"Error getting notification history: {str(e)}")
         return jsonify({'error': 'Failed to get notification history'}), 500
@@ -294,36 +294,36 @@ def get_notification_stats():
     """Get user's notification engagement statistics."""
     try:
         firebase_service = FirebaseService()
-        
+
         # Get stats for last 30 days
         end_date = datetime.utcnow()
         start_date = end_date - timedelta(days=30)
-        
+
         # Query notification logs
         query = firebase_service.db.collection('notification_logs')
         query = query.where('user_id', '==', request.user_id)
         query = query.where('timestamp', '>=', start_date)
         query = query.where('timestamp', '<=', end_date)
-        
+
         docs = query.stream()
-        
+
         # Calculate statistics
         total_sent = 0
         total_successful = 0
         type_counts = {}
-        
+
         for doc in docs:
             data = doc.to_dict()
             total_sent += 1
-            
+
             if data.get('success', False):
                 total_successful += 1
-            
+
             notification_type = data.get('type', 'unknown')
             type_counts[notification_type] = type_counts.get(notification_type, 0) + 1
-        
+
         success_rate = (total_successful / total_sent * 100) if total_sent > 0 else 0
-        
+
         return jsonify({
             'period_days': 30,
             'total_sent': total_sent,
@@ -332,7 +332,7 @@ def get_notification_stats():
             'type_breakdown': type_counts,
             'average_daily': round(total_sent / 30, 1)
         })
-        
+
     except Exception as e:
         logger.error(f"Error getting notification stats: {str(e)}")
         return jsonify({'error': 'Failed to get notification stats'}), 500
@@ -345,58 +345,58 @@ def unsubscribe_from_notifications():
     try:
         data = request.get_json() or {}
         reason = data.get('reason', 'user_request')
-        
+
         firebase_service = FirebaseService()
-        
+
         # Disable all notifications
         prefs_ref = firebase_service.db.collection('user_preferences').document(request.user_id)
         prefs_doc = prefs_ref.get()
-        
+
         if prefs_doc.exists:
             prefs = prefs_doc.to_dict()
         else:
             prefs = {}
-        
+
         # Set notifications to disabled
         prefs['notifications'] = prefs.get('notifications', {})
         prefs['notifications']['enabled'] = False
         prefs['notifications']['unsubscribed_at'] = datetime.utcnow()
         prefs['notifications']['unsubscribe_reason'] = reason
-        
+
         prefs_ref.set(prefs)
-        
+
         # Log unsubscribe for analytics
         firebase_service.db.collection('notification_unsubscribes').add({
             'user_id': request.user_id,
             'reason': reason,
             'timestamp': datetime.utcnow()
         })
-        
+
         return jsonify({
             'success': True,
             'message': 'Successfully unsubscribed from all notifications'
         })
-        
+
     except Exception as e:
         logger.error(f"Error unsubscribing from notifications: {str(e)}")
         return jsonify({'error': 'Failed to unsubscribe'}), 500
 
 
 @notifications_bp.route('/resubscribe', methods=['POST'])
-@require_auth  
+@require_auth
 def resubscribe_to_notifications():
     """Resubscribe to notifications with ADHD-friendly defaults."""
     try:
         firebase_service = FirebaseService()
-        
+
         prefs_ref = firebase_service.db.collection('user_preferences').document(request.user_id)
         prefs_doc = prefs_ref.get()
-        
+
         if prefs_doc.exists:
             prefs = prefs_doc.to_dict()
         else:
             prefs = {}
-        
+
         # Re-enable with gentle defaults
         prefs['notifications'] = {
             'enabled': True,
@@ -411,17 +411,17 @@ def resubscribe_to_notifications():
             'quiet_hours': {'enabled': True, 'start': 22, 'end': 8},
             'tone': 'gentle',
             'frequency': 'minimal',  # Start with minimal
-            'max_daily': 5,          # Lower limit
+            'max_daily': 5,          # Lower limi
             'resubscribed_at': datetime.utcnow()
         }
-        
+
         prefs_ref.set(prefs)
-        
+
         return jsonify({
             'success': True,
             'message': 'Welcome back! Notifications re-enabled with gentle settings.'
         })
-        
+
     except Exception as e:
         logger.error(f"Error resubscribing to notifications: {str(e)}")
         return jsonify({'error': 'Failed to resubscribe'}), 500
@@ -434,18 +434,18 @@ def notification_health():
     try:
         # Basic health check
         firebase_service = FirebaseService()
-        
+
         # Test Firestore connection
         test_doc = firebase_service.db.collection('health_check').document('notification_test')
         test_doc.set({'timestamp': datetime.utcnow(), 'status': 'healthy'})
-        
+
         return jsonify({
             'status': 'healthy',
             'component': 'notifications',
             'timestamp': datetime.utcnow().isoformat(),
             'fcm_configured': bool(current_app.config.get('FCM_SERVER_KEY'))
         }), 200
-        
+
     except Exception as e:
         logger.error(f"Notification health check failed: {str(e)}")
         return jsonify({

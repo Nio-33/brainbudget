@@ -1,5 +1,5 @@
 """
-ADHD-Friendly AI Financial Coach Service for BrainBudget
+ADHD-Friendly AI Financial Coach Service for BrainBudge
 Uses Google Gemini to provide supportive, personalized financial guidance
 """
 import json
@@ -41,31 +41,31 @@ class ConversationSession:
 class AICoachService:
     """
     ADHD-friendly AI financial coach using Google Gemini.
-    
+
     Provides warm, supportive financial guidance with:
     - ADHD-aware communication style
     - Context from user's financial data
     - Conversation memory and continuity
     - Safety filters for financial advice
     """
-    
+
     def __init__(self, firebase_service: FirebaseService = None, gemini_api_key: str = None):
         """Initialize the AI coach service."""
         self.firebase_service = firebase_service or FirebaseService()
         self.db = self.firebase_service.db
-        
+
         # Configure Gemini
         if gemini_api_key:
             genai.configure(api_key=gemini_api_key)
         else:
-            # Try to get from environment
+            # Try to get from environmen
             import os
             api_key = os.getenv('GEMINI_API_KEY')
             if api_key:
                 genai.configure(api_key=api_key)
             else:
                 logger.warning("No Gemini API key configured. AI coach will use mock responses.")
-        
+
         # Initialize Gemini model
         self.model = genai.GenerativeModel(
             model_name='gemini-1.5-flash',
@@ -76,10 +76,10 @@ class AICoachService:
                 'max_output_tokens': 1024,
             }
         )
-        
-        # ADHD-friendly coach personality prompt
+
+        # ADHD-friendly coach personality promp
         self.system_prompt = self._build_system_prompt()
-        
+
         # Quick action templates
         self.quick_actions = {
             'spending_review': "Can you review my recent spending and help me understand my patterns?",
@@ -91,13 +91,13 @@ class AICoachService:
             'adhd_tips': "Do you have any ADHD-specific tips for managing money?",
             'celebrate': "I want to celebrate a financial win!"
         }
-        
+
         # Safety keywords that require disclaimers
         self.safety_keywords = [
-            'invest', 'stock', 'crypto', 'retirement', 'loan', 'mortgage', 
+            'invest', 'stock', 'crypto', 'retirement', 'loan', 'mortgage',
             'debt consolidation', 'tax', 'insurance', 'legal', 'bankruptcy'
         ]
-    
+
     def _build_system_prompt(self) -> str:
         """Build the ADHD-aware system prompt for the AI coach."""
         return """You are BrainBudget's AI Financial Coach - a warm, supportive assistant designed specifically for people with ADHD.
@@ -113,15 +113,15 @@ PERSONALITY & COMMUNICATION STYLE:
 
 ADHD-AWARE APPROACH:
 - Recognize that ADHD affects executive function, impulse control, and planning
-- Suggest practical, concrete actions rather than abstract concepts  
-- Acknowledge emotional aspects of money management
-- Offer gentle reminders without shame or judgment
+- Suggest practical, concrete actions rather than abstract concepts
+- Acknowledge emotional aspects of money managemen
+- Offer gentle reminders without shame or judgmen
 - Focus on progress over perfection
 - Provide flexible strategies that can adapt to different situations
 
 RESPONSE GUIDELINES:
 - Keep responses conversational and friendly (300 words max usually)
-- Always start with validation or acknowledgment
+- Always start with validation or acknowledgmen
 - Provide actionable advice in numbered steps when helpful
 - Use encouraging language like "You've got this!" and "That's totally normal"
 - Avoid overwhelming the user with too much information at once
@@ -129,7 +129,7 @@ RESPONSE GUIDELINES:
 
 SAFETY & DISCLAIMERS:
 - For complex financial topics (investments, loans, taxes), acknowledge your limitations
-- Encourage professional consultation for major financial decisions  
+- Encourage professional consultation for major financial decisions
 - Always remind that you're a supportive tool, not a licensed financial advisor
 - Focus on budgeting, spending awareness, and financial habits
 - Avoid specific investment or legal advice
@@ -148,13 +148,13 @@ Remember: Your goal is to be the supportive financial friend every ADHD person d
         try:
             session_id = str(uuid.uuid4())
             current_time = datetime.utcnow()
-            
+
             # Get user context for personalized greeting
             user_context = await self._get_user_context(user_id)
-            
+
             # Create welcome message
             welcome_message = await self._generate_welcome_message(user_context)
-            
+
             # Create conversation session
             session = ConversationSession(
                 session_id=session_id,
@@ -165,7 +165,7 @@ Remember: Your goal is to be the supportive financial friend every ADHD person d
                 context_summary=user_context,
                 total_messages=0
             )
-            
+
             # Add welcome message
             welcome_msg = ConversationMessage(
                 id=str(uuid.uuid4()),
@@ -174,16 +174,16 @@ Remember: Your goal is to be the supportive financial friend every ADHD person d
                 timestamp=current_time,
                 context_data={'type': 'welcome'}
             )
-            
+
             session.messages.append(welcome_msg)
             session.total_messages = 1
-            
+
             # Save session to database
             await self._save_conversation_session(session)
-            
+
             logger.info(f"Started conversation session {session_id} for user {user_id}")
             return session_id
-            
+
         except Exception as e:
             logger.error(f"Error starting conversation: {str(e)}")
             raise
@@ -200,11 +200,11 @@ Remember: Your goal is to be the supportive financial friend every ADHD person d
             session = await self._load_conversation_session(session_id)
             if not session:
                 raise ValueError(f"Conversation session {session_id} not found")
-            
+
             # Process quick action if provided
             if quick_action and quick_action in self.quick_actions:
                 user_message = self.quick_actions[quick_action]
-            
+
             # Add user message to session
             user_msg = ConversationMessage(
                 id=str(uuid.uuid4()),
@@ -213,15 +213,15 @@ Remember: Your goal is to be the supportive financial friend every ADHD person d
                 timestamp=datetime.utcnow()
             )
             session.messages.append(user_msg)
-            
-            # Get fresh user context
+
+            # Get fresh user contex
             user_context = await self._get_user_context(session.user_id)
-            
+
             # Generate AI response
             ai_response = await self._generate_response(
-                session, user_message, user_context
+                session, user_message, user_contex
             )
-            
+
             # Add AI response to session
             ai_msg = ConversationMessage(
                 id=str(uuid.uuid4()),
@@ -231,15 +231,15 @@ Remember: Your goal is to be the supportive financial friend every ADHD person d
                 confidence_score=ai_response.get('confidence', 0.8)
             )
             session.messages.append(ai_msg)
-            
+
             # Update session metadata
             session.total_messages += 2
             session.updated_at = datetime.utcnow()
-            session.context_summary = user_context
-            
+            session.context_summary = user_contex
+
             # Save updated session
             await self._save_conversation_session(session)
-            
+
             # Log conversation for analytics
             await self._log_conversation_event(
                 session.user_id, session_id, 'message_exchange',
@@ -250,7 +250,7 @@ Remember: Your goal is to be the supportive financial friend every ADHD person d
                     'quick_action': quick_action
                 }
             )
-            
+
             return {
                 'message_id': ai_msg.id,
                 'content': ai_response['content'],
@@ -263,7 +263,7 @@ Remember: Your goal is to be the supportive financial friend every ADHD person d
                     'session_duration': (session.updated_at - session.created_at).total_seconds()
                 }
             }
-            
+
         except Exception as e:
             logger.error(f"Error processing message: {str(e)}")
             # Return fallback response
@@ -279,10 +279,10 @@ Remember: Your goal is to be the supportive financial friend every ADHD person d
             session = await self._load_conversation_session(session_id)
             if not session:
                 return []
-            
+
             # Return recent messages
             recent_messages = session.messages[-limit:] if session.messages else []
-            
+
             return [
                 {
                     'id': msg.id,
@@ -293,7 +293,7 @@ Remember: Your goal is to be the supportive financial friend every ADHD person d
                 }
                 for msg in recent_messages
             ]
-            
+
         except Exception as e:
             logger.error(f"Error getting conversation history: {str(e)}")
             return []
@@ -304,10 +304,10 @@ Remember: Your goal is to be the supportive financial friend every ADHD person d
             session = await self._load_conversation_session(session_id)
             if not session:
                 raise ValueError(f"Session {session_id} not found")
-            
+
             session.satisfaction_rating = rating
             await self._save_conversation_session(session)
-            
+
             # Log feedback
             await self._log_conversation_event(
                 session.user_id, session_id, 'feedback_received',
@@ -317,14 +317,14 @@ Remember: Your goal is to be the supportive financial friend every ADHD person d
                     'total_messages': session.total_messages
                 }
             )
-            
+
             logger.info(f"Received rating {rating} for session {session_id}")
-            
+
         except Exception as e:
             logger.error(f"Error rating conversation: {str(e)}")
 
     # Private helper methods
-    
+
     async def _get_user_context(self, user_id: str) -> Dict[str, Any]:
         """Get user's financial context for personalized responses."""
         try:
@@ -336,17 +336,17 @@ Remember: Your goal is to be the supportive financial friend every ADHD person d
                 'achievements': [],
                 'last_activity': None
             }
-            
+
             # Get user's goals
             from app.services.goals_service import GoalsService
             goals_service = GoalsService()
             goals = await goals_service.get_user_goals(user_id)
-            
+
             if goals:
                 context['has_goals'] = True
                 context['active_goals'] = len([g for g in goals if g.get('status') == 'active'])
                 context['completed_goals'] = len([g for g in goals if g.get('status') == 'completed'])
-            
+
             # Get recent transaction summary (if available)
             try:
                 from app.services.analysis_service import AnalysisService
@@ -360,14 +360,14 @@ Remember: Your goal is to be the supportive financial friend every ADHD person d
                 }
             except Exception:
                 pass
-            
+
             # Get achievements
             if goals:
                 achievements = await goals_service.get_user_achievements(user_id)
                 context['achievements'] = [a for a in achievements if a.get('unlocked')]
-            
-            return context
-            
+
+            return contex
+
         except Exception as e:
             logger.error(f"Error getting user context: {str(e)}")
             return {'user_id': user_id}
@@ -389,13 +389,13 @@ Make it:
 - Invite them to share what's on their mind
 - Keep it concise (under 150 words)
 - ADHD-friendly tone"""
-            
+
             response = self.model.generate_content(
                 f"{self.system_prompt}\n\n{context_prompt}"
             )
-            
+
             return response.text.strip()
-            
+
         except Exception as e:
             logger.error(f"Error generating welcome message: {str(e)}")
             return """👋 Hi there! I'm your AI financial coach, and I'm so glad you're here!
@@ -412,20 +412,20 @@ What's on your mind today? I'm here to listen and help however I can! 💙"""
     ) -> Dict[str, Any]:
         """Generate AI response using Gemini."""
         try:
-            # Build conversation history for context
+            # Build conversation history for contex
             conversation_history = ""
             if session.messages:
                 recent_messages = session.messages[-6:]  # Last 3 exchanges
                 for msg in recent_messages:
                     role = "User" if msg.role == 'user' else "Coach"
                     conversation_history += f"{role}: {msg.content}\n"
-            
+
             # Check for safety keywords
             needs_disclaimer = any(keyword in user_message.lower() for keyword in self.safety_keywords)
-            
-            # Build prompt with context
+
+            # Build prompt with contex
             context_info = self._format_context_for_prompt(user_context)
-            
+
             full_prompt = f"""{self.system_prompt}
 
 USER CONTEXT:
@@ -437,26 +437,26 @@ CONVERSATION HISTORY:
 USER'S CURRENT MESSAGE: {user_message}
 
 Please respond as the supportive ADHD-aware financial coach. Keep your response conversational, encouraging, and helpful."""
-            
+
             # Generate response
             response = self.model.generate_content(full_prompt)
             ai_response = response.text.strip()
-            
+
             # Add disclaimer if needed
             if needs_disclaimer:
                 disclaimer = "\n\n💡 Just a friendly reminder: I'm here to provide supportive guidance, but for complex financial decisions like investments or major loans, it's always best to consult with a licensed financial professional who can give you personalized advice based on your complete situation."
                 ai_response += disclaimer
-            
+
             # Calculate confidence score (basic implementation)
             confidence = 0.9 if len(ai_response) > 50 else 0.7
-            
+
             return {
                 'content': ai_response,
                 'confidence': confidence,
                 'needs_disclaimer': needs_disclaimer,
                 'suggestions': self._extract_suggestions(ai_response)
             }
-            
+
         except Exception as e:
             logger.error(f"Error generating AI response: {str(e)}")
             return await self._generate_fallback_response(user_message)
@@ -464,36 +464,36 @@ Please respond as the supportive ADHD-aware financial coach. Keep your response 
     def _format_context_for_prompt(self, context: Dict[str, Any]) -> str:
         """Format user context for inclusion in prompt."""
         context_lines = []
-        
+
         if context.get('has_goals'):
             context_lines.append(f"- Has {context.get('active_goals', 0)} active financial goals")
             context_lines.append(f"- Completed {context.get('completed_goals', 0)} goals")
         else:
             context_lines.append("- No active financial goals set yet")
-        
+
         if context.get('achievements'):
             context_lines.append(f"- Earned {len(context['achievements'])} achievements")
-        
+
         if context.get('recent_spending'):
             spending = context['recent_spending']
             if spending.get('total_week'):
                 context_lines.append(f"- Recent weekly spending: ${spending['total_week']}")
-        
+
         return "\n".join(context_lines) if context_lines else "- New user getting started"
 
     async def _generate_fallback_response(self, user_message: str) -> Dict[str, Any]:
         """Generate fallback response when AI fails."""
         fallback_responses = [
             "I appreciate you sharing that with me! I'm having a bit of trouble processing right now, but I want you to know that whatever you're dealing with financially is completely valid. Sometimes money stuff can feel overwhelming, especially with an ADHD brain, and that's totally normal. Can you try asking me again, maybe in a slightly different way?",
-            
+
             "Thank you for reaching out! I'm experiencing some technical hiccups at the moment, but I don't want to leave you hanging. Your financial journey matters, and every question you have is important. While I sort this out, remember that you're already doing something great by thinking about your finances mindfully!",
-            
+
             "I hear you, and I want to help! I'm having some difficulty right now, but please don't let that discourage you. Managing money is hard work, especially when you're juggling ADHD, and just by being here you're showing incredible strength. Feel free to try your question again - I'll do my best to support you!"
         ]
-        
+
         import random
         response = random.choice(fallback_responses)
-        
+
         return {
             'content': response,
             'confidence': 0.5,
@@ -504,7 +504,7 @@ Please respond as the supportive ADHD-aware financial coach. Keep your response 
     def _extract_suggestions(self, response: str) -> List[str]:
         """Extract action suggestions from AI response."""
         suggestions = []
-        
+
         # Look for numbered lists or action items
         if "1." in response or "2." in response:
             lines = response.split('\n')
@@ -514,15 +514,15 @@ Please respond as the supportive ADHD-aware financial coach. Keep your response 
                     suggestion = line[2:].strip()
                     if len(suggestion) > 10:  # Valid suggestion
                         suggestions.append(suggestion)
-        
+
         return suggestions[:3]  # Max 3 suggestions
 
     def _suggest_quick_actions(self, user_message: str, context: Dict[str, Any]) -> List[Dict[str, str]]:
         """Suggest relevant quick actions based on message and context."""
         suggestions = []
-        
+
         message_lower = user_message.lower()
-        
+
         # Context-aware suggestions
         if 'budget' in message_lower or 'spending' in message_lower:
             suggestions.append({
@@ -530,28 +530,28 @@ Please respond as the supportive ADHD-aware financial coach. Keep your response 
                 'text': 'Review Recent Spending',
                 'icon': '📊'
             })
-        
+
         if 'goal' in message_lower or 'save' in message_lower:
             suggestions.append({
                 'id': 'goal_progress',
                 'text': 'Check Goal Progress',
                 'icon': '🎯'
             })
-        
+
         if 'overwhelmed' in message_lower or 'stressed' in message_lower:
             suggestions.append({
                 'id': 'motivation',
                 'text': 'Get Encouragement',
                 'icon': '💪'
             })
-        
+
         if 'adhd' in message_lower or 'executive function' in message_lower:
             suggestions.append({
                 'id': 'adhd_tips',
                 'text': 'ADHD Money Tips',
                 'icon': '🧠'
             })
-        
+
         # Default suggestions if none match
         if not suggestions:
             suggestions = [
@@ -559,7 +559,7 @@ Please respond as the supportive ADHD-aware financial coach. Keep your response 
                 {'id': 'motivation', 'text': 'Stay Motivated', 'icon': '✨'},
                 {'id': 'explain_concept', 'text': 'Explain Something', 'icon': '💡'}
             ]
-        
+
         return suggestions[:3]
 
     async def _save_conversation_session(self, session: ConversationSession):
@@ -585,10 +585,10 @@ Please respond as the supportive ADHD-aware financial coach. Keep your response 
                     for msg in session.messages
                 ]
             }
-            
+
             session_ref = self.db.collection('ai_conversations').document(session.session_id)
             session_ref.set(session_data)
-            
+
         except Exception as e:
             logger.error(f"Error saving conversation session: {str(e)}")
 
@@ -597,12 +597,12 @@ Please respond as the supportive ADHD-aware financial coach. Keep your response 
         try:
             session_ref = self.db.collection('ai_conversations').document(session_id)
             session_doc = session_ref.get()
-            
+
             if not session_doc.exists:
                 return None
-            
+
             data = session_doc.to_dict()
-            
+
             # Reconstruct messages
             messages = []
             for msg_data in data.get('messages', []):
@@ -615,7 +615,7 @@ Please respond as the supportive ADHD-aware financial coach. Keep your response 
                     confidence_score=msg_data.get('confidence_score')
                 )
                 messages.append(msg)
-            
+
             session = ConversationSession(
                 session_id=data['session_id'],
                 user_id=data['user_id'],
@@ -626,9 +626,9 @@ Please respond as the supportive ADHD-aware financial coach. Keep your response 
                 total_messages=data.get('total_messages', 0),
                 satisfaction_rating=data.get('satisfaction_rating')
             )
-            
+
             return session
-            
+
         except Exception as e:
             logger.error(f"Error loading conversation session: {str(e)}")
             return None
@@ -650,29 +650,29 @@ Please respond as the supportive ADHD-aware financial coach. Keep your response 
                 'timestamp': datetime.utcnow(),
                 'source': 'ai_coach_service'
             }
-            
+
             self.db.collection('ai_coach_events').add(event)
-            
+
         except Exception as e:
             logger.error(f"Error logging conversation event: {str(e)}")
 
     # Synchronous wrappers for Flask routes
-    
+
     def start_conversation_sync(self, user_id: str) -> str:
         """Synchronous wrapper for start_conversation."""
         import asyncio
         return asyncio.run(self.start_conversation(user_id))
-    
+
     def send_message_sync(self, session_id: str, user_message: str, quick_action: Optional[str] = None) -> Dict[str, Any]:
         """Synchronous wrapper for send_message."""
         import asyncio
         return asyncio.run(self.send_message(session_id, user_message, quick_action))
-    
+
     def get_conversation_history_sync(self, session_id: str, limit: int = 20) -> List[Dict[str, Any]]:
         """Synchronous wrapper for get_conversation_history."""
         import asyncio
         return asyncio.run(self.get_conversation_history(session_id, limit))
-    
+
     def rate_conversation_sync(self, session_id: str, rating: int, feedback: str = None):
         """Synchronous wrapper for rate_conversation."""
         import asyncio

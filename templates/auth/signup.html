@@ -1,683 +1,376 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Join BrainBudget - ADHD-Friendly Budgeting</title>
-    
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/charts.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
-    
-    <!-- Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Firebase SDK -->
-    <script type="module">
-      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
-      import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
-      
-      // Initialize Firebase with configuration from backend
-      async function initializeFirebaseAuth() {
-        try {
-          console.log('🔥 Initializing Firebase authentication...');
-          const response = await fetch('/api/auth/firebase-config');
-          
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-          }
-          
-          const result = await response.json();
-          
-          if (!result.success || !result.config) {
-            throw new Error(result.error || 'Firebase configuration not available');
-          }
-          
-          console.log('🔥 Initializing Firebase with project:', result.config.projectId);
-          const app = initializeApp(result.config);
-          const auth = getAuth(app);
-          const googleProvider = new GoogleAuthProvider();
-          
-          // Make available globally
-          window.firebaseAuth = auth;
-          window.googleProvider = googleProvider;
-          window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
-          window.signInWithEmailAndPassword = signInWithEmailAndPassword;
-          window.signInWithPopup = signInWithPopup;
-          window.updateProfile = updateProfile;
-          
-          console.log('🔥 Firebase authentication ready!');
-          
-        } catch (error) {
-          console.error('❌ Firebase initialization failed:', error);
-          
-          // Show error to user
-          setTimeout(() => {
-            if (window.brainBudgetAuth) {
-              window.brainBudgetAuth.showMessage('error', 
-                'Firebase authentication failed to load. Please refresh the page or contact support.');
-            }
-          }, 2000);
-          
-          // Don't set up Firebase objects - let the auth system handle the error
-          window.firebaseAuth = null;
-          window.googleProvider = null;
-          window.createUserWithEmailAndPassword = null;
-          window.signInWithEmailAndPassword = null;
-          window.signInWithPopup = null;
-          window.updateProfile = null;
-        }
-      }
-      
-      // Initialize Firebase when page loads
-      initializeFirebaseAuth();
-    </script>
-    
-    <style>
-        /* Additional styles for signup-specific features */
-        .signup-progress {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: var(--spacing-md);
-            margin-bottom: var(--spacing-xl);
-            padding: var(--spacing-lg) 0;
-        }
-        
-        .progress-step {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-sm);
-            color: var(--color-text-secondary);
-            font-size: var(--font-size-legend);
-            font-weight: 500;
-        }
-        
-        .progress-step.active {
-            color: var(--color-cozy-blue);
-        }
-        
-        .progress-step.completed {
-            color: var(--color-success-green);
-        }
-        
-        .progress-step-icon {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 700;
-            background-color: var(--color-neutral-gray);
-            color: white;
-        }
-        
-        .progress-step.active .progress-step-icon {
-            background-color: var(--color-cozy-blue);
-        }
-        
-        .progress-step.completed .progress-step-icon {
-            background-color: var(--color-success-green);
-        }
-        
-        .progress-connector {
-            width: 40px;
-            height: 2px;
-            background-color: var(--color-grid-lines);
-        }
-        
-        .progress-connector.completed {
-            background-color: var(--color-success-green);
-        }
-        
-        .signup-benefits {
-            background: linear-gradient(135deg, rgba(107, 155, 214, 0.1), rgba(129, 199, 132, 0.1));
-            border-radius: var(--border-radius-lg);
-            padding: var(--spacing-lg);
-            margin-bottom: var(--spacing-xl);
-            border: 1px solid rgba(107, 155, 214, 0.2);
-        }
-        
-        .benefits-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: var(--spacing-md);
-        }
-        
-        .benefit-item {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-sm);
-            font-size: var(--font-size-body);
-            color: var(--color-text-primary);
-        }
-        
-        .benefit-icon {
-            font-size: 1.2rem;
-            flex-shrink: 0;
-        }
-        
-        .feature-preview {
-            background-color: var(--color-background);
-            border-radius: var(--border-radius-md);
-            padding: var(--spacing-md);
-            margin: var(--spacing-md) 0;
-            border-left: 4px solid var(--color-cozy-blue);
-        }
-        
-        .feature-preview-title {
-            font-weight: 600;
-            color: var(--color-text-primary);
-            margin-bottom: var(--spacing-xs);
-        }
-        
-        .feature-preview-description {
-            font-size: var(--font-size-legend);
-            color: var(--color-text-secondary);
-        }
-        
-        @media (max-width: 768px) {
-            .signup-progress {
-                flex-direction: column;
-                gap: var(--spacing-sm);
-            }
-            
-            .progress-connector {
-                width: 2px;
-                height: 20px;
-            }
-            
-            .benefits-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="auth-container">
-        <div class="auth-card">
-            <!-- Authentication Header -->
-            <div class="auth-header">
-                <span class="auth-logo">🧠💰</span>
-                <h1 class="auth-title">🎉 Welcome to BrainBudget!</h1>
-                <p class="auth-subtitle">Join thousands making budgeting fun and ADHD-friendly</p>
-            </div>
-            
-            <!-- Progress Indicator -->
-            <div class="signup-progress">
-                <div class="progress-step active">
-                    <div class="progress-step-icon">1</div>
-                    <span>Basic Info</span>
-                </div>
-                <div class="progress-connector"></div>
-                <div class="progress-step">
-                    <div class="progress-step-icon">2</div>
-                    <span>Security</span>
-                </div>
-                <div class="progress-connector"></div>
-                <div class="progress-step">
-                    <div class="progress-step-icon">3</div>
-                    <span>Preferences</span>
+{% extends "base.html" %}
+
+{% block title %}Sign Up - BrainBudget{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+        <!-- Header -->
+        <div class="text-center">
+            <div class="flex justify-center mb-6">
+                <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
+                    <span class="text-3xl">🧠💰</span>
                 </div>
             </div>
-            
-            <!-- Benefits Section -->
-            <div class="signup-benefits">
-                <h3 style="color: var(--color-text-primary); margin-bottom: var(--spacing-md); text-align: center;">
-                    ✨ Why BrainBudget Works for ADHD Minds
-                </h3>
-                <div class="benefits-grid">
-                    <div class="benefit-item">
-                        <span class="benefit-icon">🎨</span>
-                        <span>Gentle, warm colors that don't overwhelm</span>
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">Join BrainBudget</h2>
+            <p class="text-gray-600">Start your journey to financial clarity</p>
+        </div>
+
+        <!-- Signup Form -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+            <form id="signup-form" class="space-y-6">
+                <!-- Progress Indicator -->
+                <div class="flex items-center justify-center space-x-4 mb-6">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                            <span class="text-white text-sm font-semibold">1</span>
+                        </div>
+                        <span class="ml-2 text-sm text-blue-600 font-medium">Account</span>
                     </div>
-                    <div class="benefit-item">
-                        <span class="benefit-icon">📊</span>
-                        <span>Visual charts that make sense instantly</span>
-                    </div>
-                    <div class="benefit-item">
-                        <span class="benefit-icon">💬</span>
-                        <span>Supportive language, never judgmental</span>
-                    </div>
-                    <div class="benefit-item">
-                        <span class="benefit-icon">🔒</span>
-                        <span>Bank-level security for peace of mind</span>
-                    </div>
-                    <div class="benefit-item">
-                        <span class="benefit-icon">📱</span>
-                        <span>Works perfectly on any device</span>
-                    </div>
-                    <div class="benefit-item">
-                        <span class="benefit-icon">⚡</span>
-                        <span>Quick insights, no endless scrolling</span>
+                    <div class="w-8 h-1 bg-gray-200 rounded-full"></div>
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                            <span class="text-gray-400 text-sm font-semibold">2</span>
+                        </div>
+                        <span class="ml-2 text-sm text-gray-400">Profile</span>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Messages Container -->
-            <div id="auth-messages" aria-live="polite"></div>
-            
-            <!-- Quick Signup Options -->
-            <div class="auth-button-group" style="margin-bottom: var(--spacing-lg);">
+
+                <!-- Step 1: Account Details -->
+                <div id="step-1" class="space-y-4">
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                            Email Address
+                        </label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                            placeholder="your@email.com"
+                        >
+                    </div>
+                    
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+                            Password
+                        </label>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                            placeholder="Create a strong password"
+                        >
+                        <p class="text-xs text-gray-500 mt-1">At least 8 characters</p>
+                    </div>
+                    
+                    <div>
+                        <label for="confirm-password" class="block text-sm font-medium text-gray-700 mb-2">
+                            Confirm Password
+                        </label>
+                        <input 
+                            type="password" 
+                            id="confirm-password" 
+                            name="confirm-password" 
+                            required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                            placeholder="Confirm your password"
+                        >
+                    </div>
+                </div>
+
+                <!-- Step 2: Profile Details (Hidden initially) -->
+                <div id="step-2" class="hidden space-y-4">
+                    <div>
+                        <label for="first-name" class="block text-sm font-medium text-gray-700 mb-2">
+                            First Name
+                        </label>
+                        <input 
+                            type="text" 
+                            id="first-name" 
+                            name="first-name" 
+                            required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                            placeholder="Your first name"
+                        >
+                    </div>
+                    
+                    <div>
+                        <label for="last-name" class="block text-sm font-medium text-gray-700 mb-2">
+                            Last Name
+                        </label>
+                        <input 
+                            type="text" 
+                            id="last-name" 
+                            name="last-name" 
+                            required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                            placeholder="Your last name"
+                        >
+                    </div>
+                    
+                    <div>
+                        <label for="adhd-type" class="block text-sm font-medium text-gray-700 mb-2">
+                            ADHD Type (Optional)
+                        </label>
+                        <select 
+                            id="adhd-type" 
+                            name="adhd-type"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                        >
+                            <option value="">Select your ADHD type</option>
+                            <option value="inattentive">Primarily Inattentive</option>
+                            <option value="hyperactive">Primarily Hyperactive-Impulsive</option>
+                            <option value="combined">Combined Type</option>
+                            <option value="unsure">Not sure yet</option>
+                            <option value="other">Other neurodivergent</option>
+                        </select>
+                        <p class="text-xs text-gray-500 mt-1">This helps us personalize your experience</p>
+                    </div>
+                </div>
+
+                <!-- Terms and Privacy -->
+                <div class="flex items-start space-x-3">
+                    <input 
+                        type="checkbox" 
+                        id="terms" 
+                        name="terms" 
+                        required
+                        class="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    >
+                    <label for="terms" class="text-sm text-gray-600">
+                        I agree to the 
+                        <a href="#" class="text-blue-600 hover:text-blue-800 underline">Terms of Service</a> 
+                        and 
+                        <a href="#" class="text-blue-600 hover:text-blue-800 underline">Privacy Policy</a>
+                    </label>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="space-y-3">
+                    <!-- Step 1 Button -->
+                    <button 
+                        type="button" 
+                        id="next-step-btn"
+                        class="w-full bg-blue-500 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200"
+                    >
+                        Continue to Profile
+                    </button>
+                    
+                    <!-- Step 2 Button (Hidden initially) -->
+                    <button 
+                        type="submit" 
+                        id="signup-btn"
+                        class="hidden w-full bg-purple-500 text-white py-3 px-4 rounded-lg font-semibold hover:bg-purple-600 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200"
+                    >
+                        🚀 Create Account
+                    </button>
+                    
+                    <!-- Back Button (Hidden initially) -->
+                    <button 
+                        type="button" 
+                        id="back-btn"
+                        class="hidden w-full bg-gray-200 text-gray-700 py-3 px-4 rounded-lg font-semibold hover:bg-gray-300 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200"
+                    >
+                        ← Back to Account
+                    </button>
+                </div>
+
+                <!-- Divider -->
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-white text-gray-500">Or continue with</span>
+                    </div>
+                </div>
+
+                <!-- Google Sign Up -->
                 <button 
                     type="button" 
                     id="google-signup-btn"
-                    class="auth-button auth-button-google"
-                    style="width: 100%;"
+                    class="w-full bg-white border border-gray-300 text-gray-700 py-3 px-4 rounded-lg font-semibold hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 flex items-center justify-center space-x-2"
                 >
-                    <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo">
-                    <span>Continue with Google - Super Quick! 🚀</span>
+                    <svg class="w-5 h-5" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    <span>Continue with Google</span>
                 </button>
-                
-                <div class="auth-divider">
-                    <span class="auth-divider-text">or set up your account manually</span>
-                </div>
-            </div>
-            
-            <!-- Signup Form -->
-            <form id="signup-form" class="auth-form" novalidate>
-                <!-- Step 1: Basic Information -->
-                <div class="auth-step-content" id="signup-step-1">
-                    <!-- Name Field -->
-                    <div class="auth-form-group">
-                        <label for="full-name" class="auth-form-label">
-                            👤 What should we call you? <span class="required">*</span>
-                        </label>
-                        <div class="auth-input-group">
-                            <span class="auth-input-icon">👤</span>
-                            <input 
-                                type="text" 
-                                id="full-name" 
-                                name="fullName"
-                                class="auth-input" 
-                                placeholder="Your preferred name"
-                                autocomplete="name"
-                                required
-                                aria-describedby="name-help"
-                            >
-                        </div>
-                        <small id="name-help" style="color: var(--color-text-secondary); font-size: var(--font-size-legend);">
-                            💡 This helps us personalize your BrainBudget experience!
-                        </small>
-                    </div>
-                    
-                    <!-- Email Field -->
-                    <div class="auth-form-group">
-                        <label for="email" class="auth-form-label">
-                            📧 Email Address <span class="required">*</span>
-                        </label>
-                        <div class="auth-input-group">
-                            <span class="auth-input-icon">📧</span>
-                            <input 
-                                type="email" 
-                                id="email" 
-                                name="email"
-                                class="auth-input" 
-                                placeholder="your.email@example.com"
-                                autocomplete="email"
-                                required
-                                aria-describedby="email-help"
-                            >
-                        </div>
-                        <small id="email-help" style="color: var(--color-text-secondary); font-size: var(--font-size-legend);">
-                            📬 We'll send helpful tips and important updates here
-                        </small>
-                    </div>
-                    
-                    <!-- Password Field -->
-                    <div class="auth-form-group">
-                        <label for="password" class="auth-form-label">
-                            🔑 Create Your Password <span class="required">*</span>
-                        </label>
-                        <div class="auth-input-group auth-password-group">
-                            <span class="auth-input-icon">🔑</span>
-                            <input 
-                                type="password" 
-                                id="password" 
-                                name="password"
-                                class="auth-input" 
-                                placeholder="Make it strong and memorable"
-                                autocomplete="new-password"
-                                required
-                            >
-                            <button 
-                                type="button" 
-                                class="auth-password-toggle"
-                                aria-label="Show password"
-                            >👁️</button>
-                        </div>
-                        
-                        <!-- Password Strength Indicator -->
-                        <div class="password-strength">
-                            <div class="password-strength-label">🔐 Let's make it stronger!</div>
-                            <div class="password-strength-bar">
-                                <div class="password-strength-fill weak"></div>
-                            </div>
-                            <div class="password-requirements">
-                                <div class="password-requirement">
-                                    <span class="password-requirement-icon">⭕</span>
-                                    <span>At least 8 characters long</span>
-                                </div>
-                                <div class="password-requirement">
-                                    <span class="password-requirement-icon">⭕</span>
-                                    <span>Contains lowercase letters</span>
-                                </div>
-                                <div class="password-requirement">
-                                    <span class="password-requirement-icon">⭕</span>
-                                    <span>Contains uppercase letters</span>
-                                </div>
-                                <div class="password-requirement">
-                                    <span class="password-requirement-icon">⭕</span>
-                                    <span>Contains numbers</span>
-                                </div>
-                                <div class="password-requirement">
-                                    <span class="password-requirement-icon">⭕</span>
-                                    <span>Contains special characters (!@#$%)</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Confirm Password -->
-                    <div class="auth-form-group">
-                        <label for="confirm-password" class="auth-form-label">
-                            🔁 Confirm Your Password <span class="required">*</span>
-                        </label>
-                        <div class="auth-input-group">
-                            <span class="auth-input-icon">🔁</span>
-                            <input 
-                                type="password" 
-                                id="confirm-password" 
-                                name="confirmPassword"
-                                class="auth-input" 
-                                placeholder="Type your password again"
-                                autocomplete="new-password"
-                                required
-                            >
-                        </div>
-                        <div id="password-match-indicator" style="margin-top: var(--spacing-xs); font-size: var(--font-size-legend);"></div>
-                    </div>
-                </div>
-                
-                <!-- Feature Preview -->
-                <div class="feature-preview">
-                    <div class="feature-preview-title">🎯 What you'll get access to:</div>
-                    <div class="feature-preview-description">
-                        Smart spending analysis • Beautiful visual charts • ADHD-friendly insights • Secure data • Export your data anytime • No ads, ever!
-                    </div>
-                </div>
-                
-                <!-- Terms and Privacy -->
-                <div class="auth-form-group">
-                    <div class="auth-checkbox-group">
-                        <input type="checkbox" id="accept-terms" class="auth-checkbox" required>
-                        <label for="accept-terms" class="auth-checkbox-label">
-                            <strong>I agree to the 
-                            <a href="/terms" target="_blank" class="auth-link">Terms of Service</a> 
-                            and 
-                            <a href="/privacy" target="_blank" class="auth-link">Privacy Policy</a> 
-                            <span class="required">*</span></strong>
-                        </label>
-                    </div>
-                    
-                    <div class="auth-checkbox-group" style="margin-top: var(--spacing-sm);">
-                        <input type="checkbox" id="newsletter-opt-in" class="auth-checkbox" checked>
-                        <label for="newsletter-opt-in" class="auth-checkbox-label">
-                            📧 Send me helpful ADHD budgeting tips and product updates 
-                            <span class="optional">(you can unsubscribe anytime)</span>
-                        </label>
-                    </div>
-                </div>
-                
-                <!-- Privacy Notice -->
-                <div class="auth-message info">
-                    <span class="auth-message-icon">🛡️</span>
-                    <div>
-                        <strong>Your Privacy is Our Priority!</strong><br>
-                        We only collect what we need to make BrainBudget amazing for you. We never sell your data, and you can delete your account anytime with one click.
-                    </div>
-                </div>
-                
-                <!-- Submit Button -->
-                <div class="auth-button-group">
-                    <button 
-                        type="submit" 
-                        id="create-account-btn"
-                        class="auth-button auth-button-primary"
-                        style="font-size: var(--font-size-body); padding: var(--spacing-md) var(--spacing-lg);"
-                    >
-                        <span>🎉 Create My BrainBudget Account</span>
-                    </button>
-                </div>
             </form>
-            
-            <!-- Footer -->
-            <div class="auth-footer">
-                <p>
-                    Already have an account?
-                    <a href="/auth/login" class="auth-link">
-                        Sign in here! 🚀
-                    </a>
-                </p>
-                
-                <div class="auth-message success" style="margin-top: var(--spacing-lg); border: none; background: transparent; padding: 0;">
-                    <span class="auth-message-icon">💝</span>
-                    <div style="text-align: center; color: var(--color-text-secondary);">
-                        <strong>Join 10,000+ people</strong> who've made budgeting work with their ADHD brain!<br>
-                        <small>🔒 Secured with enterprise-grade encryption • Built with ❤️ for the neurodivergent community</small>
-                    </div>
+        </div>
+
+        <!-- Sign In Link -->
+        <div class="text-center">
+            <p class="text-gray-600">
+                Already have an account? 
+                <a href="/auth/login" class="text-blue-600 hover:text-blue-800 font-semibold underline">
+                    Sign in here
+                </a>
+            </p>
+        </div>
+
+        <!-- Benefits -->
+        <div class="bg-white rounded-xl p-6 border border-gray-100">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4 text-center">Why Choose BrainBudget?</h3>
+            <div class="space-y-3">
+                <div class="flex items-center space-x-3">
+                    <span class="text-green-500">✅</span>
+                    <span class="text-sm text-gray-600">ADHD-friendly interface design</span>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <span class="text-green-500">✅</span>
+                    <span class="text-sm text-gray-600">AI-powered financial insights</span>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <span class="text-green-500">✅</span>
+                    <span class="text-sm text-gray-600">Gentle, non-judgmental guidance</span>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <span class="text-green-500">✅</span>
+                    <span class="text-sm text-gray-600">Celebrate every financial win</span>
                 </div>
             </div>
         </div>
     </div>
+</div>
+
+<!-- Loading Overlay -->
+<div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg p-6 flex items-center space-x-3">
+        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+        <span class="text-gray-700">Creating your account...</span>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('signup-form');
+    const step1 = document.getElementById('step-1');
+    const step2 = document.getElementById('step-2');
+    const nextBtn = document.getElementById('next-step-btn');
+    const backBtn = document.getElementById('back-btn');
+    const signupBtn = document.getElementById('signup-btn');
+    const loadingOverlay = document.getElementById('loading-overlay');
     
-    <!-- Load Authentication JavaScript -->
-    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+    let currentStep = 1;
     
-    <!-- Signup-specific JavaScript -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Wait a moment for Firebase initialization to complete
+    // Step navigation
+    nextBtn.addEventListener('click', function() {
+        if (validateStep1()) {
+            step1.classList.add('hidden');
+            step2.classList.remove('hidden');
+            nextBtn.classList.add('hidden');
+            backBtn.classList.remove('hidden');
+            signupBtn.classList.remove('hidden');
+            currentStep = 2;
+            updateProgress();
+        }
+    });
+    
+    backBtn.addEventListener('click', function() {
+        step1.classList.remove('hidden');
+        step2.classList.add('hidden');
+        nextBtn.classList.remove('hidden');
+        backBtn.classList.add('hidden');
+        signupBtn.classList.add('hidden');
+        currentStep = 1;
+        updateProgress();
+    });
+    
+    function updateProgress() {
+        const step1Indicator = document.querySelector('.progress-step:first-child');
+        const step2Indicator = document.querySelector('.progress-step:last-child');
+        
+        if (currentStep === 1) {
+            step1Indicator.classList.add('active');
+            step2Indicator.classList.remove('active');
+        } else {
+            step1Indicator.classList.remove('active');
+            step2Indicator.classList.add('active');
+        }
+    }
+    
+    function validateStep1() {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+        const terms = document.getElementById('terms').checked;
+        
+        if (!email || !password || !confirmPassword || !terms) {
+            showMessage('Please fill in all required fields and accept the terms.', 'error');
+            return false;
+        }
+        
+        if (password !== confirmPassword) {
+            showMessage('Passwords do not match.', 'error');
+            return false;
+        }
+        
+        if (password.length < 8) {
+            showMessage('Password must be at least 8 characters long.', 'error');
+            return false;
+        }
+        
+        return true;
+    }
+    
+    // Form submission
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (!validateStep1()) {
+            return;
+        }
+        
+        // Show loading
+        loadingOverlay.classList.remove('hidden');
+        
+        // Simulate account creation (replace with actual API call)
+        setTimeout(() => {
+            loadingOverlay.classList.add('hidden');
+            showMessage('Account created successfully! Redirecting to dashboard...', 'success');
+            
+            // Redirect to dashboard after a short delay
             setTimeout(() => {
-                // Initialize signup-specific features
-                initializeSignupPage();
-            }, 1000);
-        });
+                window.location.href = '/dashboard';
+            }, 2000);
+        }, 2000);
+    });
+    
+    // Google signup
+    document.getElementById('google-signup-btn').addEventListener('click', function() {
+        showMessage('Google signup coming soon!', 'info');
+    });
+    
+    // Message display function
+    function showMessage(message, type = 'info') {
+        // Create a simple toast notification
+        const toast = document.createElement('div');
+        toast.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white z-50 ${
+            type === 'error' ? 'bg-red-500' : 
+            type === 'success' ? 'bg-green-500' : 'bg-blue-500'
+        }`;
+        toast.textContent = message;
         
-        function initializeSignupPage() {
-            console.log('🎉 Signup page loaded');
-            
-            // Set auth mode to registration
-            if (window.brainBudgetAuth) {
-                brainBudgetAuth.authMode = 'register';
-                brainBudgetAuth.currentStep = 1;
-            }
-            
-            // Enhanced password matching
-            const passwordInput = document.getElementById('password');
-            const confirmPasswordInput = document.getElementById('confirm-password');
-            const matchIndicator = document.getElementById('password-match-indicator');
-            
-            function checkPasswordMatch() {
-                if (!confirmPasswordInput.value) {
-                    matchIndicator.innerHTML = '';
-                    return;
-                }
-                
-                if (passwordInput.value === confirmPasswordInput.value) {
-                    matchIndicator.innerHTML = '<span style="color: var(--color-success-green);">✅ Passwords match perfectly!</span>';
-                    confirmPasswordInput.style.borderColor = 'var(--color-success-green)';
-                } else {
-                    matchIndicator.innerHTML = '<span style="color: var(--color-soft-red);">❌ Passwords don\'t match yet</span>';
-                    confirmPasswordInput.style.borderColor = 'var(--color-soft-red)';
-                }
-            }
-            
-            confirmPasswordInput.addEventListener('input', checkPasswordMatch);
-            passwordInput.addEventListener('input', checkPasswordMatch);
-            
-            // Google signup handler
-            document.getElementById('google-signup-btn').addEventListener('click', async function() {
-                const button = this;
-                const originalText = button.innerHTML;
-                
-                try {
-                    button.disabled = true;
-                    button.innerHTML = '<img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo"><span>Signing in with Google... 🚀</span>';
-                    
-                    if (window.brainBudgetAuth) {
-                        brainBudgetAuth.showMessage('info', '🚀 Starting Google Sign-In...');
-                        
-                        const result = await brainBudgetAuth.firebaseGoogleSignIn();
-                        
-                        brainBudgetAuth.showMessage('success', `🎉 Welcome ${result.displayName || result.email}! Account ready!`);
-                        
-                        setTimeout(() => {
-                            window.location.href = '/dashboard?welcome=true&google=true';
-                        }, 1500);
-                    }
-                } catch (error) {
-                    console.error('Google signup error:', error);
-                    
-                    let errorMessage = 'Google Sign-In didn\'t work this time. Please try again! 🔄';
-                    
-                    if (error.code === 'auth/popup-closed-by-user') {
-                        errorMessage = 'Sign-in was cancelled. No worries, try again when ready! 👋';
-                    } else if (error.code === 'auth/popup-blocked') {
-                        errorMessage = 'Popup blocked! Please allow popups for this site and try again. 🚫';
-                    }
-                    
-                    if (window.brainBudgetAuth) {
-                        brainBudgetAuth.showMessage('error', errorMessage);
-                    }
-                } finally {
-                    button.disabled = false;
-                    button.innerHTML = originalText;
-                }
-            });
-            
-            // Form submission is handled by the main auth system now
-            
-            // Real-time validation
-            const requiredFields = ['full-name', 'email', 'password', 'confirm-password'];
-            requiredFields.forEach(fieldId => {
-                const field = document.getElementById(fieldId);
-                if (field) {
-                    field.addEventListener('blur', validateField);
-                    field.addEventListener('input', function() {
-                        // Remove error styling on input
-                        this.style.borderColor = '';
-                    });
-                }
-            });
-            
-            // Show welcome message for first-time visitors
-            setTimeout(() => {
-                if (window.brainBudgetAuth) {
-                    brainBudgetAuth.showMessage('info', 
-                        '👋 Welcome! This form is designed to be ADHD-friendly. Take your time, we\'re here to help!'
-                    );
-                }
-            }, 1000);
-        }
+        document.body.appendChild(toast);
         
-        function validateField(event) {
-            const field = event.target;
-            const value = field.value.trim();
-            
-            if (!value && field.required) {
-                field.style.borderColor = 'var(--color-soft-red)';
-                return false;
-            }
-            
-            // Email validation
-            if (field.type === 'email' && value) {
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(value)) {
-                    field.style.borderColor = 'var(--color-soft-red)';
-                    return false;
-                }
-            }
-            
-            field.style.borderColor = 'var(--color-success-green)';
-            return true;
-        }
-        
-        function validateSignupForm() {
-            const requiredFields = [
-                { id: 'full-name', name: 'Name' },
-                { id: 'email', name: 'Email' },
-                { id: 'password', name: 'Password' },
-                { id: 'confirm-password', name: 'Confirm Password' },
-                { id: 'accept-terms', name: 'Terms acceptance' }
-            ];
-            
-            let isValid = true;
-            const errors = [];
-            
-            for (const field of requiredFields) {
-                const element = document.getElementById(field.id);
-                if (!element) continue;
-                
-                if (element.type === 'checkbox') {
-                    if (!element.checked) {
-                        errors.push(`Please accept the ${field.name.toLowerCase()}`);
-                        isValid = false;
-                    }
-                } else {
-                    if (!element.value.trim()) {
-                        errors.push(`${field.name} is required`);
-                        element.style.borderColor = 'var(--color-soft-red)';
-                        isValid = false;
-                    }
-                }
-            }
-            
-            // Check password match
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirm-password').value;
-            
-            if (password !== confirmPassword) {
-                errors.push('Passwords do not match');
-                isValid = false;
-            }
-            
-            // Check email format
-            const email = document.getElementById('email').value;
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (email && !emailRegex.test(email)) {
-                errors.push('Please enter a valid email address');
-                isValid = false;
-            }
-            
-            if (!isValid && window.brainBudgetAuth) {
-                brainBudgetAuth.showMessage('error', `Please fix these issues: ${errors.join(', ')}`);
-            }
-            
-            return isValid;
-        }
-        
-        // Add some encouraging messages during form completion
-        let encouragementTimer;
-        document.addEventListener('input', function() {
-            clearTimeout(encouragementTimer);
-            encouragementTimer = setTimeout(() => {
-                if (window.brainBudgetAuth && Math.random() < 0.3) { // 30% chance
-                    const messages = [
-                        '👍 Great job! You\'re doing awesome!',
-                        '🌟 Looking good! Keep going!',
-                        '💪 You\'ve got this! Almost there!',
-                        '🎯 Perfect! You\'re on the right track!'
-                    ];
-                    const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-                    brainBudgetAuth.showMessage('success', randomMessage);
-                }
-            }, 3000);
-        });
-    </script>
-</body>
-</html>
+        // Remove after 5 seconds
+        setTimeout(() => {
+            toast.remove();
+        }, 5000);
+    }
+    
+    // Initialize progress
+    updateProgress();
+});
+</script>
+{% endblock %}

@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 class AdviceCategory(Enum):
     BUDGETING = "budgeting"
-    DEBT_REDUCTION = "debt_reduction" 
+    DEBT_REDUCTION = "debt_reduction"
     SAVINGS = "savings"
     INVESTMENT = "investment"
     EMERGENCY_FUND = "emergency_fund"
@@ -51,7 +51,7 @@ class PersonalizationFactors:
     user_id: str
     income_level: str  # low, medium, high, variable
     income_variability: float  # 0.0-1.0, higher = more variable
-    debt_levels: Dict[str, float]  # category -> amount
+    debt_levels: Dict[str, float]
     spending_patterns: Dict[str, any]  # From ML analytics
     financial_goals: List[Dict]  # Active goals
     adhd_symptom_impact: ADHDSymptomImpact
@@ -74,7 +74,7 @@ class AdviceTemplate:
     time_investment: str  # "5 min", "15 min", "ongoing", etc.
     effectiveness_metrics: Dict  # Historical performance data
 
-@dataclass 
+@dataclass
 class PersonalizedAdvice:
     """Personalized advice generated for a specific user"""
     advice_id: str
@@ -98,24 +98,24 @@ class AdviceEngineService:
     """
     ADHD-aware personalized financial advice engine
     """
-    
+
     def __init__(self, firebase_service: FirebaseService = None):
         self.firebase_service = firebase_service or FirebaseService()
         self.ml_available = ML_AVAILABLE
-        
+
         # Initialize advice templates
         self._advice_templates = {}
         self._load_advice_templates()
-        
+
         # ML models for personalization
         self.models = {}
         if self.ml_available:
             self._initialize_ml_models()
-        
+
         # Cache for user factors
         self._user_factors_cache = {}
         self._cache_ttl = timedelta(hours=1)
-        
+
         logger.info("Advice Engine initialized successfully")
 
     def _load_advice_templates(self):
@@ -157,7 +157,7 @@ class AdviceEngineService:
                 time_investment="15 min setup, 5 min weekly",
                 effectiveness_metrics={"user_rating": 4.2, "completion_rate": 0.78, "adherence_rate": 0.65}
             ),
-            
+
             "debt_snowball_adhd": AdviceTemplate(
                 template_id="debt_snowball_adhd",
                 category=AdviceCategory.DEBT_REDUCTION,
@@ -165,7 +165,7 @@ class AdviceEngineService:
                 description="Pay off debts in a way that keeps ADHD brains motivated",
                 content_blocks=[
                     {
-                        "type": "introduction", 
+                        "type": "introduction",
                         "content": "The debt snowball method works perfectly for ADHD because it provides quick wins and momentum!"
                     },
                     {
@@ -193,7 +193,7 @@ class AdviceEngineService:
                 time_investment="30 min setup, 10 min monthly",
                 effectiveness_metrics={"user_rating": 4.5, "completion_rate": 0.72, "debt_reduction_rate": 0.83}
             ),
-            
+
             "emergency_fund_micro": AdviceTemplate(
                 template_id="emergency_fund_micro",
                 category=AdviceCategory.EMERGENCY_FUND,
@@ -229,7 +229,7 @@ class AdviceEngineService:
                 time_investment="2 min daily",
                 effectiveness_metrics={"user_rating": 4.7, "completion_rate": 0.89, "fund_growth_rate": 0.76}
             ),
-            
+
             "investment_simple": AdviceTemplate(
                 template_id="investment_simple",
                 category=AdviceCategory.INVESTMENT,
@@ -265,7 +265,7 @@ class AdviceEngineService:
                 time_investment="1 hour setup, 15 min quarterly",
                 effectiveness_metrics={"user_rating": 4.1, "completion_rate": 0.68, "portfolio_growth": 0.72}
             ),
-            
+
             "savings_automated": AdviceTemplate(
                 template_id="savings_automated",
                 category=AdviceCategory.SAVINGS,
@@ -293,7 +293,7 @@ class AdviceEngineService:
                 },
                 adhd_adaptations={
                     "automation": "Remove all manual decision-making from the process",
-                    "visual_feedback": "Set up savings tracking app with celebration animations", 
+                    "visual_feedback": "Set up savings tracking app with celebration animations",
                     "flexibility": "Allow yourself to pause/adjust without guilt",
                     "celebration": "Set milestone rewards (dinner out at $500 saved, etc.)"
                 },
@@ -302,7 +302,7 @@ class AdviceEngineService:
                 effectiveness_metrics={"user_rating": 4.6, "completion_rate": 0.84, "savings_growth": 0.79}
             )
         }
-        
+
         self._advice_templates = templates
         logger.info(f"Loaded {len(templates)} advice templates")
 
@@ -311,38 +311,38 @@ class AdviceEngineService:
         if not self.ml_available:
             logger.warning("ML libraries not available, using rule-based personalization only")
             return
-            
+
         # Advice recommendation model (collaborative filtering)
         self.models['advice_recommender'] = RandomForestClassifier(
             n_estimators=50,
             max_depth=10,
             random_state=42
         )
-        
+
         # User clustering for similar users
         self.models['user_clusterer'] = KMeans(
             n_clusters=5,
             random_state=42
         )
-        
+
         logger.info("ML models initialized for advice personalization")
 
     async def get_personalized_advice(
-        self, 
-        user_id: str, 
+        self,
+        user_id: str,
         category: Optional[AdviceCategory] = None,
         limit: int = 3,
         urgency_filter: Optional[AdviceUrgency] = None
     ) -> Dict:
         """
         Get personalized financial advice for a user
-        
+
         Args:
             user_id: User identifier
             category: Specific advice category (optional)
             limit: Maximum number of advice pieces to return
             urgency_filter: Filter by urgency level
-            
+
         Returns:
             Dict containing personalized advice and metadata
         """
@@ -351,16 +351,16 @@ class AdviceEngineService:
             factors = await self._get_user_factors(user_id)
             if not factors:
                 return {"success": False, "message": "Unable to analyze user profile"}
-            
+
             # Generate personalized advice
             advice_list = await self._generate_advice(factors, category, limit, urgency_filter)
-            
-            # Get user's advice history for context
+
+            # Get user's advice history for contex
             advice_history = await self._get_advice_history(user_id, days=30)
-            
+
             # Filter out recently seen advice
             filtered_advice = self._filter_recent_advice(advice_list, advice_history)
-            
+
             return {
                 "success": True,
                 "advice": [asdict(advice) for advice in filtered_advice[:limit]],
@@ -368,11 +368,11 @@ class AdviceEngineService:
                 "personalization_notes": self._get_personalization_notes(factors),
                 "advice_count": len(filtered_advice)
             }
-            
+
         except Exception as e:
             logger.error(f"Error generating personalized advice: {e}")
             return {
-                "success": False, 
+                "success": False,
                 "message": "Unable to generate personalized advice at this time",
                 "error": str(e)
             }
@@ -386,22 +386,22 @@ class AdviceEngineService:
     async def _get_user_factors(self, user_id: str) -> Optional[PersonalizationFactors]:
         """Extract personalization factors for a user"""
         try:
-            # Check cache first
+            # Check cache firs
             cache_key = f"factors_{user_id}"
             if cache_key in self._user_factors_cache:
                 cached_data, timestamp = self._user_factors_cache[cache_key]
                 if datetime.now() - timestamp < self._cache_ttl:
                     return cached_data
-            
+
             # Gather data from various sources
             user_profile = await self._get_user_profile(user_id)
             transaction_data = await self._get_user_transactions(user_id, days=90)
             goals_data = await self._get_user_goals(user_id)
             ml_insights = await self._get_ml_insights(user_id)
-            
+
             if not user_profile:
                 return None
-            
+
             # Calculate factors from data
             factors = PersonalizationFactors(
                 user_id=user_id,
@@ -416,130 +416,130 @@ class AdviceEngineService:
                 motivation_level=self._estimate_motivation_level(user_profile, goals_data),
                 learning_preference=user_profile.get('learning_preference', 'visual')
             )
-            
+
             # Cache the results
             self._user_factors_cache[cache_key] = (factors, datetime.now())
-            
+
             return factors
-            
+
         except Exception as e:
             logger.error(f"Error getting user factors for {user_id}: {e}")
             return None
 
     async def _generate_advice(
-        self, 
-        factors: PersonalizationFactors, 
-        category: Optional[AdviceCategory], 
+        self,
+        factors: PersonalizationFactors,
+        category: Optional[AdviceCategory],
         limit: int,
         urgency_filter: Optional[AdviceUrgency]
     ) -> List[PersonalizedAdvice]:
         """Generate personalized advice based on user factors"""
         advice_list = []
-        
+
         # Determine which templates to use
         relevant_templates = self._select_relevant_templates(factors, category, urgency_filter)
-        
+
         for template in relevant_templates[:limit * 2]:  # Get extra for filtering
             try:
                 # Personalize the template
                 personalized = await self._personalize_template(template, factors)
                 advice_list.append(personalized)
-                
+
             except Exception as e:
                 logger.warning(f"Error personalizing template {template.template_id}: {e}")
                 continue
-        
+
         # Sort by relevance and confidence
         advice_list.sort(key=lambda x: x.confidence_score, reverse=True)
-        
+
         return advice_list
 
     def _select_relevant_templates(
-        self, 
-        factors: PersonalizationFactors, 
+        self,
+        factors: PersonalizationFactors,
         category: Optional[AdviceCategory],
         urgency_filter: Optional[AdviceUrgency]
     ) -> List[AdviceTemplate]:
         """Select most relevant advice templates for user"""
         templates = list(self._advice_templates.values())
-        
+
         # Filter by category if specified
         if category:
             templates = [t for t in templates if t.category == category]
-        
+
         # Score templates by relevance to user factors
         scored_templates = []
         for template in templates:
             score = self._calculate_template_relevance_score(template, factors)
             scored_templates.append((template, score))
-        
+
         # Sort by relevance score
         scored_templates.sort(key=lambda x: x[1], reverse=True)
-        
+
         return [template for template, score in scored_templates]
 
     def _calculate_template_relevance_score(self, template: AdviceTemplate, factors: PersonalizationFactors) -> float:
         """Calculate how relevant a template is for a specific user"""
         score = 0.0
-        
+
         # Base score from template effectiveness
         score += template.effectiveness_metrics.get('user_rating', 3.0) / 5.0 * 0.3
-        
-        # Adjust for ADHD symptom impact
+
+        # Adjust for ADHD symptom impac
         if factors.adhd_symptom_impact == ADHDSymptomImpact.HIGH:
             if template.difficulty_level <= 2:
-                score += 0.4  # Prefer simple strategies for high ADHD impact
+                score += 0.4  # Prefer simple strategies for high ADHD impac
             else:
                 score -= 0.3  # Penalize complex strategies
-        
+
         # Adjust for executive function level
         if factors.executive_function_level < 0.5:
             if "automated" in template.template_id or "simple" in template.template_id:
                 score += 0.3
-        
+
         # Category-specific scoring
         if template.category == AdviceCategory.EMERGENCY_FUND:
             if not factors.spending_patterns.get('has_emergency_fund', False):
                 score += 0.4
-        
+
         elif template.category == AdviceCategory.DEBT_REDUCTION:
             total_debt = sum(factors.debt_levels.values())
-            if total_debt > 10000:  # High debt
+            if total_debt > 10000:  # High deb
                 score += 0.5
             elif total_debt > 0:
                 score += 0.2
             else:
-                score -= 0.4  # No debt, less relevant
-        
+                score -= 0.4  # No debt, less relevan
+
         elif template.category == AdviceCategory.BUDGETING:
             if factors.spending_patterns.get('budget_variance', 1.0) > 0.3:
                 score += 0.3  # High variance = needs budgeting help
-        
+
         # Adjust for income variability
         if factors.income_variability > 0.4:
             if "variable" in template.personalization_rules:
                 score += 0.3
-        
+
         return max(0.0, min(1.0, score))
 
     async def _personalize_template(self, template: AdviceTemplate, factors: PersonalizationFactors) -> PersonalizedAdvice:
         """Personalize an advice template for a specific user"""
-        
+
         # Apply personalization rules
         personalized_content = self._apply_personalization_rules(template, factors)
-        
+
         # Generate ADHD-specific adaptations
         adhd_tips = self._generate_adhd_tips(template, factors)
-        
+
         # Calculate confidence score
         confidence = self._calculate_advice_confidence(template, factors)
-        
+
         # Determine urgency
         urgency = self._determine_advice_urgency(template, factors)
-        
+
         # Generate personalization reasons
         reasons = self._generate_personalization_reasons(template, factors)
-        
+
         # Create personalized advice
         advice = PersonalizedAdvice(
             advice_id=self._generate_advice_id(template.template_id, factors.user_id),
@@ -558,18 +558,18 @@ class AdviceEngineService:
             follow_up_actions=personalized_content['follow_up_actions'],
             created_at=datetime.now()
         )
-        
+
         return advice
 
     def _apply_personalization_rules(self, template: AdviceTemplate, factors: PersonalizationFactors) -> Dict:
         """Apply personalization rules to customize template content"""
-        
-        # Start with base content
+
+        # Start with base conten
         content_blocks = template.content_blocks.copy()
-        
+
         # Apply personalization rules based on user factors
         rules_applied = []
-        
+
         # Income variability adjustments
         if factors.income_variability > 0.4:
             if "income_variable" in template.personalization_rules:
@@ -579,7 +579,7 @@ class AdviceEngineService:
                     "content": f"💡 Since your income varies: {rule}"
                 })
                 rules_applied.append("income_variable")
-        
+
         # ADHD symptom adjustments
         if factors.adhd_symptom_impact == ADHDSymptomImpact.HIGH:
             if "high_impulse" in template.personalization_rules:
@@ -589,7 +589,7 @@ class AdviceEngineService:
                     "content": f"🧠 For ADHD brains: {rule}"
                 })
                 rules_applied.append("high_impulse")
-        
+
         # Executive function adjustments
         if factors.executive_function_level < 0.5:
             if "low_executive" in template.personalization_rules:
@@ -599,24 +599,24 @@ class AdviceEngineService:
                     "content": f"🎯 To make this easier: {rule}"
                 })
                 rules_applied.append("low_executive")
-        
-        # Compile personalized content
+
+        # Compile personalized conten
         title = template.title
         if factors.adhd_symptom_impact != ADHDSymptomImpact.LOW:
             if "ADHD" not in title:
                 title = f"ADHD-Friendly {title}"
-        
+
         summary = template.description
-        
+
         # Build full content from blocks
         content_parts = []
         action_steps = []
         follow_up_actions = []
-        
+
         for block in content_blocks:
             block_type = block.get("type", "general")
             block_content = block.get("content", "")
-            
+
             if block_type == "introduction":
                 content_parts.append(f"## Getting Started\n{block_content}\n")
             elif block_type == "method" or block_type == "strategy":
@@ -628,7 +628,7 @@ class AdviceEngineService:
                 content_parts.append(f"## 🧠 ADHD Brain Hack\n{block_content}\n")
             else:
                 content_parts.append(f"{block_content}\n")
-        
+
         # Add default action steps if none were created
         if not action_steps:
             action_steps = [
@@ -637,7 +637,7 @@ class AdviceEngineService:
                 "Set up any needed tools or accounts",
                 "Track your progress for the first week"
             ]
-        
+
         # Add follow-up actions
         follow_up_actions = [
             "Check your progress after one week",
@@ -645,7 +645,7 @@ class AdviceEngineService:
             "Celebrate your wins, however small!",
             "Consider the next step in your financial journey"
         ]
-        
+
         return {
             "title": title,
             "summary": summary,
@@ -658,7 +658,7 @@ class AdviceEngineService:
     def _generate_adhd_tips(self, template: AdviceTemplate, factors: PersonalizationFactors) -> List[str]:
         """Generate ADHD-specific tips for the advice"""
         tips = []
-        
+
         # Base ADHD tips from template
         if template.adhd_adaptations:
             for key, adaptation in template.adhd_adaptations.items():
@@ -672,7 +672,7 @@ class AdviceEngineService:
                     tips.append(f"🌊 Stay flexible: {adaptation}")
                 elif key == "celebration":
                     tips.append(f"🎉 Celebrate: {adaptation}")
-        
+
         # Additional personalized ADHD tips
         if factors.adhd_symptom_impact == ADHDSymptomImpact.HIGH:
             tips.extend([
@@ -680,43 +680,43 @@ class AdviceEngineService:
                 "Use timers to stay focused - try 15-minute sessions",
                 "Have an accountability buddy check in with you weekly"
             ])
-        
+
         if factors.executive_function_level < 0.5:
             tips.extend([
                 "Set up automatic reminders on your phone",
                 "Use external organization tools instead of relying on memory",
                 "Schedule specific times to work on this, don't leave it to 'later'"
             ])
-        
+
         return tips[:5]  # Limit to 5 tips to avoid overwhelm
 
     def _calculate_advice_confidence(self, template: AdviceTemplate, factors: PersonalizationFactors) -> float:
         """Calculate confidence score for personalized advice"""
         base_score = template.effectiveness_metrics.get('completion_rate', 0.5)
-        
-        # Adjust based on user-template fit
+
+        # Adjust based on user-template fi
         difficulty_penalty = 0
         if template.difficulty_level > 3 and factors.executive_function_level < 0.5:
             difficulty_penalty = 0.2
         elif template.difficulty_level <= 2 and factors.adhd_symptom_impact == ADHDSymptomImpact.HIGH:
-            base_score += 0.1  # Simple strategies work better for high ADHD impact
-        
+            base_score += 0.1  # Simple strategies work better for high ADHD impac
+
         # Adjust for data quality
         data_quality = 0.8  # Assume decent data quality
         if not factors.spending_patterns:
             data_quality *= 0.7
-        
+
         confidence = (base_score - difficulty_penalty) * data_quality
         return max(0.1, min(1.0, confidence))
 
     def _determine_advice_urgency(self, template: AdviceTemplate, factors: PersonalizationFactors) -> AdviceUrgency:
         """Determine urgency level for the advice"""
-        
+
         # Emergency fund is critical if none exists
         if template.category == AdviceCategory.EMERGENCY_FUND:
             if not factors.spending_patterns.get('has_emergency_fund', False):
                 return AdviceUrgency.HIGH
-        
+
         # Debt reduction urgency based on debt levels
         if template.category == AdviceCategory.DEBT_REDUCTION:
             total_debt = sum(factors.debt_levels.values())
@@ -726,7 +726,7 @@ class AdviceEngineService:
                 return AdviceUrgency.HIGH
             elif total_debt > 5000:
                 return AdviceUrgency.MEDIUM
-        
+
         # Budgeting urgency based on spending variance
         if template.category == AdviceCategory.BUDGETING:
             variance = factors.spending_patterns.get('budget_variance', 0)
@@ -734,80 +734,80 @@ class AdviceEngineService:
                 return AdviceUrgency.HIGH
             elif variance > 0.3:
                 return AdviceUrgency.MEDIUM
-        
+
         # Default urgency
         return AdviceUrgency.MEDIUM
 
     def _generate_personalization_reasons(self, template: AdviceTemplate, factors: PersonalizationFactors) -> List[str]:
         """Generate explanations for why this advice was personalized this way"""
         reasons = []
-        
+
         # ADHD-related reasons
         if factors.adhd_symptom_impact == ADHDSymptomImpact.HIGH:
             reasons.append("Simplified approach recommended for ADHD brain optimization")
-        
+
         # Income variability
         if factors.income_variability > 0.4:
             reasons.append("Adapted for variable income patterns")
-        
+
         # Executive function
         if factors.executive_function_level < 0.6:
             reasons.append("Includes automation to reduce decision fatigue")
-        
+
         # Debt levels
         total_debt = sum(factors.debt_levels.values())
         if total_debt > 20000 and template.category == AdviceCategory.DEBT_REDUCTION:
             reasons.append("Prioritized due to significant debt levels")
-        
-        # Goals alignment
+
+        # Goals alignmen
         if factors.financial_goals:
             goal_categories = [goal.get('category') for goal in factors.financial_goals]
             if template.category.value in goal_categories:
                 reasons.append("Aligns with your active financial goals")
-        
+
         return reasons
 
     def _estimate_advice_impact(self, template: AdviceTemplate, factors: PersonalizationFactors) -> str:
         """Estimate the potential impact of following this advice"""
-        
+
         # Base impact from template metrics
         effectiveness = template.effectiveness_metrics.get('user_rating', 3.0)
-        
+
         if effectiveness >= 4.5:
             base_impact = "High"
         elif effectiveness >= 3.5:
             base_impact = "Medium"
         else:
             base_impact = "Low"
-        
+
         # Adjust for user factors
         if template.category == AdviceCategory.EMERGENCY_FUND:
             if not factors.spending_patterns.get('has_emergency_fund', False):
                 return "High - Emergency fund provides crucial financial security"
-        
+
         elif template.category == AdviceCategory.DEBT_REDUCTION:
             total_debt = sum(factors.debt_levels.values())
             if total_debt > 30000:
                 return "High - Significant debt reduction potential"
             elif total_debt > 10000:
                 return "Medium - Meaningful debt reduction possible"
-        
+
         return f"{base_impact} - Based on similar users' results"
 
     def _personalize_time_estimate(self, template: AdviceTemplate, factors: PersonalizationFactors) -> str:
         """Personalize time estimates based on user factors"""
-        base_time = template.time_investment
-        
+        base_time = template.time_investmen
+
         # Adjust for ADHD factors
         if factors.adhd_symptom_impact == ADHDSymptomImpact.HIGH:
             if "min" in base_time:
                 # Add buffer time for ADHD brains
                 return base_time + " (may take longer with ADHD - be patient with yourself!)"
-        
+
         # Adjust for executive function
         if factors.executive_function_level < 0.5:
             return base_time + " (plan extra time for setup and organization)"
-        
+
         return base_time
 
     def _generate_advice_id(self, template_id: str, user_id: str) -> str:
@@ -817,20 +817,20 @@ class AdviceEngineService:
         return hashlib.md5(content.encode()).hexdigest()[:16]
 
     # Helper methods for user data analysis
-    
+
     def _analyze_income_level(self, transactions: List[Dict]) -> str:
         """Analyze user's income level from transactions"""
         if not transactions:
             return "unknown"
-        
+
         # Look for income transactions (positive amounts)
         income_transactions = [t for t in transactions if t.get('amount', 0) > 0]
-        
+
         if not income_transactions:
             return "low"
-        
+
         monthly_income = sum(t['amount'] for t in income_transactions) / 3  # Assuming 3 months of data
-        
+
         if monthly_income > 8000:
             return "high"
         elif monthly_income > 4000:
@@ -842,16 +842,16 @@ class AdviceEngineService:
         """Calculate income variability (0.0 = stable, 1.0 = highly variable)"""
         if not transactions:
             return 0.5
-        
+
         # Get monthly income amounts
         income_amounts = []
         current_month = None
         monthly_total = 0
-        
+
         for transaction in sorted(transactions, key=lambda x: x.get('date', '')):
             if transaction.get('amount', 0) > 0:  # Income transaction
                 transaction_month = transaction.get('date', '')[:7]  # YYYY-MM
-                
+
                 if current_month != transaction_month:
                     if current_month is not None:
                         income_amounts.append(monthly_total)
@@ -859,33 +859,33 @@ class AdviceEngineService:
                     monthly_total = transaction['amount']
                 else:
                     monthly_total += transaction['amount']
-        
+
         if current_month:
             income_amounts.append(monthly_total)
-        
+
         if len(income_amounts) < 2:
             return 0.3  # Default moderate variability
-        
+
         # Calculate coefficient of variation
         mean_income = sum(income_amounts) / len(income_amounts)
         if mean_income == 0:
             return 0.5
-        
+
         variance = sum((x - mean_income) ** 2 for x in income_amounts) / len(income_amounts)
         std_dev = variance ** 0.5
         cv = std_dev / mean_income
-        
+
         return min(1.0, cv)  # Cap at 1.0
 
     def _analyze_debt_levels(self, transactions: List[Dict]) -> Dict[str, float]:
         """Analyze debt levels by category"""
         debt_categories = {}
-        
+
         for transaction in transactions:
             amount = transaction.get('amount', 0)
             category = transaction.get('category', 'other')
             merchant = transaction.get('merchant', '').lower()
-            
+
             # Identify debt payments
             if amount < 0:  # Expense
                 if any(keyword in merchant for keyword in ['loan', 'credit', 'debt', 'mortgage', 'student']):
@@ -893,87 +893,87 @@ class AdviceEngineService:
                     debt_categories[debt_type] = debt_categories.get(debt_type, 0) + abs(amount)
                 elif category in ['loans', 'credit_cards', 'debt']:
                     debt_categories[category] = debt_categories.get(category, 0) + abs(amount)
-        
+
         # Estimate outstanding balances (rough approximation)
         estimated_balances = {}
         for debt_type, monthly_payment in debt_categories.items():
             # Rough estimate: 20x monthly payment for outstanding balance
             estimated_balances[debt_type] = monthly_payment * 20
-        
+
         return estimated_balances
 
     def _assess_adhd_impact(self, user_profile: Dict, ml_insights: Optional[Dict]) -> ADHDSymptomImpact:
         """Assess ADHD symptom impact from available data"""
-        
-        # Check user's self-reported ADHD impact
+
+        # Check user's self-reported ADHD impac
         if user_profile.get('adhd_impact'):
             return ADHDSymptomImpact(user_profile['adhd_impact'])
-        
+
         # Infer from spending patterns if ML insights available
         if ml_insights:
             impulse_score = ml_insights.get('impulse_spending_frequency', 0)
             pattern_inconsistency = ml_insights.get('pattern_inconsistency', 0)
-            
+
             if impulse_score > 0.7 or pattern_inconsistency > 0.6:
                 return ADHDSymptomImpact.HIGH
             elif impulse_score > 0.4 or pattern_inconsistency > 0.3:
                 return ADHDSymptomImpact.MODERATE
-        
+
         # Default to moderate if unknown
         return ADHDSymptomImpact.MODERATE
 
     def _estimate_executive_function(self, transactions: List[Dict], ml_insights: Optional[Dict]) -> float:
         """Estimate executive function level (0.0 = low, 1.0 = high)"""
         score = 0.5  # Default middle ground
-        
+
         # Look for patterns indicating good executive function
         if transactions:
             # Regular savings patterns
             savings_transactions = [t for t in transactions if 'savings' in t.get('category', '').lower()]
             if savings_transactions:
                 score += 0.2
-            
+
             # Budget consistency (if available from ML insights)
             if ml_insights:
                 budget_consistency = ml_insights.get('budget_consistency', 0.5)
                 score = (score + budget_consistency) / 2
-        
+
         return max(0.1, min(1.0, score))
 
     def _estimate_stress_level(self, ml_insights: Optional[Dict]) -> float:
         """Estimate current stress level from spending patterns"""
         if not ml_insights:
             return 0.5
-        
+
         # Look for stress indicators in spending
         stress_spending = ml_insights.get('emotional_spending_frequency', 0)
         spending_volatility = ml_insights.get('spending_volatility', 0)
-        
+
         stress_score = (stress_spending + spending_volatility) / 2
         return max(0.1, min(1.0, stress_score))
 
     def _estimate_motivation_level(self, user_profile: Dict, goals_data: List[Dict]) -> float:
         """Estimate motivation level from goals and profile"""
         score = 0.5
-        
+
         # Active goals indicate higher motivation
         if goals_data:
             score += 0.3
-            
+
             # Recent goal activity indicates higher motivation
-            recent_goals = [g for g in goals_data if 
+            recent_goals = [g for g in goals_data if
                           (datetime.now() - datetime.fromisoformat(g.get('created_at', '2020-01-01'))).days < 30]
             if recent_goals:
                 score += 0.2
-        
+
         # User engagement indicators
         if user_profile.get('last_login_days', 30) < 7:
             score += 0.1
-        
+
         return max(0.1, min(1.0, score))
 
     # Data fetching methods (to be implemented based on actual data sources)
-    
+
     async def _get_user_profile(self, user_id: str) -> Optional[Dict]:
         """Get user profile data"""
         try:
@@ -987,12 +987,8 @@ class AdviceEngineService:
         """Get user transaction data"""
         try:
             cutoff_date = datetime.now() - timedelta(days=days)
-            transactions_ref = self.firebase_service.db.collection('transactions')\
-                .where('user_id', '==', user_id)\
-                .where('date', '>=', cutoff_date)\
-                .order_by('date', direction='DESCENDING')\
-                .limit(1000)
-            
+            transactions_ref = self.firebase_service.db.collection('transactions').where('user_id', '==', user_id).where('date', '>=', cutoff_date).order_by('date', direction='DESCENDING').limit(1000)
+
             docs = transactions_ref.stream()
             return [doc.to_dict() for doc in docs]
         except Exception as e:
@@ -1002,10 +998,8 @@ class AdviceEngineService:
     async def _get_user_goals(self, user_id: str) -> List[Dict]:
         """Get user's financial goals"""
         try:
-            goals_ref = self.firebase_service.db.collection('goals')\
-                .where('user_id', '==', user_id)\
-                .where('status', '==', 'active')
-            
+            goals_ref = self.firebase_service.db.collection('goals').where('user_id', '==', user_id).where('status', '==', 'active')
+
             docs = goals_ref.stream()
             return [doc.to_dict() for doc in docs]
         except Exception as e:
@@ -1018,7 +1012,7 @@ class AdviceEngineService:
             # This would integrate with the ML Analytics service
             from app.services.ml_analytics_service import MLAnalyticsService
             ml_service = MLAnalyticsService()
-            
+
             # Get recent insights
             insights = await ml_service.get_user_insights_sync(user_id, days=60)
             return insights if insights.get('success') else None
@@ -1030,11 +1024,8 @@ class AdviceEngineService:
         """Get user's recent advice history"""
         try:
             cutoff_date = datetime.now() - timedelta(days=days)
-            advice_ref = self.firebase_service.db.collection('advice_history')\
-                .where('user_id', '==', user_id)\
-                .where('created_at', '>=', cutoff_date)\
-                .order_by('created_at', direction='DESCENDING')
-            
+            advice_ref = self.firebase_service.db.collection('advice_history').where('user_id', '==', user_id).where('created_at', '>=', cutoff_date).order_by('created_at', direction='DESCENDING')
+
             docs = advice_ref.stream()
             return [doc.to_dict() for doc in docs]
         except Exception as e:
@@ -1045,16 +1036,16 @@ class AdviceEngineService:
         """Filter out advice that was recently shown"""
         if not history:
             return advice_list
-        
+
         recent_templates = {item.get('template_id') for item in history}
-        
+
         # Filter out advice based on recently seen templates
         filtered = []
         for advice in advice_list:
             template_id = advice.advice_id.split('_')[0]  # Extract template ID
             if template_id not in recent_templates:
                 filtered.append(advice)
-        
+
         return filtered
 
     def _summarize_user_factors(self, factors: PersonalizationFactors) -> Dict:
@@ -1071,7 +1062,7 @@ class AdviceEngineService:
         """Determine the user's primary financial focus area"""
         total_debt = sum(factors.debt_levels.values())
         has_emergency_fund = factors.spending_patterns.get('has_emergency_fund', False)
-        
+
         if total_debt > 20000:
             return "Debt reduction"
         elif not has_emergency_fund:
@@ -1084,23 +1075,23 @@ class AdviceEngineService:
     def _get_personalization_notes(self, factors: PersonalizationFactors) -> List[str]:
         """Generate notes explaining the personalization approach"""
         notes = []
-        
+
         if factors.adhd_symptom_impact == ADHDSymptomImpact.HIGH:
             notes.append("Advice simplified and automated for ADHD brain optimization")
-        
+
         if factors.income_variability > 0.4:
             notes.append("Strategies adapted for variable income patterns")
-        
+
         if factors.executive_function_level < 0.6:
             notes.append("Extra automation and reminders included to support executive function")
-        
+
         if sum(factors.debt_levels.values()) > 10000:
             notes.append("Debt reduction prioritized in recommendations")
-        
+
         return notes
 
     # Public utility methods
-    
+
     async def record_advice_interaction(self, user_id: str, advice_id: str, action: str, feedback: Optional[Dict] = None):
         """Record user interaction with advice for improvement"""
         try:
@@ -1112,12 +1103,12 @@ class AdviceEngineService:
                 'timestamp': datetime.now(),
                 'created_at': datetime.now()
             }
-            
+
             self.firebase_service.db.collection('advice_interactions').add(interaction)
-            
+
             # Update advice effectiveness metrics
             await self._update_advice_metrics(advice_id, action, feedback)
-            
+
         except Exception as e:
             logger.error(f"Error recording advice interaction: {e}")
 
@@ -1154,7 +1145,7 @@ class AdviceEngineService:
         """Get icon for advice category"""
         icons = {
             AdviceCategory.BUDGETING: "📊",
-            AdviceCategory.DEBT_REDUCTION: "💪", 
+            AdviceCategory.DEBT_REDUCTION: "💪",
             AdviceCategory.SAVINGS: "🏦",
             AdviceCategory.INVESTMENT: "📈",
             AdviceCategory.EMERGENCY_FUND: "🛡️"

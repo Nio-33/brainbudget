@@ -1,5 +1,5 @@
 """
-Guest/Anonymous functionality for BrainBudget
+Guest/Anonymous functionality for BrainBudge
 Allows users to try basic features before signing up
 """
 
@@ -27,40 +27,40 @@ def guest_upload():
         if 'guest_id' not in session:
             session['guest_id'] = f"guest_{uuid.uuid4().hex[:12]}"
             session['guest_created'] = datetime.now().isoformat()
-        
+
         guest_id = session['guest_id']
-        
+
         # Check file upload
         if 'file' not in request.files:
             return jsonify({
                 "success": False,
                 "message": "No worries! Just drag and drop your bank statement to get started 📁"
             }), 400
-        
+
         file = request.files['file']
         if file.filename == '':
             return jsonify({
                 "success": False,
                 "message": "Looks like no file was selected. Try again with a CSV file! 😊"
             }), 400
-        
+
         # Validate file type
         if not file.filename.lower().endswith(('.csv', '.txt')):
             return jsonify({
                 "success": False,
                 "message": "We need a CSV file to work our magic! Most banks can export these 📊"
             }), 400
-        
+
         # Save file temporarily
         temp_dir = tempfile.mkdtemp()
         temp_file = os.path.join(temp_dir, f"guest_{guest_id}_{file.filename}")
         file.save(temp_file)
-        
+
         # Analyze the file
         try:
             # Read CSV file and create basic analysis
             analysis_result = analyze_guest_csv(temp_file)
-            
+
             # Add guest-specific encouraging messages
             analysis_result['guest_experience'] = {
                 "message": "🎉 Wow! Look what we discovered about your spending!",
@@ -72,7 +72,7 @@ def guest_upload():
                     "Get personalized spending insights"
                 ]
             }
-            
+
             # Limit guest analysis to prevent abuse
             if 'transactions' in analysis_result:
                 analysis_result['transactions'] = analysis_result['transactions'][:50]
@@ -80,7 +80,7 @@ def guest_upload():
                     "message": "📊 Showing first 50 transactions",
                     "full_message": "Create an account to see all your transactions and advanced insights!"
                 }
-            
+
             return jsonify({
                 "success": True,
                 "guest_id": guest_id,
@@ -90,14 +90,14 @@ def guest_upload():
                     "title": "Love what you see? 🌟",
                     "benefits": [
                         "Save and track all your analysis",
-                        "Set ADHD-friendly financial goals", 
+                        "Set ADHD-friendly financial goals",
                         "Chat with AI coach anytime",
                         "Get ML-powered spending insights",
                         "Connect bank accounts for real-time tracking"
                     ]
                 }
             })
-            
+
         except Exception as analysis_error:
             logger.error(f"Guest analysis error: {analysis_error}")
             return jsonify({
@@ -105,7 +105,7 @@ def guest_upload():
                 "message": "We had trouble analyzing your file, but don't worry! This might be due to the file format. Try a different CSV export from your bank 🔄",
                 "suggestion": "Most banks have CSV export in their online banking. Look for 'Export' or 'Download' options!"
             }), 500
-            
+
         finally:
             # Clean up temporary file
             try:
@@ -114,7 +114,7 @@ def guest_upload():
                 os.rmdir(temp_dir)
             except Exception as cleanup_error:
                 logger.warning(f"Cleanup error: {cleanup_error}")
-    
+
     except Exception as e:
         logger.error(f"Guest upload error: {e}")
         return jsonify({
@@ -127,7 +127,7 @@ def guest_upload():
 @guest_bp.route('/convert', methods=['POST'])
 def convert_guest_to_user():
     """
-    Convert guest session to full user account
+    Convert guest session to full user accoun
     Preserves analysis data during conversion
     """
     try:
@@ -136,19 +136,19 @@ def convert_guest_to_user():
                 "success": False,
                 "message": "No guest session found. Please try uploading a file first!"
             }), 400
-        
+
         data = request.get_json()
         if not data:
             return jsonify({
                 "success": False,
                 "message": "Please provide your account information to continue"
             }), 400
-        
+
         guest_id = session['guest_id']
-        
+
         # Here we would normally integrate with the auth system
         # For now, return conversion info
-        
+
         return jsonify({
             "success": True,
             "message": "🎉 Welcome to BrainBudget! Your analysis has been saved to your account.",
@@ -165,7 +165,7 @@ def convert_guest_to_user():
                 "Start chatting with your AI coach"
             ]
         })
-    
+
     except Exception as e:
         logger.error(f"Guest conversion error: {e}")
         return jsonify({
@@ -178,7 +178,7 @@ def convert_guest_to_user():
 @guest_bp.route('/demo-insights', methods=['GET'])
 def get_demo_insights():
     """
-    Provide demo insights for users who haven't uploaded yet
+    Provide demo insights for users who haven't uploaded ye
     Shows what BrainBudget can do
     """
     try:
@@ -195,7 +195,7 @@ def get_demo_insights():
                     },
                     {
                         "type": "hyperfocus",
-                        "icon": "🎯", 
+                        "icon": "🎯",
                         "title": "Hyperfocus Spending",
                         "description": "Track concentrated spending during special interest periods",
                         "example": "Art supplies shopping session: $180 in 2 hours - hyperfocus can be expensive!"
@@ -257,12 +257,12 @@ def get_demo_insights():
                 ]
             }
         }
-        
+
         return jsonify({
             "success": True,
             "demo_insights": demo_insights
         })
-    
+
     except Exception as e:
         logger.error(f"Demo insights error: {e}")
         return jsonify({
@@ -289,32 +289,32 @@ def analyze_guest_csv(file_path):
     """
     import csv
     import os
-    from collections import defaultdict
-    
+    from collections import defaultdic
+
     try:
         transactions = []
         category_breakdown = defaultdict(float)
         total_spending = 0
         transaction_count = 0
-        
+
         with open(file_path, 'r', newline='', encoding='utf-8') as csvfile:
             # Try to detect delimiter
             sample = csvfile.read(1024)
             csvfile.seek(0)
             sniffer = csv.Sniffer()
             delimiter = sniffer.sniff(sample).delimiter
-            
+
             reader = csv.DictReader(csvfile, delimiter=delimiter)
-            
+
             for row in reader:
                 # Try to find amount and description columns
                 amount = None
                 description = ""
-                
+
                 # Common column names for amounts
-                amount_cols = ['amount', 'Amount', 'AMOUNT', 'debit', 'Debit', 'DEBIT', 
+                amount_cols = ['amount', 'Amount', 'AMOUNT', 'debit', 'Debit', 'DEBIT',
                               'credit', 'Credit', 'CREDIT', 'transaction_amount', 'value']
-                
+
                 for col in amount_cols:
                     if col in row and row[col]:
                         try:
@@ -323,31 +323,31 @@ def analyze_guest_csv(file_path):
                             break
                         except (ValueError, TypeError):
                             continue
-                
+
                 # Common column names for descriptions
-                desc_cols = ['description', 'Description', 'DESCRIPTION', 'memo', 'Memo', 
+                desc_cols = ['description', 'Description', 'DESCRIPTION', 'memo', 'Memo',
                             'details', 'Details', 'payee', 'Payee', 'merchant']
-                
+
                 for col in desc_cols:
                     if col in row and row[col]:
                         description = row[col]
                         break
-                
+
                 if amount is not None and abs(amount) > 0:
                     transactions.append({
                         'amount': amount,
                         'description': description
                     })
-                    
+
                     # Basic categorization
                     category = categorize_transaction(description)
                     category_breakdown[category] += abs(amount)
-                    
+
                     if amount < 0:  # Spending
                         total_spending += abs(amount)
-                    
+
                     transaction_count += 1
-        
+
         return {
             'transaction_count': transaction_count,
             'total_spending': total_spending,
@@ -355,7 +355,7 @@ def analyze_guest_csv(file_path):
             'transactions': transactions[:50],  # Limit for guests
             'analysis_type': 'guest_basic'
         }
-        
+
     except Exception as e:
         logger.error(f"CSV analysis error: {e}")
         return {
@@ -372,7 +372,7 @@ def categorize_transaction(description):
     Basic transaction categorization for guest analysis
     """
     description_lower = description.lower()
-    
+
     # Simple keyword-based categorization
     if any(keyword in description_lower for keyword in ['grocery', 'market', 'food', 'supermarket']):
         return 'groceries'

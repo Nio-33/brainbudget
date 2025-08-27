@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  brainbudget:
+    build: .
+    ports:
+      - "8080:8080"
+      - "8081:8080"  # Alternative port
+    environment:
+      - FLASK_ENV=production
+      - PORT=8080
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/app/logs
+      - ./uploads:/app/uploads
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - brainbudget_network
+
+networks:
+  brainbudget_network:
+    driver: bridge

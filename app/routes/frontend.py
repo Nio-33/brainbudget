@@ -2,7 +2,7 @@
 Frontend routes for BrainBudget web application.
 Serves HTML pages and handles static file requests.
 """
-from flask import Blueprint, render_template, request, jsonify, send_from_directory
+from flask import Blueprint, render_template, request, jsonify, send_from_directory, redirect, url_for, session
 import logging
 import os
 
@@ -12,57 +12,30 @@ logger = logging.getLogger(__name__)
 frontend_bp = Blueprint('frontend', __name__, template_folder='../../templates', static_folder='../../static')
 
 
+def require_auth():
+    """Simple authentication check - redirect to login if not authenticated."""
+    # For now, we'll use session-based auth; Firebase integration is handled client-side
+    if not session.get('user_id'):
+        return redirect(url_for('frontend.login_page'))
+    return None
+
+
+# ============================================================================
+# LANDING PAGE (Public - No Auth Required)
+# ============================================================================
 @frontend_bp.route('/')
 def index():
-    """Serve the BrainBudget home page showcasing all features."""
+    """Serve the BrainBudget landing page - entry point for all users."""
     try:
-        return render_template('home.html')
+        return render_template('index.html')
     except Exception as e:
-        logger.error(f"Error serving home page: {e}")
-        return render_template('error.html', message="Unable to load the home page"), 500
+        logger.error(f"Error serving landing page: {e}")
+        return render_template('error.html', message="Unable to load the landing page"), 500
 
 
-@frontend_bp.route('/upload')
-def upload_page():
-    """Serve the upload interface page."""
-    try:
-        return render_template('upload.html')
-    except Exception as e:
-        logger.error(f"Error serving upload page: {e}")
-        return render_template('error.html', message="Unable to load the upload page"), 500
-
-
-@frontend_bp.route('/analysis')
-def analysis_page():
-    """Serve the analysis results page."""
-    try:
-        # In a real implementation, you might pass analysis data here
-        return render_template('analysis.html')
-    except Exception as e:
-        logger.error(f"Error serving analysis page: {e}")
-        return render_template('error.html', message="Unable to load the analysis page"), 500
-
-
-@frontend_bp.route('/dashboard')
-def dashboard_page():
-    """Serve the dashboard page."""
-    try:
-        return render_template('dashboard.html')
-    except Exception as e:
-        logger.error(f"Error serving dashboard page: {e}")
-        return render_template('error.html', message="Unable to load the dashboard page"), 500
-
-
-@frontend_bp.route('/settings')
-def settings_page():
-    """Serve the settings page."""
-    try:
-        return render_template('settings.html')
-    except Exception as e:
-        logger.error(f"Error serving settings page: {e}")
-        return render_template('error.html', message="Unable to load the settings page"), 500
-
-
+# ============================================================================
+# AUTHENTICATION PAGES (Public - No Auth Required)
+# ============================================================================
 @frontend_bp.route('/auth/login')
 def login_page():
     """Serve the authentication login page."""
@@ -93,10 +66,156 @@ def signup_page():
         return render_template('error.html', message="Unable to load the signup page"), 500
 
 
+# ============================================================================
+# MAIN APP PAGES (Protected - Auth Required)
+# ============================================================================
+@frontend_bp.route('/upload')
+def upload_page():
+    """Serve the upload interface page."""
+    try:
+        # Check authentication
+        auth_check = require_auth()
+        if auth_check:
+            return auth_check
+            
+        return render_template('upload.html')
+    except Exception as e:
+        logger.error(f"Error serving upload page: {e}")
+        return render_template('error.html', message="Unable to load the upload page"), 500
+
+
+@frontend_bp.route('/dashboard')
+def dashboard_page():
+    """Serve the dashboard page."""
+    try:
+        # Check authentication
+        auth_check = require_auth()
+        if auth_check:
+            return auth_check
+            
+        return render_template('dashboard.html')
+    except Exception as e:
+        logger.error(f"Error serving dashboard page: {e}")
+        return render_template('error.html', message="Unable to load the dashboard page"), 500
+
+
+@frontend_bp.route('/goals')
+def goals_page():
+    """Serve the goals page."""
+    try:
+        # Check authentication
+        auth_check = require_auth()
+        if auth_check:
+            return auth_check
+            
+        return render_template('goal_wizard.html')
+    except Exception as e:
+        logger.error(f"Error serving goals page: {e}")
+        return render_template('error.html', message="Unable to load the goals page"), 500
+
+
+@frontend_bp.route('/advice')
+def advice_page():
+    """Serve the advice page."""
+    try:
+        # Check authentication
+        auth_check = require_auth()
+        if auth_check:
+            return auth_check
+            
+        return render_template('advice.html')
+    except Exception as e:
+        logger.error(f"Error serving advice page: {e}")
+        return render_template('error.html', message="Unable to load the advice page"), 500
+
+
+@frontend_bp.route('/insights')
+def insights_page():
+    """Serve the insights page."""
+    try:
+        # Check authentication
+        auth_check = require_auth()
+        if auth_check:
+            return auth_check
+            
+        return render_template('insights.html')
+    except Exception as e:
+        logger.error(f"Error serving insights page: {e}")
+        return render_template('error.html', message="Unable to load the insights page"), 500
+
+
+@frontend_bp.route('/coach')
+def ai_coach_page():
+    """Serve the AI coach page."""
+    try:
+        # Check authentication
+        auth_check = require_auth()
+        if auth_check:
+            return auth_check
+            
+        return render_template('ai_coach.html')
+    except Exception as e:
+        logger.error(f"Error serving AI coach page: {e}")
+        return render_template('error.html', message="Unable to load the AI coach page"), 500
+
+
+@frontend_bp.route('/community')
+def community_page():
+    """Serve the community page."""
+    try:
+        # Check authentication
+        auth_check = require_auth()
+        if auth_check:
+            return auth_check
+            
+        return render_template('community.html')
+    except Exception as e:
+        logger.error(f"Error serving community page: {e}")
+        return render_template('error.html', message="Unable to load the community page"), 500
+
+
+@frontend_bp.route('/settings')
+def settings_page():
+    """Serve the settings page."""
+    try:
+        # Check authentication
+        auth_check = require_auth()
+        if auth_check:
+            return auth_check
+            
+        return render_template('settings.html')
+    except Exception as e:
+        logger.error(f"Error serving settings page: {e}")
+        return render_template('error.html', message="Unable to load the settings page"), 500
+
+
+# ============================================================================
+# LEGACY/UTILITY PAGES
+# ============================================================================
+@frontend_bp.route('/analysis')
+def analysis_page():
+    """Serve the analysis results page."""
+    try:
+        # Check authentication
+        auth_check = require_auth()
+        if auth_check:
+            return auth_check
+            
+        return render_template('analysis.html')
+    except Exception as e:
+        logger.error(f"Error serving analysis page: {e}")
+        return render_template('error.html', message="Unable to load the analysis page"), 500
+
+
 @frontend_bp.route('/profile')
 def profile_page():
     """Serve the user profile page."""
     try:
+        # Check authentication
+        auth_check = require_auth()
+        if auth_check:
+            return auth_check
+            
         return render_template('auth/profile.html')
     except Exception as e:
         logger.error(f"Error serving profile page: {e}")
@@ -113,6 +232,9 @@ def charts_demo():
         return render_template('error.html', message="Unable to load the charts demo"), 500
 
 
+# ============================================================================
+# PWA & STATIC FILES
+# ============================================================================
 @frontend_bp.route('/sw.js')
 def service_worker():
     """Serve the service worker file."""
@@ -180,11 +302,13 @@ def favicon():
         return "", 204  # No content, but not an error
 
 
-# Error handlers for frontend routes
+# ============================================================================
+# ERROR HANDLERS
+# ============================================================================
 @frontend_bp.errorhandler(404)
 def not_found_error(error):
     """Handle 404 errors with ADHD-friendly messaging."""
-    return render_template('error.html', 
+    return render_template('error.html',
                          title="Page Not Found",
                          message="We couldn't find what you're looking for. Let's get you back on track! 🧭",
                          suggestion="Try going back to the home page or checking the URL.",
@@ -198,18 +322,8 @@ def internal_error(error):
     return render_template('error.html',
                          title="Something Went Wrong",
                          message="Oops! Something unexpected happened, but don't worry - we're on it! 🛠️",
-                         suggestion="Please try refreshing the page or come back in a few minutes.",
+                         suggestion="Try refreshing the page or going back to the home page.",
                          error_code=500), 500
-
-
-@frontend_bp.errorhandler(503)
-def service_unavailable(error):
-    """Handle 503 errors (service unavailable)."""
-    return render_template('error.html',
-                         title="Service Temporarily Unavailable", 
-                         message="We're doing some quick maintenance. We'll be back shortly! ⚙️",
-                         suggestion="Please try again in a few minutes.",
-                         error_code=503), 503
 
 
 # Route for handling PWA app installation
@@ -233,80 +347,7 @@ def connect_bank_page():
         return render_template('error.html', message="Unable to load bank connection page"), 500
 
 
-@frontend_bp.route('/goals/create')
-def create_goal_page():
-    """Serve the ADHD-friendly goal creation wizard."""
-    try:
-        return render_template('goal_wizard.html')
-    except Exception as e:
-        logger.error(f"Error serving goal creation page: {e}")
-        return render_template('error.html', message="Unable to load goal creation page"), 500
-
-
-@frontend_bp.route('/coach')
-def ai_coach_page():
-    """Serve the AI financial coach chat interface."""
-    try:
-        return render_template('ai_coach.html')
-    except Exception as e:
-        logger.error(f"Error serving AI coach page: {e}")
-        return render_template('error.html', message="Unable to load AI coach page"), 500
-
-
-@frontend_bp.route('/insights')
-def insights_page():
-    """Serve the ML-powered spending insights dashboard."""
-    try:
-        return render_template('insights.html')
-    except Exception as e:
-        logger.error(f"Error serving insights page: {e}")
-        return render_template('error.html', message="Unable to load insights page"), 500
-
-
-@frontend_bp.route('/advice')
-def advice_page():
-    """Serve the personalized financial advice dashboard."""
-    try:
-        return render_template('advice.html')
-    except Exception as e:
-        logger.error(f"Error serving advice page: {e}")
-        return render_template('error.html', message="Unable to load advice page"), 500
-
-
-@frontend_bp.route('/community')
-def community_page():
-    """Serve the ADHD community page (coming soon)."""
-    try:
-        return render_template('community.html')
-    except Exception as e:
-        logger.error(f"Error serving community page: {e}")
-        return render_template('error.html', message="Unable to load community page"), 500
-
-
-# Health check specifically for frontend
-@frontend_bp.route('/frontend-health')
-def frontend_health():
-    """Frontend-specific health check."""
-    try:
-        # Test template rendering
-        render_template('base.html')
-        
-        return jsonify({
-            'status': 'healthy',
-            'component': 'frontend',
-            'templates': 'ok',
-            'static_files': 'ok'
-        }), 200
-    except Exception as e:
-        logger.error(f"Frontend health check failed: {e}")
-        return jsonify({
-            'status': 'unhealthy',
-            'component': 'frontend',
-            'error': str(e)
-        }), 503
-
-
-# Route to serve robots.txt
+# Route to serve robots.tx
 @frontend_bp.route('/robots.txt')
 def robots_txt():
     """Serve robots.txt for SEO."""
@@ -364,18 +405,18 @@ def friendly_date_filter(date):
     """Format dates in a friendly, readable way."""
     if not date:
         return "Unknown date"
-    
+
     try:
         from datetime import datetime, date as date_type
-        
+
         if isinstance(date, str):
             date = datetime.fromisoformat(date.replace('Z', '+00:00'))
         elif isinstance(date, date_type):
             date = datetime.combine(date, datetime.min.time())
-        
+
         now = datetime.now(date.tzinfo)
         diff = now - date
-        
+
         if diff.days == 0:
             return "Today"
         elif diff.days == 1:
@@ -384,7 +425,7 @@ def friendly_date_filter(date):
             return f"{diff.days} days ago"
         else:
             return date.strftime("%B %d, %Y")
-            
+
     except Exception as e:
         logger.warning(f"Date formatting error: {e}")
         return str(date)

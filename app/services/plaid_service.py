@@ -34,11 +34,11 @@ logger = logging.getLogger(__name__)
 
 class PlaidService:
     """Plaid API service for banking data integration."""
-    
+
     def __init__(self, client_id: str, secret: str, environment: str = 'sandbox'):
         """
         Initialize Plaid service.
-        
+
         Args:
             client_id: Plaid client ID
             secret: Plaid secret key
@@ -49,7 +49,7 @@ class PlaidService:
         self.environment = environment
         self.client = None
         self._initialize_client()
-    
+
     def _initialize_client(self):
         """Initialize Plaid API client."""
         try:
@@ -57,16 +57,16 @@ class PlaidService:
                 logger.warning("Plaid SDK not available, using mock mode")
                 self.client = None
                 return
-            
+
             # Map environment strings to Plaid Environment enums
             env_mapping = {
                 'sandbox': Environment.sandbox,
                 'development': Environment.development,
                 'production': Environment.production
             }
-            
+
             host = env_mapping.get(self.environment.lower(), Environment.sandbox)
-            
+
             configuration = Configuration(
                 host=host,
                 api_key={
@@ -77,9 +77,9 @@ class PlaidService:
             )
             api_client = ApiClient(configuration)
             self.client = plaid_api.PlaidApi(api_client)
-            
+
             logger.info(f"Plaid service initialized for {self.environment} environment")
-            
+
         except Exception as e:
             logger.error(f"Failed to initialize Plaid client: {e}")
             if self.environment == 'production':
@@ -88,15 +88,15 @@ class PlaidService:
                 # In development, continue with mock mode
                 logger.warning("Falling back to mock mode for development")
                 self.client = None
-    
+
     def create_link_token(self, user_id: str, user_name: str = None) -> Optional[Dict[str, Any]]:
         """
         Create a link token for Plaid Link initialization.
-        
+
         Args:
             user_id: Unique user identifier
             user_name: User's name (optional)
-            
+
         Returns:
             Link token data if successful, None otherwise
         """
@@ -109,7 +109,7 @@ class PlaidService:
                     'expiration': (datetime.utcnow() + timedelta(hours=4)).isoformat(),
                     'request_id': f'mock-request-{user_id}'
                 }
-            
+
             # Real Plaid implementation
             request = LinkTokenCreateRequest(
                 products=[Products('transactions')],
@@ -120,28 +120,28 @@ class PlaidService:
                     client_user_id=user_id
                 )
             )
-            
+
             response = self.client.link_token_create(request)
             result = response['link_token']
-            
+
             logger.info(f"Link token created successfully for user: {user_id}")
             return {
                 'link_token': result,
                 'expiration': response['expiration'],
                 'request_id': response['request_id']
             }
-            
+
         except Exception as e:
             logger.error(f"Failed to create link token for user {user_id}: {e}")
             return None
-    
+
     def exchange_public_token(self, public_token: str) -> Optional[Dict[str, str]]:
         """
         Exchange public token for access token.
-        
+
         Args:
             public_token: Public token from Plaid Link
-            
+
         Returns:
             Dict with access_token and item_id if successful, None otherwise
         """
@@ -153,31 +153,31 @@ class PlaidService:
                     'access_token': f"access-sandbox-mock-{public_token[-8:]}",
                     'item_id': f"item-mock-{public_token[-8:]}"
                 }
-            
+
             # Real Plaid implementation
             request = ItemPublicTokenExchangeRequest(
                 public_token=public_token
             )
-            
+
             response = self.client.item_public_token_exchange(request)
-            
+
             logger.info("Public token exchanged successfully")
             return {
                 'access_token': response['access_token'],
                 'item_id': response['item_id']
             }
-            
+
         except Exception as e:
             logger.error(f"Failed to exchange public token: {e}")
             return None
-    
+
     def get_accounts(self, access_token: str) -> List[Dict[str, Any]]:
         """
         Get user's bank accounts.
-        
+
         Args:
             access_token: Plaid access token
-            
+
         Returns:
             List of account dictionaries
         """
@@ -213,11 +213,11 @@ class PlaidService:
                         'mask': '1234'
                     }
                 ]
-            
+
             # Real Plaid implementation
             request = AccountsGetRequest(access_token=access_token)
             response = self.client.accounts_get(request)
-            
+
             accounts = []
             for account in response['accounts']:
                 account_dict = {
@@ -234,25 +234,25 @@ class PlaidService:
                     }
                 }
                 accounts.append(account_dict)
-            
+
             logger.info(f"Retrieved {len(accounts)} accounts successfully")
             return accounts
-            
+
         except Exception as e:
             logger.error(f"Failed to get accounts: {e}")
             return []
-    
-    def get_transactions(self, access_token: str, start_date: datetime = None, 
+
+    def get_transactions(self, access_token: str, start_date: datetime = None,
                         end_date: datetime = None, account_ids: List[str] = None) -> List[Dict[str, Any]]:
         """
         Get user's transactions.
-        
+
         Args:
             access_token: Plaid access token
             start_date: Start date for transactions (default: 30 days ago)
             end_date: End date for transactions (default: today)
             account_ids: List of account IDs to filter (optional)
-            
+
         Returns:
             List of transaction dictionaries
         """
@@ -262,7 +262,7 @@ class PlaidService:
                 start_date = datetime.utcnow() - timedelta(days=30)
             if not end_date:
                 end_date = datetime.utcnow()
-            
+
             if not self.client or not PLAID_AVAILABLE:
                 # Mock implementation for development/testing
                 logger.info(f"Fetching mock transactions from {start_date.date()} to {end_date.date()}")
@@ -299,7 +299,7 @@ class PlaidService:
                         'pending': False,
                         'location': {
                             'address': '456 Market St',
-                            'city': 'San Francisco', 
+                            'city': 'San Francisco',
                             'region': 'CA',
                             'postal_code': '94105',
                             'country': 'US'
@@ -319,7 +319,7 @@ class PlaidService:
                         'location': {}
                     }
                 ]
-            
+
             # Real Plaid implementation
             request = TransactionsGetRequest(
                 access_token=access_token,
@@ -327,9 +327,9 @@ class PlaidService:
                 end_date=end_date.date(),
                 account_ids=account_ids
             )
-            
+
             response = self.client.transactions_get(request)
-            
+
             transactions = []
             for txn in response['transactions']:
                 transaction_dict = {
@@ -346,22 +346,22 @@ class PlaidService:
                     'location': txn.get('location', {})
                 }
                 transactions.append(transaction_dict)
-            
+
             logger.info(f"Retrieved {len(transactions)} transactions successfully")
             return transactions
-            
+
         except Exception as e:
             logger.error(f"Failed to get transactions: {e}")
             return []
-    
+
     def sync_transactions(self, access_token: str, cursor: str = None) -> Dict[str, Any]:
         """
         Sync transactions using Plaid's sync endpoint for real-time updates.
-        
+
         Args:
             access_token: Plaid access token
             cursor: Cursor for incremental sync (optional)
-            
+
         Returns:
             Sync response with added, modified, and removed transactions
         """
@@ -376,16 +376,16 @@ class PlaidService:
                     'next_cursor': f'mock_cursor_{datetime.utcnow().strftime("%Y%m%d%H%M%S")}',
                     'has_more': False
                 }
-            
-            # Real Plaid implementation using transactions/sync endpoint
+
+            # Real Plaid implementation using transactions/sync endpoin
             request = TransactionsSyncRequest(
                 access_token=access_token,
                 cursor=cursor
             )
-            
+
             response = self.client.transactions_sync(request)
-            
-            # Transform transactions to match our internal format
+
+            # Transform transactions to match our internal forma
             added = []
             for txn in response.get('added', []):
                 added.append({
@@ -398,7 +398,7 @@ class PlaidService:
                     'category': txn.get('category', []),
                     'pending': txn.get('pending', False)
                 })
-            
+
             modified = []
             for txn in response.get('modified', []):
                 modified.append({
@@ -411,11 +411,11 @@ class PlaidService:
                     'category': txn.get('category', []),
                     'pending': txn.get('pending', False)
                 })
-            
+
             removed = [txn['transaction_id'] for txn in response.get('removed', [])]
-            
+
             logger.info(f"Sync completed: {len(added)} added, {len(modified)} modified, {len(removed)} removed")
-            
+
             return {
                 'added': added,
                 'modified': modified,
@@ -423,7 +423,7 @@ class PlaidService:
                 'next_cursor': response.get('next_cursor'),
                 'has_more': response.get('has_more', False)
             }
-            
+
         except Exception as e:
             logger.error(f"Failed to sync transactions: {e}")
             return {
@@ -433,25 +433,25 @@ class PlaidService:
                 'next_cursor': None,
                 'has_more': False
             }
-    
+
     def get_balance(self, access_token: str, account_id: str = None) -> Dict[str, Any]:
         """
         Get current account balance(s).
-        
+
         Args:
             access_token: Plaid access token
             account_id: Specific account ID (optional)
-            
+
         Returns:
             Balance information
         """
         try:
             # TODO: Implement in Phase 2
             # This will use the accounts endpoint to get real-time balances
-            
+
             # Placeholder implementation
             logger.info(f"Fetching balance for account: {account_id or 'all accounts'}")
-            
+
             if account_id:
                 return {
                     'account_id': account_id,
@@ -472,18 +472,18 @@ class PlaidService:
                     ],
                     'last_updated': datetime.utcnow().isoformat()
                 }
-            
+
         except Exception as e:
             logger.error(f"Failed to get balance: {e}")
             return {}
-    
+
     def remove_item(self, access_token: str) -> bool:
         """
         Remove (disconnect) a bank connection.
-        
+
         Args:
             access_token: Plaid access token
-            
+
         Returns:
             True if successful, False otherwise
         """
@@ -492,32 +492,32 @@ class PlaidService:
                 # Mock implementation for development/testing
                 logger.info("Mock removing bank connection")
                 return True
-            
+
             # Real Plaid implementation
             request = ItemRemoveRequest(access_token=access_token)
             response = self.client.item_remove(request)
-            
+
             logger.info("Bank connection removed successfully")
             return True
-            
+
         except Exception as e:
             logger.error(f"Failed to remove item: {e}")
             return False
-    
+
     def get_institution_info(self, institution_id: str) -> Optional[Dict[str, Any]]:
         """
         Get information about a financial institution.
-        
+
         Args:
             institution_id: Plaid institution ID
-            
+
         Returns:
             Institution information if found
         """
         try:
             # TODO: Implement in Phase 2
-            # This will use Plaid's /institutions/get_by_id endpoint
-            
+            # This will use Plaid's /institutions/get_by_id endpoin
+
             # Placeholder implementation
             logger.info(f"Fetching institution info for: {institution_id}")
             return {
@@ -528,28 +528,28 @@ class PlaidService:
                 'logo': None,
                 'primary_color': '#003366'
             }
-            
+
         except Exception as e:
             logger.error(f"Failed to get institution info: {e}")
             return None
-    
+
     def transform_to_internal_format(self, plaid_transactions: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """
         Transform Plaid transactions to BrainBudget internal format.
-        
+
         Args:
             plaid_transactions: List of transactions from Plaid
-            
+
         Returns:
-            List of transactions in internal format
+            List of transactions in internal forma
         """
         internal_transactions = []
-        
+
         for txn in plaid_transactions:
             # Map Plaid categories to BrainBudget categories
             category_mapping = {
                 'Food and Drink': 'Food & Dining',
-                'Shops': 'Shopping', 
+                'Shops': 'Shopping',
                 'Recreation': 'Entertainment',
                 'Transportation': 'Transportation',
                 'Healthcare': 'Healthcare',
@@ -557,11 +557,11 @@ class PlaidService:
                 'Deposit': 'Income',
                 'Payment': 'Bills & Utilities'
             }
-            
+
             plaid_category = txn.get('category', [])
             primary_category = plaid_category[0] if plaid_category else 'Other'
             internal_category = category_mapping.get(primary_category, 'Other')
-            
+
             internal_txn = {
                 'id': txn['transaction_id'],
                 'date': txn['date'],
@@ -578,20 +578,20 @@ class PlaidService:
                 'location': txn.get('location', {}),
                 'raw_data': txn  # Keep original for debugging
             }
-            
+
             internal_transactions.append(internal_txn)
-        
+
         return internal_transactions
-    
-    def detect_duplicates(self, new_transactions: List[Dict[str, Any]], 
+
+    def detect_duplicates(self, new_transactions: List[Dict[str, Any]],
                          existing_transactions: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """
         Detect and filter out duplicate transactions.
-        
+
         Args:
             new_transactions: New transactions to check
             existing_transactions: Previously stored transactions
-            
+
         Returns:
             List of unique transactions
         """
@@ -600,32 +600,32 @@ class PlaidService:
         for txn in existing_transactions:
             signature = f"{txn['date']}_{txn['amount']}_{txn['description'][:20]}"
             existing_signatures.add(signature)
-        
+
         unique_transactions = []
         for txn in new_transactions:
             signature = f"{txn['date']}_{txn['amount']}_{txn['description'][:20]}"
             if signature not in existing_signatures:
                 unique_transactions.append(txn)
                 existing_signatures.add(signature)  # Prevent duplicates within the new set too
-        
+
         logger.info(f"Filtered {len(new_transactions) - len(unique_transactions)} duplicates")
         return unique_transactions
-    
+
     def get_friendly_error_message(self, error: Exception) -> str:
         """
         Convert Plaid errors to ADHD-friendly messages.
-        
+
         Args:
             error: Exception from Plaid API
-            
+
         Returns:
             User-friendly error message
         """
         error_str = str(error).lower()
-        
+
         friendly_messages = {
             'item_login_required': "Your bank needs you to log in again. No worries, just reconnect! 🔑",
-            'invalid_credentials': "Your login info doesn't match. Let's try connecting again! 🤔", 
+            'invalid_credentials': "Your login info doesn't match. Let's try connecting again! 🤔",
             'invalid_mfa': "The verification code didn't work. Please try again! 🔢",
             'item_locked': "Your bank account is temporarily locked. Contact your bank to unlock it! 🔒",
             'user_setup_required': "Your bank needs some additional setup. Check your bank's website! ⚙️",
@@ -639,18 +639,18 @@ class PlaidService:
             'api_error': "There's a temporary issue with our banking partner. Try again soon! 🔄",
             'internal_server_error': "Something went wrong on our end. We're fixing it! 🛠️"
         }
-        
+
         for key, message in friendly_messages.items():
             if key in error_str:
                 return message
-        
+
         # Default friendly message
         return "Something didn't work as expected with your bank connection. No worries, you can try again or upload a statement instead! 💪"
 
 
 class PlaidError(Exception):
     """Custom exception for Plaid-specific errors."""
-    
+
     def __init__(self, message: str, error_code: str = None, display_message: str = None):
         super().__init__(message)
         self.error_code = error_code

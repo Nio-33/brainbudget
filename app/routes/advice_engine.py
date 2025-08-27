@@ -28,15 +28,15 @@ def require_auth(f):
                     "success": False,
                     "message": "You'll need to log in first to access personalized advice! 🔑"
                 }), 401
-            
+
             # Extract and verify token
             token = auth_header.split('Bearer ')[1]
             decoded_token = auth.verify_id_token(token)
             request.user_id = decoded_token['uid']
             request.user_email = decoded_token.get('email')
-            
+
             return f(*args, **kwargs)
-            
+
         except auth.InvalidIdTokenError:
             return jsonify({
                 "success": False,
@@ -48,7 +48,7 @@ def require_auth(f):
                 "success": False,
                 "message": "Authentication error. Please try logging in again! 🛠️"
             }), 401
-    
+
     return decorated_function
 
 # Initialize service
@@ -59,23 +59,23 @@ advice_service = AdviceEngineService()
 def get_personalized_advice():
     """
     Get personalized financial advice for the authenticated user
-    
+
     Query Parameters:
     - category: Optional advice category (budgeting, debt_reduction, savings, investment, emergency_fund)
     - limit: Number of advice pieces to return (default: 3, max: 10)
     - urgency: Filter by urgency level (low, medium, high, critical)
-    
+
     Returns:
-        JSON response with personalized advice and user context
+        JSON response with personalized advice and user contex
     """
     try:
         user_id = request.user_id
-        
+
         # Parse query parameters
         category = request.args.get('category')
         limit = min(int(request.args.get('limit', 3)), 10)
         urgency = request.args.get('urgency')
-        
+
         # Validate category
         category_enum = None
         if category:
@@ -86,7 +86,7 @@ def get_personalized_advice():
                     "success": False,
                     "message": f"Invalid category. Valid options: {[c.value for c in AdviceCategory]}"
                 }), 400
-        
+
         # Validate urgency
         urgency_enum = None
         if urgency:
@@ -97,21 +97,21 @@ def get_personalized_advice():
                     "success": False,
                     "message": f"Invalid urgency. Valid options: {[u.value for u in AdviceUrgency]}"
                 }), 400
-        
+
         # Get personalized advice
         result = advice_service.get_personalized_advice_sync(
             user_id=user_id,
             category=category,
-            limit=limit
+            limit=limi
         )
-        
+
         if not result.get("success"):
             return jsonify({
                 "success": False,
                 "message": result.get("message", "Unable to generate personalized advice"),
                 "suggestion": "Try uploading more transaction data or setting up your financial goals first"
             }), 500
-        
+
         return jsonify({
             "success": True,
             "advice": result["advice"],
@@ -120,7 +120,7 @@ def get_personalized_advice():
             "total_available": result.get("advice_count", 0),
             "generated_at": datetime.now().isoformat()
         })
-        
+
     except Exception as e:
         logger.error(f"Error getting personalized advice for user {request.user_id}: {e}")
         return jsonify({
@@ -135,19 +135,19 @@ def get_personalized_advice():
 def get_advice_categories():
     """
     Get available advice categories
-    
+
     Returns:
         JSON response with category information
     """
     try:
         categories = advice_service.get_advice_categories()
-        
+
         return jsonify({
             "success": True,
             "categories": categories,
             "total_categories": len(categories)
         })
-        
+
     except Exception as e:
         logger.error(f"Error getting advice categories: {e}")
         return jsonify({
@@ -162,7 +162,7 @@ def get_advice_categories():
 def record_advice_interaction():
     """
     Record user interaction with advice (for improvement and analytics)
-    
+
     Request Body:
     {
         "advice_id": "string",
@@ -175,30 +175,30 @@ def record_advice_interaction():
             "not_relevant": boolean
         }
     }
-    
+
     Returns:
         JSON response confirming interaction recording
     """
     try:
         user_id = request.user_id
         data = request.get_json()
-        
+
         if not data:
             return jsonify({
                 "success": False,
                 "message": "Request body required"
             }), 400
-        
+
         # Validate required fields
         advice_id = data.get('advice_id')
         action = data.get('action')
-        
+
         if not advice_id or not action:
             return jsonify({
                 "success": False,
                 "message": "advice_id and action are required"
             }), 400
-        
+
         # Validate action
         valid_actions = ['viewed', 'started', 'completed', 'dismissed', 'helpful', 'not_helpful']
         if action not in valid_actions:
@@ -206,10 +206,10 @@ def record_advice_interaction():
                 "success": False,
                 "message": f"Invalid action. Valid options: {valid_actions}"
             }), 400
-        
+
         # Get optional feedback
         feedback = data.get('feedback', {})
-        
+
         # Record the interaction
         import asyncio
         asyncio.run(advice_service.record_advice_interaction(
@@ -218,7 +218,7 @@ def record_advice_interaction():
             action=action,
             feedback=feedback
         ))
-        
+
         # Provide encouraging response based on action
         response_messages = {
             'viewed': "Thanks for checking out the advice! 👀",
@@ -228,13 +228,13 @@ def record_advice_interaction():
             'helpful': "So glad that advice was helpful! Thanks for letting us know! 😊",
             'not_helpful': "Thanks for the feedback - we'll work on making better suggestions! 🛠️"
         }
-        
+
         return jsonify({
             "success": True,
             "message": response_messages.get(action, "Thanks for your feedback!"),
             "recorded_at": datetime.now().isoformat()
         })
-        
+
     except Exception as e:
         logger.error(f"Error recording advice interaction: {e}")
         return jsonify({
@@ -249,20 +249,20 @@ def record_advice_interaction():
 def get_advice_by_category(category):
     """
     Get advice for a specific category
-    
+
     Path Parameters:
     - category: Advice category
-    
+
     Query Parameters:
     - limit: Number of advice pieces (default: 5, max: 10)
-    
+
     Returns:
         JSON response with category-specific advice
     """
     try:
         user_id = request.user_id
         limit = min(int(request.args.get('limit', 5)), 10)
-        
+
         # Validate category
         try:
             category_enum = AdviceCategory(category)
@@ -271,27 +271,27 @@ def get_advice_by_category(category):
                 "success": False,
                 "message": f"Invalid category '{category}'. Valid options: {[c.value for c in AdviceCategory]}"
             }), 400
-        
+
         # Get category-specific advice
         result = advice_service.get_personalized_advice_sync(
             user_id=user_id,
             category=category,
-            limit=limit
+            limit=limi
         )
-        
+
         if not result.get("success"):
             return jsonify({
                 "success": False,
                 "message": f"Unable to generate {category.replace('_', ' ')} advice at this time",
                 "suggestion": "Make sure you have sufficient transaction data for personalized recommendations"
             }), 500
-        
-        # Add category-specific context
+
+        # Add category-specific contex
         category_info = next(
             (cat for cat in advice_service.get_advice_categories() if cat['category'] == category),
             {}
         )
-        
+
         return jsonify({
             "success": True,
             "category": category_info,
@@ -300,7 +300,7 @@ def get_advice_by_category(category):
             "personalization_notes": result.get("personalization_notes", []),
             "total_available": result.get("advice_count", 0)
         })
-        
+
     except Exception as e:
         logger.error(f"Error getting {category} advice for user {request.user_id}: {e}")
         return jsonify({
@@ -315,37 +315,37 @@ def get_advice_by_category(category):
 def get_urgent_advice():
     """
     Get high-priority/urgent advice for the user
-    
+
     Query Parameters:
     - limit: Number of advice pieces (default: 3, max: 5)
-    
+
     Returns:
         JSON response with urgent financial advice
     """
     try:
         user_id = request.user_id
         limit = min(int(request.args.get('limit', 3)), 5)
-        
+
         # Get personalized advice filtered for high/critical urgency
         result = advice_service.get_personalized_advice_sync(
             user_id=user_id,
             category=None,
-            limit=limit
+            limit=limi
         )
-        
+
         if not result.get("success"):
             return jsonify({
                 "success": False,
                 "message": "Unable to analyze urgent financial priorities",
                 "suggestion": "Add more transaction data for better priority analysis"
             }), 500
-        
+
         # Filter for urgent advice only
         urgent_advice = [
             advice for advice in result["advice"]
             if advice.get("urgency") in ["high", "critical"]
         ]
-        
+
         return jsonify({
             "success": True,
             "urgent_advice": urgent_advice[:limit],
@@ -353,7 +353,7 @@ def get_urgent_advice():
             "user_context": result.get("user_profile_summary", {}),
             "priority_explanation": "These items need your attention to improve your financial stability"
         })
-        
+
     except Exception as e:
         logger.error(f"Error getting urgent advice for user {request.user_id}: {e}")
         return jsonify({
@@ -368,24 +368,24 @@ def get_urgent_advice():
 def get_quick_tips():
     """
     Get quick, actionable ADHD-friendly financial tips
-    
+
     Query Parameters:
     - limit: Number of tips (default: 5, max: 10)
-    
+
     Returns:
         JSON response with quick financial tips
     """
     try:
         user_id = request.user_id
         limit = min(int(request.args.get('limit', 5)), 10)
-        
+
         # Get personalized advice and extract quick tips
         result = advice_service.get_personalized_advice_sync(
             user_id=user_id,
             category=None,
             limit=limit * 2  # Get more to extract tips from
         )
-        
+
         if not result.get("success"):
             # Provide default ADHD-friendly tips if personalization fails
             default_tips = [
@@ -397,7 +397,7 @@ def get_quick_tips():
                 },
                 {
                     "tip": "Use the 'envelope method' with three categories: needs, wants, savings",
-                    "category": "budgeting", 
+                    "category": "budgeting",
                     "time_needed": "15 minutes to start",
                     "adhd_friendly": True
                 },
@@ -408,13 +408,13 @@ def get_quick_tips():
                     "adhd_friendly": True
                 }
             ]
-            
+
             return jsonify({
                 "success": True,
                 "quick_tips": default_tips[:limit],
                 "message": "General ADHD-friendly tips (personalized tips available with more data)"
             })
-        
+
         # Extract quick tips from advice
         quick_tips = []
         for advice in result["advice"]:
@@ -428,14 +428,14 @@ def get_quick_tips():
                 "from_advice_id": advice.get("advice_id")
             }
             quick_tips.append(tip)
-        
+
         return jsonify({
             "success": True,
             "quick_tips": quick_tips[:limit],
             "total_available": len(quick_tips),
             "personalized": True
         })
-        
+
     except Exception as e:
         logger.error(f"Error getting quick tips for user {request.user_id}: {e}")
         return jsonify({
@@ -449,8 +449,8 @@ def get_quick_tips():
 @require_auth
 def progress_check():
     """
-    Check user's progress on financial advice and provide encouragement
-    
+    Check user's progress on financial advice and provide encouragemen
+
     Request Body:
     {
         "advice_id": "string",
@@ -458,31 +458,31 @@ def progress_check():
         "notes": "string",
         "challenges": ["string"]
     }
-    
+
     Returns:
         JSON response with progress feedback and next steps
     """
     try:
         user_id = request.user_id
         data = request.get_json()
-        
+
         if not data:
             return jsonify({
                 "success": False,
                 "message": "Request body required"
             }), 400
-        
+
         advice_id = data.get('advice_id')
         progress_status = data.get('progress_status')
         notes = data.get('notes', '')
         challenges = data.get('challenges', [])
-        
+
         if not advice_id or not progress_status:
             return jsonify({
                 "success": False,
                 "message": "advice_id and progress_status are required"
             }), 400
-        
+
         # Validate progress status
         valid_statuses = ['not_started', 'in_progress', 'completed', 'stuck']
         if progress_status not in valid_statuses:
@@ -490,7 +490,7 @@ def progress_check():
                 "success": False,
                 "message": f"Invalid progress_status. Valid options: {valid_statuses}"
             }), 400
-        
+
         # Record progress
         progress_data = {
             "status": progress_status,
@@ -498,7 +498,7 @@ def progress_check():
             "challenges": challenges,
             "timestamp": datetime.now().isoformat()
         }
-        
+
         import asyncio
         asyncio.run(advice_service.record_advice_interaction(
             user_id=user_id,
@@ -506,7 +506,7 @@ def progress_check():
             action=f"progress_{progress_status}",
             feedback=progress_data
         ))
-        
+
         # Generate encouraging response based on progress
         responses = {
             'not_started': {
@@ -547,9 +547,9 @@ def progress_check():
                 ]
             }
         }
-        
+
         response_data = responses.get(progress_status, responses['in_progress'])
-        
+
         # Add specific help for challenges
         challenge_tips = []
         for challenge in challenges:
@@ -561,7 +561,7 @@ def progress_check():
                 challenge_tips.append("Connect this goal to something you really care about")
             elif 'time' in challenge.lower():
                 challenge_tips.append("Start with just 5 minutes - you can do anything for 5 minutes!")
-        
+
         return jsonify({
             "success": True,
             "progress_status": progress_status,
@@ -569,7 +569,7 @@ def progress_check():
             "challenge_tips": challenge_tips,
             "recorded_at": datetime.now().isoformat()
         })
-        
+
     except Exception as e:
         logger.error(f"Error processing progress check: {e}")
         return jsonify({
@@ -584,16 +584,16 @@ def health_check():
     """Health check endpoint for advice engine"""
     try:
         health_status = advice_service.health_check()
-        
+
         import asyncio
         health_data = asyncio.run(health_status)
-        
+
         return jsonify({
             "success": True,
             "health": health_data,
             "timestamp": datetime.now().isoformat()
         })
-        
+
     except Exception as e:
         logger.error(f"Health check failed: {e}")
         return jsonify({

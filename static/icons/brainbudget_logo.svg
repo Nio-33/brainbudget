@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <!-- Brain gradient from design -->
+    <linearGradient id="brainGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#b2f1ff;stop-opacity:1;" />
+      <stop offset="25%" style="stop-color:#8eb5e3;stop-opacity:1;" />
+      <stop offset="50%" style="stop-color:#6976c6;stop-opacity:1;" />
+      <stop offset="75%" style="stop-color:#4749a0;stop-opacity:1;" />
+      <stop offset="100%" style="stop-color:#03102f;stop-opacity:1;" />
+    </linearGradient>
+    
+    <!-- Money/coin gradient -->
+    <linearGradient id="coinGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#e9f0f3;stop-opacity:1;" />
+      <stop offset="50%" style="stop-color:#c5cacf;stop-opacity:1;" />
+      <stop offset="100%" style="stop-color:#a2a5ac;stop-opacity:1;" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Brain shape -->
+  <path d="M60 80c-15 0-25 10-25 25s10 25 25 25c5 0 10-2 15-5c5 8 15 15 25 15s20-7 25-15c5 3 10 5 15 5c15 0 25-10 25-25s-10-25-25-25c-5 0-10 2-15 5c-5-8-15-15-25-15s-20 7-25 15c-5-3-10-5-15-5z" fill="url(#brainGradient)" stroke="#03102f" stroke-width="2"/>
+  
+  <!-- Dollar sign -->
+  <g transform="translate(100, 140)">
+    <!-- Dollar sign circle background -->
+    <circle cx="0" cy="0" r="25" fill="url(#coinGradient)" stroke="#6976c6" stroke-width="2"/>
+    <!-- Dollar sign -->
+    <path d="M-8 -15 L8 -15 M-8 -5 L8 -5 M-8 5 L8 5 M0 -20 L0 20" stroke="#4749a0" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M-8 -15 Q8 -15 8 -10 Q8 -5 -8 -5 Q8 -5 8 0 Q8 5 -8 5" stroke="#4749a0" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Connection line between brain and money -->
+  <line x1="100" y1="125" x2="100" y2="115" stroke="#6976c6" stroke-width="3" stroke-linecap="round"/>
+  
+  <!-- Small sparkle/star effects -->
+  <g fill="#b2f1ff">
+    <circle cx="40" cy="60" r="2"/>
+    <circle cx="160" cy="70" r="2"/>
+    <circle cx="180" cy="160" r="2"/>
+    <circle cx="20" cy="160" r="2"/>
+  </g>
+</svg>

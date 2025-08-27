@@ -1,5 +1,5 @@
 """
-ADHD-Friendly Goal Management Service for BrainBudget
+ADHD-Friendly Goal Management Service for BrainBudge
 Focuses on small steps, visual progress, and celebration over perfection
 """
 import json
@@ -70,7 +70,7 @@ class Achievement:
 class GoalsService:
     """
     ADHD-friendly goal management service.
-    
+
     Key ADHD-friendly features:
     - Small, achievable milestones
     - Flexible goal adjustment without shame
@@ -78,12 +78,12 @@ class GoalsService:
     - Celebration of small wins
     - Focus on progress over perfection
     """
-    
+
     def __init__(self, firebase_service: FirebaseService = None):
         """Initialize the goals service."""
         self.firebase_service = firebase_service or FirebaseService()
         self.db = self.firebase_service.db
-        
+
         # ADHD-friendly goal templates
         self.goal_templates = {
             GoalType.SPENDING_REDUCTION: [
@@ -160,7 +160,7 @@ class GoalsService:
                 }
             ]
         }
-        
+
         # Achievement definitions
         self.achievements = {
             "first_goal": Achievement(
@@ -192,7 +192,7 @@ class GoalsService:
                 "🌅", "resilience"
             )
         }
-    
+
     async def create_goal(
         self,
         user_id: str,
@@ -200,19 +200,19 @@ class GoalsService:
     ) -> Dict[str, Any]:
         """
         Create a new ADHD-friendly goal with automatic milestone generation.
-        
+
         Args:
             user_id: Firebase user ID
             goal_data: Goal configuration data
-            
+
         Returns:
             Created goal data with generated milestones
         """
         try:
             goal_id = str(uuid.uuid4())
             current_time = datetime.utcnow()
-            
-            # Build goal object
+
+            # Build goal objec
             goal = {
                 "id": goal_id,
                 "user_id": user_id,
@@ -248,29 +248,29 @@ class GoalsService:
                     "tags": goal_data.get("tags", [])
                 }
             }
-            
+
             # Generate ADHD-friendly milestones
             milestones = await self._generate_milestones(goal)
             goal["milestones"] = [asdict(m) for m in milestones]
             goal["progress"]["total_milestones"] = len(milestones)
-            
+
             # Save to database
             goal_ref = self.db.collection('user_goals').document(f"{user_id}_{goal_id}")
             goal_ref.set(goal)
-            
-            # Award first goal achievement
+
+            # Award first goal achievemen
             await self._unlock_achievement(user_id, "first_goal")
-            
+
             # Log goal creation
             await self._log_goal_event(user_id, goal_id, "created", {"goal_type": goal["type"]})
-            
+
             logger.info(f"Created goal for user {user_id}: {goal['name']}")
             return goal
-            
+
         except Exception as e:
             logger.error(f"Error creating goal: {str(e)}")
             raise
-    
+
     async def get_user_goals(
         self,
         user_id: str,
@@ -280,33 +280,33 @@ class GoalsService:
         """Get all goals for a user with current progress."""
         try:
             query = self.db.collection('user_goals').where('user_id', '==', user_id)
-            
+
             if status_filter:
                 query = query.where('status', '==', status_filter)
-            
+
             docs = query.stream()
             goals = []
-            
+
             for doc in docs:
                 goal_data = doc.to_dict()
-                
+
                 # Skip completed goals if not requested
                 if not include_completed and goal_data.get('status') == GoalStatus.COMPLETED.value:
                     continue
-                
+
                 # Update progress with latest data
                 updated_goal = await self._update_goal_progress(goal_data)
                 goals.append(updated_goal)
-            
+
             # Sort by creation date (newest first)
             goals.sort(key=lambda g: g.get('created_at', datetime.min), reverse=True)
-            
+
             return goals
-            
+
         except Exception as e:
             logger.error(f"Error getting user goals: {str(e)}")
             return []
-    
+
     async def update_goal_progress(
         self,
         user_id: str,
@@ -316,32 +316,32 @@ class GoalsService:
     ) -> Dict[str, Any]:
         """
         Update goal progress based on new transaction or manual entry.
-        
+
         Args:
             user_id: Firebase user ID
             goal_id: Goal ID to update
-            new_amount: Manual progress update amount
+            new_amount: Manual progress update amoun
             transaction_data: Transaction that affects this goal
-            
+
         Returns:
             Updated goal data with new progress
         """
         try:
             goal_ref = self.db.collection('user_goals').document(f"{user_id}_{goal_id}")
             goal_doc = goal_ref.get()
-            
+
             if not goal_doc.exists:
                 raise ValueError(f"Goal {goal_id} not found")
-            
+
             goal = goal_doc.to_dict()
-            
+
             # Skip if goal is not active
             if goal.get('status') != GoalStatus.ACTIVE.value:
                 return goal
-            
+
             # Calculate new progress
             old_amount = goal.get('current_amount', 0)
-            
+
             if new_amount is not None:
                 # Manual update
                 goal['current_amount'] = new_amount
@@ -353,41 +353,41 @@ class GoalsService:
             else:
                 # No change
                 return goal
-            
+
             # Update progress percentage
             target = goal.get('target_amount', 1)
             goal['progress']['percentage'] = min(100.0, (goal['current_amount'] / target) * 100)
-            
+
             # Check for milestone completions
             milestones_completed = await self._check_milestone_completions(goal)
-            
+
             # Update streak tracking
             await self._update_streak_tracking(goal, progress_change > 0)
-            
+
             # Update timestamps
             goal['updated_at'] = datetime.utcnow()
             goal['progress']['last_activity'] = datetime.utcnow().isoformat()
-            
+
             # Check if goal is complete
             if goal['progress']['percentage'] >= 100:
                 goal['status'] = GoalStatus.COMPLETED.value
                 goal['completed_at'] = datetime.utcnow()
                 await self._unlock_achievement(user_id, "goal_complete")
-                
+
                 # Send celebration notification
                 from app.services.notification_service import NotificationService
                 notification_service = NotificationService()
                 await notification_service.send_goal_achievement(
                     user_id, goal['name'], "milestone"
                 )
-            
+
             # Save updated goal
             goal_ref.set(goal)
-            
+
             # Send milestone notifications for newly completed milestones
             for milestone in milestones_completed:
                 await self._send_milestone_celebration(user_id, goal, milestone)
-            
+
             # Log progress update
             await self._log_goal_event(
                 user_id, goal_id, "progress_updated",
@@ -397,13 +397,13 @@ class GoalsService:
                     "milestones_completed": len(milestones_completed)
                 }
             )
-            
+
             return goal
-            
+
         except Exception as e:
             logger.error(f"Error updating goal progress: {str(e)}")
             raise
-    
+
     async def adjust_goal(
         self,
         user_id: str,
@@ -413,49 +413,49 @@ class GoalsService:
     ) -> Dict[str, Any]:
         """
         ADHD-friendly goal adjustment without shame.
-        
+
         Args:
             user_id: Firebase user ID
-            goal_id: Goal to adjust
+            goal_id: Goal to adjus
             adjustments: Changes to make (target_amount, target_date, etc.)
             reason: Reason for adjustment (for learning/analytics)
-            
+
         Returns:
             Adjusted goal data
         """
         try:
             goal_ref = self.db.collection('user_goals').document(f"{user_id}_{goal_id}")
             goal_doc = goal_ref.get()
-            
+
             if not goal_doc.exists:
                 raise ValueError(f"Goal {goal_id} not found")
-            
+
             goal = goal_doc.to_dict()
-            
+
             # Check if adjustments are allowed
             if not goal.get('settings', {}).get('allow_adjustments', True):
                 raise ValueError("Goal adjustments are disabled for this goal")
-            
+
             old_values = {}
-            
+
             # Apply adjustments
             for key, value in adjustments.items():
                 if key in ['target_amount', 'target_date', 'name', 'description']:
                     old_values[key] = goal.get(key)
                     goal[key] = value
-            
+
             # Regenerate milestones if target changed significantly
             if 'target_amount' in adjustments or 'target_date' in adjustments:
                 milestones = await self._generate_milestones(goal)
                 goal['milestones'] = [asdict(m) for m in milestones]
                 goal['progress']['total_milestones'] = len(milestones)
-            
-            # Update progress percentage with new target
+
+            # Update progress percentage with new targe
             if 'target_amount' in adjustments:
                 new_target = adjustments['target_amount']
                 current = goal.get('current_amount', 0)
                 goal['progress']['percentage'] = min(100.0, (current / new_target) * 100)
-            
+
             # Update metadata
             goal['updated_at'] = datetime.utcnow()
             goal['adjustments'] = goal.get('adjustments', []) + [{
@@ -464,26 +464,26 @@ class GoalsService:
                 'changes': adjustments,
                 'old_values': old_values
             }]
-            
+
             # Save updated goal
             goal_ref.set(goal)
-            
-            # Award flexibility achievement
+
+            # Award flexibility achievemen
             await self._unlock_achievement(user_id, "flexible_friend")
-            
-            # Log adjustment
+
+            # Log adjustmen
             await self._log_goal_event(
                 user_id, goal_id, "adjusted",
                 {"reason": reason, "adjustments": list(adjustments.keys())}
             )
-            
+
             logger.info(f"Adjusted goal {goal_id} for user {user_id}: {reason}")
             return goal
-            
+
         except Exception as e:
             logger.error(f"Error adjusting goal: {str(e)}")
             raise
-    
+
     async def pause_goal(
         self,
         user_id: str,
@@ -492,46 +492,46 @@ class GoalsService:
     ) -> Dict[str, Any]:
         """
         Pause a goal without shame - ADHD brains sometimes need breaks!
-        
+
         Args:
             user_id: Firebase user ID
             goal_id: Goal to pause
             reason: Reason for pausing (for support and learning)
-            
+
         Returns:
             Paused goal data
         """
         try:
             goal_ref = self.db.collection('user_goals').document(f"{user_id}_{goal_id}")
             goal_doc = goal_ref.get()
-            
+
             if not goal_doc.exists:
                 raise ValueError(f"Goal {goal_id} not found")
-            
+
             goal = goal_doc.to_dict()
-            
+
             # Update status and metadata
             goal['status'] = GoalStatus.PAUSED.value
             goal['paused_at'] = datetime.utcnow()
             goal['pause_reason'] = reason
             goal['updated_at'] = datetime.utcnow()
-            
+
             # Save paused goal
             goal_ref.set(goal)
-            
-            # Log pause event
+
+            # Log pause even
             await self._log_goal_event(
                 user_id, goal_id, "paused",
                 {"reason": reason}
             )
-            
+
             logger.info(f"Paused goal {goal_id} for user {user_id}: {reason}")
             return goal
-            
+
         except Exception as e:
             logger.error(f"Error pausing goal: {str(e)}")
             raise
-    
+
     async def resume_goal(
         self,
         user_id: str,
@@ -540,142 +540,142 @@ class GoalsService:
     ) -> Dict[str, Any]:
         """
         Resume a paused goal with encouragement.
-        
+
         Args:
             user_id: Firebase user ID
             goal_id: Goal to resume
             extend_deadline: Whether to extend deadline by pause duration
-            
+
         Returns:
             Resumed goal data
         """
         try:
             goal_ref = self.db.collection('user_goals').document(f"{user_id}_{goal_id}")
             goal_doc = goal_ref.get()
-            
+
             if not goal_doc.exists:
                 raise ValueError(f"Goal {goal_id} not found")
-            
+
             goal = goal_doc.to_dict()
-            
+
             if goal.get('status') != GoalStatus.PAUSED.value:
                 raise ValueError("Goal is not paused")
-            
+
             # Calculate pause duration
             paused_at = goal.get('paused_at')
             if paused_at and extend_deadline:
                 pause_duration = datetime.utcnow() - paused_at
-                
+
                 # Extend target date by pause duration
                 if 'target_date' in goal:
                     original_date = datetime.fromisoformat(goal['target_date'].replace('Z', '+00:00'))
                     new_date = original_date + pause_duration
                     goal['target_date'] = new_date.isoformat()
-            
+
             # Update status
             goal['status'] = GoalStatus.ACTIVE.value
             goal['resumed_at'] = datetime.utcnow()
             goal['updated_at'] = datetime.utcnow()
-            
+
             # Remove pause-specific fields
             if 'paused_at' in goal:
                 del goal['paused_at']
             if 'pause_reason' in goal:
                 del goal['pause_reason']
-            
+
             # Save resumed goal
             goal_ref.set(goal)
-            
-            # Award comeback achievement
+
+            # Award comeback achievemen
             await self._unlock_achievement(user_id, "comeback_champion")
-            
+
             # Send encouragement notification
             from app.services.notification_service import NotificationService
             notification_service = NotificationService()
             await notification_service.send_encouragement(
                 user_id, "comeback", {"goal_name": goal['name']}
             )
-            
-            # Log resume event
+
+            # Log resume even
             await self._log_goal_event(
                 user_id, goal_id, "resumed",
                 {"deadline_extended": extend_deadline}
             )
-            
+
             logger.info(f"Resumed goal {goal_id} for user {user_id}")
             return goal
-            
+
         except Exception as e:
             logger.error(f"Error resuming goal: {str(e)}")
             raise
-    
+
     async def get_goal_templates(self) -> Dict[str, List[Dict[str, Any]]]:
         """Get ADHD-friendly goal templates."""
         return {
-            goal_type.value: templates 
+            goal_type.value: templates
             for goal_type, templates in self.goal_templates.items()
         }
-    
+
     async def get_user_achievements(self, user_id: str) -> List[Dict[str, Any]]:
         """Get user's unlocked achievements and progress."""
         try:
             achievements_ref = self.db.collection('user_achievements').document(user_id)
             achievements_doc = achievements_ref.get()
-            
+
             if achievements_doc.exists:
                 user_achievements = achievements_doc.to_dict()
             else:
                 user_achievements = {"unlocked": [], "progress": {}}
-            
+
             # Build response with all achievements and unlock status
             result = []
             for achievement_id, achievement in self.achievements.items():
                 achievement_data = asdict(achievement)
                 achievement_data['unlocked'] = achievement_id in user_achievements.get('unlocked', [])
-                
+
                 if achievement_data['unlocked']:
                     # Get unlock date from user data
                     unlock_data = user_achievements.get('unlock_dates', {}).get(achievement_id)
                     if unlock_data:
                         achievement_data['unlocked_date'] = unlock_data
-                
+
                 # Get current progress
                 progress = user_achievements.get('progress', {}).get(achievement_id, 0.0)
                 achievement_data['progress'] = progress
-                
+
                 result.append(achievement_data)
-            
+
             return result
-            
+
         except Exception as e:
             logger.error(f"Error getting user achievements: {str(e)}")
             return []
-    
+
     async def get_goal_analytics(self, user_id: str) -> Dict[str, Any]:
         """Get analytics data for user's goal progress."""
         try:
             # Get all user goals
             goals = await self.get_user_goals(user_id, include_completed=True)
-            
+
             # Calculate analytics
             total_goals = len(goals)
             completed_goals = len([g for g in goals if g.get('status') == GoalStatus.COMPLETED.value])
             active_goals = len([g for g in goals if g.get('status') == GoalStatus.ACTIVE.value])
             paused_goals = len([g for g in goals if g.get('status') == GoalStatus.PAUSED.value])
-            
+
             # Calculate success rate
             success_rate = (completed_goals / total_goals * 100) if total_goals > 0 else 0
-            
+
             # Get total milestones completed
             total_milestones = sum(g.get('progress', {}).get('milestones_completed', 0) for g in goals)
-            
+
             # Get best streak
             best_streak = max(g.get('progress', {}).get('best_streak', 0) for g in goals) if goals else 0
-            
-            # Get achievements count
+
+            # Get achievements coun
             achievements = await self.get_user_achievements(user_id)
             unlocked_achievements = len([a for a in achievements if a.get('unlocked')])
-            
+
             return {
                 "total_goals": total_goals,
                 "completed_goals": completed_goals,
@@ -687,13 +687,13 @@ class GoalsService:
                 "unlocked_achievements": unlocked_achievements,
                 "total_achievements": len(achievements)
             }
-            
+
         except Exception as e:
             logger.error(f"Error getting goal analytics: {str(e)}")
             return {}
-    
+
     # Private helper methods
-    
+
     async def _generate_milestones(self, goal: Dict[str, Any]) -> List[Milestone]:
         """Generate ADHD-friendly milestones for a goal."""
         milestones = []
@@ -701,31 +701,31 @@ class GoalsService:
         target_amount = goal.get('target_amount', 0)
         target_date = datetime.fromisoformat(goal.get('target_date').replace('Z', '+00:00'))
         created_date = goal.get('created_at', datetime.utcnow())
-        
+
         if isinstance(created_date, str):
             created_date = datetime.fromisoformat(created_date.replace('Z', '+00:00'))
-        
+
         total_duration = (target_date - created_date).days
-        
+
         # Determine number of milestones based on difficulty and duration
         difficulty = goal.get('difficulty', DifficultyLevel.MODERATE.value)
-        
+
         if difficulty == DifficultyLevel.GENTLE.value:
             milestone_count = min(4, max(2, total_duration // 14))  # Every 2 weeks max
         elif difficulty == DifficultyLevel.MODERATE.value:
-            milestone_count = min(6, max(3, total_duration // 10))  # Every 10 days max  
+            milestone_count = min(6, max(3, total_duration // 10))  # Every 10 days max
         else:  # AMBITIOUS
             milestone_count = min(10, max(4, total_duration // 7))  # Weekly max
-        
+
         # Generate milestones
         for i in range(milestone_count):
             progress = (i + 1) / milestone_count
             milestone_amount = target_amount * progress
-            
+
             # Calculate milestone date
             milestone_days = total_duration * progress
             milestone_date = created_date + timedelta(days=int(milestone_days))
-            
+
             # Create encouraging milestone titles
             if goal_type == GoalType.SAVINGS_TARGET.value:
                 title = f"Save ${milestone_amount:.0f}"
@@ -742,7 +742,7 @@ class GoalsService:
             else:
                 title = f"Milestone {i+1}"
                 description = f"Step {i+1} of {milestone_count} complete!"
-            
+
             milestone = Milestone(
                 id=str(uuid.uuid4()),
                 title=title,
@@ -751,17 +751,17 @@ class GoalsService:
                 target_date=milestone_date.isoformat(),
                 order=i+1
             )
-            
+
             milestones.append(milestone)
-        
+
         return milestones
-    
+
     async def _update_goal_progress(self, goal: Dict[str, Any]) -> Dict[str, Any]:
         """Update goal progress with latest transaction data."""
         # This would integrate with transaction data to calculate real progress
         # For now, return the goal as-is
         return goal
-    
+
     async def _calculate_transaction_impact(
         self,
         goal: Dict[str, Any],
@@ -772,41 +772,41 @@ class GoalsService:
         transaction_amount = abs(transaction.get('amount', 0))
         transaction_category = transaction.get('category', '').lower()
         goal_category = goal.get('category', '').lower()
-        
+
         if goal_type == GoalType.SAVINGS_TARGET.value:
             # Positive progress for savings transactions
             if transaction.get('type') == 'transfer' and 'savings' in transaction.get('description', '').lower():
                 return transaction_amount
-            
+
         elif goal_type == GoalType.SPENDING_REDUCTION.value:
             # Negative progress for spending in target category
             if goal_category and transaction_category == goal_category:
                 return -transaction_amount
-            
+
         elif goal_type == GoalType.DEBT_REDUCTION.value:
             # Positive progress for debt payments
             if 'payment' in transaction.get('description', '').lower():
                 return transaction_amount
-        
+
         return 0.0
-    
+
     async def _check_milestone_completions(self, goal: Dict[str, Any]) -> List[Dict[str, Any]]:
         """Check and mark newly completed milestones."""
         current_amount = goal.get('current_amount', 0)
         completed_milestones = []
-        
+
         milestones = goal.get('milestones', [])
         for milestone in milestones:
             if not milestone.get('completed') and current_amount >= milestone.get('target_value', 0):
                 milestone['completed'] = True
                 milestone['completed_date'] = datetime.utcnow().isoformat()
                 completed_milestones.append(milestone)
-                
+
                 # Update progress counters
                 goal['progress']['milestones_completed'] = goal['progress'].get('milestones_completed', 0) + 1
-        
+
         return completed_milestones
-    
+
     async def _update_streak_tracking(self, goal: Dict[str, Any], made_progress: bool):
         """Update streak tracking for consistent goal progress."""
         if made_progress:
@@ -817,7 +817,7 @@ class GoalsService:
             )
         else:
             goal['progress']['current_streak'] = 0
-    
+
     async def _send_milestone_celebration(
         self,
         user_id: str,
@@ -828,65 +828,65 @@ class GoalsService:
         try:
             if milestone.get('celebration_sent'):
                 return
-            
+
             from app.services.notification_service import NotificationService
             notification_service = NotificationService()
-            
+
             await notification_service.send_goal_achievement(
                 user_id,
                 f"{goal['name']} - {milestone['title']}",
                 "milestone"
             )
-            
+
             milestone['celebration_sent'] = True
-            
-            # Award milestone achievement if this is their first
+
+            # Award milestone achievement if this is their firs
             milestones_completed = goal.get('progress', {}).get('milestones_completed', 0)
             if milestones_completed == 1:
                 await self._unlock_achievement(user_id, "first_milestone")
-            
+
         except Exception as e:
             logger.error(f"Error sending milestone celebration: {str(e)}")
-    
+
     async def _unlock_achievement(self, user_id: str, achievement_id: str):
         """Unlock an achievement for the user."""
         try:
             achievements_ref = self.db.collection('user_achievements').document(user_id)
             achievements_doc = achievements_ref.get()
-            
+
             if achievements_doc.exists:
                 user_achievements = achievements_doc.to_dict()
             else:
                 user_achievements = {"unlocked": [], "unlock_dates": {}, "progress": {}}
-            
+
             # Check if already unlocked
             if achievement_id in user_achievements.get('unlocked', []):
                 return
-            
-            # Unlock achievement
+
+            # Unlock achievemen
             user_achievements['unlocked'].append(achievement_id)
             user_achievements['unlock_dates'][achievement_id] = datetime.utcnow().isoformat()
-            
+
             # Save updated achievements
             achievements_ref.set(user_achievements)
-            
+
             # Send achievement notification
             achievement = self.achievements.get(achievement_id)
             if achievement:
                 from app.services.notification_service import NotificationService
                 notification_service = NotificationService()
-                
+
                 await notification_service.send_goal_achievement(
                     user_id,
                     f"🎉 {achievement.name}",
                     "achievement"
                 )
-            
+
             logger.info(f"Unlocked achievement {achievement_id} for user {user_id}")
-            
+
         except Exception as e:
             logger.error(f"Error unlocking achievement: {str(e)}")
-    
+
     async def _log_goal_event(
         self,
         user_id: str,
@@ -904,19 +904,19 @@ class GoalsService:
                 "timestamp": datetime.utcnow(),
                 "source": "goals_service"
             }
-            
+
             self.db.collection('goal_events').add(event)
-            
+
         except Exception as e:
             logger.error(f"Error logging goal event: {str(e)}")
-    
+
     # Synchronous wrappers for Flask routes (since Flask doesn't support async)
-    
+
     def create_goal_sync(self, user_id: str, goal_data: Dict[str, Any]) -> Dict[str, Any]:
         """Synchronous wrapper for create_goal."""
         import asyncio
         return asyncio.run(self.create_goal(user_id, goal_data))
-    
+
     def get_user_goals_sync(
         self,
         user_id: str,
@@ -926,7 +926,7 @@ class GoalsService:
         """Synchronous wrapper for get_user_goals."""
         import asyncio
         return asyncio.run(self.get_user_goals(user_id, status_filter, include_completed))
-    
+
     def update_goal_progress_sync(
         self,
         user_id: str,
@@ -937,7 +937,7 @@ class GoalsService:
         """Synchronous wrapper for update_goal_progress."""
         import asyncio
         return asyncio.run(self.update_goal_progress(user_id, goal_id, new_amount, transaction_data))
-    
+
     def adjust_goal_sync(
         self,
         user_id: str,
@@ -948,7 +948,7 @@ class GoalsService:
         """Synchronous wrapper for adjust_goal."""
         import asyncio
         return asyncio.run(self.adjust_goal(user_id, goal_id, adjustments, reason))
-    
+
     def pause_goal_sync(
         self,
         user_id: str,
@@ -958,7 +958,7 @@ class GoalsService:
         """Synchronous wrapper for pause_goal."""
         import asyncio
         return asyncio.run(self.pause_goal(user_id, goal_id, reason))
-    
+
     def resume_goal_sync(
         self,
         user_id: str,
@@ -968,17 +968,17 @@ class GoalsService:
         """Synchronous wrapper for resume_goal."""
         import asyncio
         return asyncio.run(self.resume_goal(user_id, goal_id, extend_deadline))
-    
+
     def get_goal_templates_sync(self) -> Dict[str, List[Dict[str, Any]]]:
         """Synchronous wrapper for get_goal_templates."""
         import asyncio
         return asyncio.run(self.get_goal_templates())
-    
+
     def get_user_achievements_sync(self, user_id: str) -> List[Dict[str, Any]]:
         """Synchronous wrapper for get_user_achievements."""
         import asyncio
         return asyncio.run(self.get_user_achievements(user_id))
-    
+
     def get_goal_analytics_sync(self, user_id: str) -> Dict[str, Any]:
         """Synchronous wrapper for get_goal_analytics."""
         import asyncio

@@ -1,5 +1,5 @@
 """
-Machine Learning Analytics API Routes for BrainBudget
+Machine Learning Analytics API Routes for BrainBudge
 Provides ADHD-aware spending pattern analysis endpoints
 """
 from flask import Blueprint, request, jsonify, current_app
@@ -11,7 +11,7 @@ from app.services.firebase_service import FirebaseService
 
 logger = logging.getLogger(__name__)
 
-# Create blueprint
+# Create blueprin
 ml_analytics_bp = Blueprint('ml_analytics', __name__, url_prefix='/api/analytics')
 
 def require_auth(f):
@@ -22,18 +22,18 @@ def require_auth(f):
             auth_header = request.headers.get('Authorization')
             if not auth_header or not auth_header.startswith('Bearer '):
                 return jsonify({'error': 'Missing or invalid authorization header'}), 401
-            
+
             id_token = auth_header.split('Bearer ')[1]
-            
+
             # Verify the ID token
             decoded_token = auth.verify_id_token(id_token)
             request.user_id = decoded_token['uid']
-            
+
             return f(*args, **kwargs)
         except Exception as e:
             logger.error(f"Authentication error: {str(e)}")
             return jsonify({'error': 'Invalid authentication token'}), 401
-    
+
     decorated_function.__name__ = f.__name__
     return decorated_function
 
@@ -44,24 +44,24 @@ def analyze_spending_patterns():
     """Analyze user's spending patterns with ML."""
     try:
         data = request.get_json() or {}
-        
+
         # Parse request parameters
         analysis_types = data.get('analysis_types', [
             'recurring_patterns',
-            'anomaly_detection', 
+            'anomaly_detection',
             'spending_predictions',
             'adhd_insights',
             'category_trends'
         ])
-        
+
         time_period_days = min(data.get('time_period_days', 90), 365)  # Cap at 1 year
-        
+
         # Validate analysis types
         valid_types = [
             'recurring_patterns', 'anomaly_detection', 'spending_predictions',
             'adhd_insights', 'category_trends'
         ]
-        
+
         invalid_types = [t for t in analysis_types if t not in valid_types]
         if invalid_types:
             return jsonify({
@@ -69,7 +69,7 @@ def analyze_spending_patterns():
                 'message': f'Invalid analysis types: {", ".join(invalid_types)}',
                 'valid_types': valid_types
             }), 400
-        
+
         # Run analysis
         ml_service = MLAnalyticsService()
         results = ml_service.analyze_user_patterns_sync(
@@ -77,7 +77,7 @@ def analyze_spending_patterns():
             analysis_types,
             time_period_days
         )
-        
+
         # Handle different result types
         if results.get('status') == 'consent_required':
             return jsonify({
@@ -86,7 +86,7 @@ def analyze_spending_patterns():
                 'consent_required': True,
                 'next_steps': 'Enable ML analytics in your privacy settings'
             }), 403
-        
+
         elif results.get('status') == 'insufficient_data':
             return jsonify({
                 'error': False,
@@ -95,14 +95,14 @@ def analyze_spending_patterns():
                 'current_transactions': results.get('total_transactions', 0),
                 'needed_transactions': 50
             }), 200
-        
+
         elif results.get('status') == 'error':
             return jsonify({
                 'error': True,
                 'message': '🔧 Our analysis engine is having a moment. Please try again shortly!',
                 'temporary_error': True
             }), 500
-        
+
         # Successful analysis
         return jsonify({
             'success': True,
@@ -110,7 +110,7 @@ def analyze_spending_patterns():
             'analysis': results,
             'generated_at': datetime.utcnow().isoformat()
         })
-        
+
     except Exception as e:
         logger.error(f"Error in spending pattern analysis: {str(e)}")
         return jsonify({
@@ -128,7 +128,7 @@ def get_spending_insights():
         limit = min(int(request.args.get('limit', 5)), 20)
         insight_types = request.args.getlist('types') or ['all']
         time_period = int(request.args.get('days', 30))
-        
+
         # Run focused analysis for insights
         ml_service = MLAnalyticsService()
         results = ml_service.analyze_user_patterns_sync(
@@ -136,24 +136,24 @@ def get_spending_insights():
             ['adhd_insights', 'anomaly_detection', 'recurring_patterns'],
             time_period
         )
-        
+
         if results.get('status') in ['consent_required', 'insufficient_data', 'error']:
             return jsonify({
                 'insights': [],
                 'message': 'Insights will be available once we have enough data and consent',
                 'status': results.get('status')
             })
-        
+
         # Extract insights
         insights = results.get('insights', [])
-        
+
         # Filter by type if specified
         if 'all' not in insight_types:
             insights = [i for i in insights if i.get('insight_type') in insight_types]
-        
+
         # Limit results
         insights = insights[:limit]
-        
+
         # Add user-friendly formatting
         formatted_insights = []
         for insight in insights:
@@ -169,7 +169,7 @@ def get_spending_insights():
                 'period': insight.get('time_period')
             }
             formatted_insights.append(formatted)
-        
+
         return jsonify({
             'success': True,
             'insights': formatted_insights,
@@ -177,7 +177,7 @@ def get_spending_insights():
             'analysis_period_days': time_period,
             'message': f"💡 Found {len(insights)} insights about your spending patterns!"
         })
-        
+
     except Exception as e:
         logger.error(f"Error getting spending insights: {str(e)}")
         return jsonify({
@@ -193,40 +193,40 @@ def score_transaction():
     """Score a single transaction for patterns and anomalies."""
     try:
         transaction_data = request.get_json()
-        
+
         if not transaction_data:
             return jsonify({
                 'error': True,
                 'message': 'Transaction data is required for scoring'
             }), 400
-        
+
         # Validate required fields
         required_fields = ['amount', 'merchant', 'category']
         missing_fields = [f for f in required_fields if f not in transaction_data]
-        
+
         if missing_fields:
             return jsonify({
                 'error': True,
                 'message': f'Missing required fields: {", ".join(missing_fields)}'
             }), 400
-        
+
         # Add timestamp if not provided
         if 'timestamp' not in transaction_data:
             transaction_data['timestamp'] = datetime.utcnow().isoformat()
-        
+
         # Score transaction
         ml_service = MLAnalyticsService()
         score_result = ml_service.score_new_transaction_sync(
             request.user_id,
             transaction_data
         )
-        
+
         return jsonify({
             'success': True,
             'scoring': score_result,
             'message': '📊 Transaction scored successfully!'
         })
-        
+
     except Exception as e:
         logger.error(f"Error scoring transaction: {str(e)}")
         return jsonify({
@@ -240,8 +240,8 @@ def score_transaction():
 def get_detected_subscriptions():
     """Get detected recurring subscriptions."""
     try:
-        time_period = int(request.args.get('days', 180))  # 6 months default
-        
+        time_period = int(request.args.get('days', 180))  # 6 months defaul
+
         # Run recurring pattern analysis
         ml_service = MLAnalyticsService()
         results = ml_service.analyze_user_patterns_sync(
@@ -249,18 +249,18 @@ def get_detected_subscriptions():
             ['recurring_patterns'],
             time_period
         )
-        
+
         if results.get('status') in ['consent_required', 'insufficient_data', 'error']:
             return jsonify({
                 'subscriptions': [],
                 'message': 'Subscription detection will be available with more data',
                 'status': results.get('status')
             })
-        
+
         # Extract subscription data
         recurring_data = results.get('analyses', {}).get('recurring_patterns', {})
         subscriptions = recurring_data.get('subscriptions', [])
-        
+
         # Format for frontend
         formatted_subs = []
         for sub in subscriptions:
@@ -274,12 +274,12 @@ def get_detected_subscriptions():
                 'adhd_insight': sub.get('adhd_insight')
             }
             formatted_subs.append(formatted)
-        
+
         # Sort by amount descending
         formatted_subs.sort(key=lambda x: x['amount'], reverse=True)
-        
+
         total_monthly = sum(s['amount'] for s in formatted_subs if s['frequency'] == 'monthly')
-        
+
         return jsonify({
             'success': True,
             'subscriptions': formatted_subs,
@@ -290,7 +290,7 @@ def get_detected_subscriptions():
             },
             'message': f"🔍 Found {len(formatted_subs)} recurring subscriptions totaling ~${total_monthly:.2f}/month"
         })
-        
+
     except Exception as e:
         logger.error(f"Error getting subscriptions: {str(e)}")
         return jsonify({
@@ -307,13 +307,13 @@ def get_spending_predictions():
     try:
         period = request.args.get('period', 'monthly')  # daily, weekly, monthly
         days_ahead = int(request.args.get('days', 30))
-        
+
         if period not in ['daily', 'weekly', 'monthly']:
             return jsonify({
                 'error': True,
                 'message': 'Period must be one of: daily, weekly, monthly'
             }), 400
-        
+
         # Run prediction analysis
         ml_service = MLAnalyticsService()
         results = ml_service.analyze_user_patterns_sync(
@@ -321,24 +321,24 @@ def get_spending_predictions():
             ['spending_predictions'],
             90  # Use 90 days for prediction training
         )
-        
+
         if results.get('status') in ['consent_required', 'insufficient_data', 'error']:
             return jsonify({
                 'predictions': {},
                 'message': 'Predictions will be available with more transaction history',
                 'status': results.get('status')
             })
-        
+
         # Extract prediction data
         pred_data = results.get('analyses', {}).get('spending_predictions', {})
-        
+
         if not pred_data.get('predictions'):
             return jsonify({
                 'predictions': {},
                 'message': 'Not enough data for reliable predictions yet',
                 'status': 'insufficient_data'
             })
-        
+
         # Format predictions based on requested period
         if period == 'weekly':
             prediction_value = pred_data.get('weekly_prediction', 0)
@@ -350,10 +350,10 @@ def get_spending_predictions():
             daily_preds = pred_data.get('predictions', [])[:days_ahead]
             prediction_value = sum(p['predicted_amount'] for p in daily_preds)
             period_label = f'next {days_ahead} days'
-        
+
         accuracy_level = pred_data.get('confidence_level', 'medium')
         accuracy_score = pred_data.get('accuracy_score', 0.7)
-        
+
         return jsonify({
             'success': True,
             'predictions': {
@@ -367,7 +367,7 @@ def get_spending_predictions():
             'adhd_note': pred_data.get('adhd_note', ''),
             'message': f"🔮 Predicting ~${prediction_value:.0f} for {period_label} (confidence: {accuracy_level})"
         })
-        
+
     except Exception as e:
         logger.error(f"Error getting predictions: {str(e)}")
         return jsonify({
@@ -384,7 +384,7 @@ def get_spending_anomalies():
     try:
         days = int(request.args.get('days', 30))
         limit = min(int(request.args.get('limit', 10)), 50)
-        
+
         # Run anomaly detection
         ml_service = MLAnalyticsService()
         results = ml_service.analyze_user_patterns_sync(
@@ -392,18 +392,18 @@ def get_spending_anomalies():
             ['anomaly_detection'],
             days
         )
-        
+
         if results.get('status') in ['consent_required', 'insufficient_data', 'error']:
             return jsonify({
                 'anomalies': [],
                 'message': 'Anomaly detection will be available with more data',
                 'status': results.get('status')
             })
-        
+
         # Extract anomaly data
         anomaly_data = results.get('analyses', {}).get('anomaly_detection', {})
         anomalies = anomaly_data.get('anomalies', [])[:limit]
-        
+
         # Format for frontend
         formatted_anomalies = []
         for anomaly in anomalies:
@@ -417,7 +417,7 @@ def get_spending_anomalies():
                 'adhd_insight': anomaly.get('adhd_insight')
             }
             formatted_anomalies.append(formatted)
-        
+
         return jsonify({
             'success': True,
             'anomalies': formatted_anomalies,
@@ -428,7 +428,7 @@ def get_spending_anomalies():
             },
             'message': f"🔍 Found {len(formatted_anomalies)} unusual transactions in the last {days} days"
         })
-        
+
     except Exception as e:
         logger.error(f"Error getting anomalies: {str(e)}")
         return jsonify({
@@ -444,36 +444,36 @@ def update_ml_consent():
     """Update user's ML analytics consent."""
     try:
         data = request.get_json()
-        
+
         if 'consent' not in data:
             return jsonify({
                 'error': True,
                 'message': 'Consent value (true/false) is required'
             }), 400
-        
+
         consent = bool(data['consent'])
-        
+
         # Update user preferences
         firebase_service = FirebaseService()
         user_ref = firebase_service.db.collection('user_preferences').document(request.user_id)
-        
+
         user_ref.set({
             'ml_analytics_consent': consent,
             'ml_consent_updated_at': datetime.utcnow(),
             'ml_consent_version': '1.0'
         }, merge=True)
-        
+
         if consent:
             message = '✅ ML analytics enabled! Your insights will be available shortly.'
         else:
             message = '🔒 ML analytics disabled. Your privacy settings have been updated.'
-        
+
         return jsonify({
             'success': True,
             'consent': consent,
             'message': message
         })
-        
+
     except Exception as e:
         logger.error(f"Error updating ML consent: {str(e)}")
         return jsonify({
@@ -490,7 +490,7 @@ def get_ml_consent():
         firebase_service = FirebaseService()
         user_ref = firebase_service.db.collection('user_preferences').document(request.user_id)
         user_doc = user_ref.get()
-        
+
         if user_doc.exists:
             prefs = user_doc.to_dict()
             consent = prefs.get('ml_analytics_consent', False)
@@ -498,7 +498,7 @@ def get_ml_consent():
         else:
             consent = False
             consent_date = None
-        
+
         return jsonify({
             'success': True,
             'consent': consent,
@@ -510,7 +510,7 @@ def get_ml_consent():
                 'third_party_sharing': False
             }
         })
-        
+
     except Exception as e:
         logger.error(f"Error getting ML consent: {str(e)}")
         return jsonify({
@@ -527,7 +527,7 @@ def get_category_trends():
     try:
         days = int(request.args.get('days', 90))
         limit = min(int(request.args.get('limit', 10)), 20)
-        
+
         # Run category trend analysis
         ml_service = MLAnalyticsService()
         results = ml_service.analyze_user_patterns_sync(
@@ -535,18 +535,18 @@ def get_category_trends():
             ['category_trends'],
             days
         )
-        
+
         if results.get('status') in ['consent_required', 'insufficient_data', 'error']:
             return jsonify({
                 'trends': [],
                 'message': 'Category trends will be available with more data',
                 'status': results.get('status')
             })
-        
+
         # Extract trend data
         trend_data = results.get('analyses', {}).get('category_trends', {})
         trends = trend_data.get('trends', [])[:limit]
-        
+
         return jsonify({
             'success': True,
             'trends': trends,
@@ -557,7 +557,7 @@ def get_category_trends():
             },
             'message': f"📈 Analyzed spending trends across {len(trends)} categories"
         })
-        
+
     except Exception as e:
         logger.error(f"Error getting category trends: {str(e)}")
         return jsonify({
@@ -574,14 +574,14 @@ def ml_health():
     try:
         # Test basic service initialization
         ml_service = MLAnalyticsService()
-        
+
         # Check ML libraries availability
         ml_libraries_ok = True
         try:
             import pandas, numpy, sklearn
         except ImportError:
             ml_libraries_ok = False
-        
+
         return jsonify({
             'status': 'healthy',
             'component': 'ml_analytics',
@@ -590,7 +590,7 @@ def ml_health():
             'privacy_config_loaded': bool(ml_service.privacy_config),
             'adhd_patterns_loaded': bool(ml_service.adhd_patterns)
         }), 200
-        
+
     except Exception as e:
         logger.error(f"ML analytics health check failed: {str(e)}")
         return jsonify({
