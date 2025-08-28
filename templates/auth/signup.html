@@ -337,11 +337,11 @@ document.addEventListener('DOMContentLoaded', function() {
         // Simulate account creation (replace with actual API call)
         setTimeout(() => {
             loadingOverlay.classList.add('hidden');
-            showMessage('Account created successfully! Redirecting to dashboard...', 'success');
+            showMessage('Account created successfully! Redirecting to home...', 'success');
             
-            // Redirect to dashboard after a short delay
+            // Redirect to home after a short delay
             setTimeout(() => {
-                window.location.href = '/dashboard';
+                window.location.href = '/home';
             }, 2000);
         }, 2000);
     });

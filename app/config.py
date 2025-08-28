@@ -2,6 +2,7 @@
 Configuration settings for BrainBudget Flask application.
 """
 import os
+import secrets
 from datetime import timedelta
 from dotenv import load_dotenv
 
@@ -13,7 +14,7 @@ class Config:
     """Base configuration class."""
 
     # Flask configuration
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
+    SECRET_KEY = os.environ.get('SECRET_KEY') or secrets.token_hex(32)
     DEBUG = os.environ.get('DEBUG', 'False').lower() in ['true', '1', 'yes']
 
     # Firebase configuration

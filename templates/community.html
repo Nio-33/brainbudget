@@ -1,242 +1,530 @@
 {% extends "base.html" %}
 
-{% block title %}ADHD Community - BrainBudget{% endblock %}
+{% block title %}Community - BrainBudget{% endblock %}
 
 {% block content %}
-<!-- ADHD-Friendly Community Space -->
-<div class="min-h-screen bg-gray-50">
-    <!-- Header -->
-    <div class="bg-white border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="py-6">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                        <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg mr-4">
-                            <span class="text-2xl">🤗</span>
-                        </div>
-                        <div>
-                            <h1 class="text-2xl font-bold text-gray-900">ADHD Community</h1>
-                            <p class="text-sm text-gray-500">Safe space for neurodivergent financial growth</p>
-                        </div>
-                    </div>
+<!-- Community Page -->
+<div class="min-h-screen" style="background-color: #EFDFC5;">
+    <!-- Header Section -->
+    <div class="relative py-16 px-4">
+        <div class="max-w-6xl mx-auto text-center">
+            <div class="mb-6">
+                <span class="text-6xl">🤝</span>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold mb-4" style="color: #380F17;">
+                BrainBudget Community
+            </h1>
+            <p class="text-lg max-w-2xl mx-auto leading-relaxed" style="color: #252B2B;">
+                Connect with fellow ADHD budgeters, share tips, celebrate wins, and support each other on the journey to financial wellness.
+            </p>
+        </div>
+    </div>
+
+    <!-- Community Stats Bar -->
+    <div class="py-8 px-4" style="background-color: #380F17;">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                <div class="flex flex-col items-center">
+                    <span class="text-2xl font-bold mb-1" style="color: #EFDFC5;">1,247</span>
+                    <span class="text-sm" style="color: #EFDFC5;">Community Members</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="text-2xl font-bold mb-1" style="color: #EFDFC5;">89</span>
+                    <span class="text-sm" style="color: #EFDFC5;">Active Discussions</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="text-2xl font-bold mb-1" style="color: #EFDFC5;">432</span>
+                    <span class="text-sm" style="color: #EFDFC5;">Tips Shared</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="text-2xl font-bold mb-1" style="color: #EFDFC5;">95%</span>
+                    <span class="text-sm" style="color: #EFDFC5;">Support Rating</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
-        <!-- Coming Soon Banner -->
-        <div class="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-2xl p-8 mb-8 text-center">
-            <div class="text-4xl mb-4">🚀</div>
-            <h2 class="text-2xl font-bold mb-4">Community Coming Soon!</h2>
-            <p class="text-lg mb-6">
-                We're building a safe, supportive space where ADHD individuals can share financial wins, 
-                challenges, and strategies without judgment.
-            </p>
-            <div class="bg-white bg-opacity-20 rounded-lg p-4 text-sm">
-                <p class="font-medium mb-2">What to expect:</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div class="flex items-center">
-                        <span class="text-yellow-300 mr-2">✓</span>
-                        <span>Anonymous sharing options</span>
-                    </div>
-                    <div class="flex items-center">
-                        <span class="text-yellow-300 mr-2">✓</span>
-                        <span>Success story celebrations</span>
-                    </div>
-                    <div class="flex items-center">
-                        <span class="text-yellow-300 mr-2">✓</span>
-                        <span>ADHD-specific tips & tricks</span>
-                    </div>
-                    <div class="flex items-center">
-                        <span class="text-yellow-300 mr-2">✓</span>
-                        <span>Peer support & encouragement</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Preview of Community Features -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            
-            <!-- Success Stories -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <div class="flex items-center mb-4">
-                    <span class="text-2xl mr-3">🌟</span>
-                    <h3 class="text-lg font-semibold text-gray-900">Success Stories</h3>
-                </div>
-                <div class="space-y-4">
-                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-                        <div class="text-sm font-medium text-green-800 mb-2">Anonymous User</div>
-                        <p class="text-green-700 text-sm">
-                            "After 3 months using BrainBudget, I finally have a $1000 emergency fund! 
-                            The ADHD-friendly approach made all the difference. Small steps really work! 🎉"
-                        </p>
-                        <div class="mt-2 text-xs text-green-600">23 reactions • 8 supportive comments</div>
-                    </div>
-                    
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <div class="text-sm font-medium text-blue-800 mb-2">Community Member</div>
-                        <p class="text-blue-700 text-sm">
-                            "Paid off my credit card using the ADHD debt snowball method! The visual progress 
-                            tracker kept me motivated through hyperfocus periods. 💪"
-                        </p>
-                        <div class="mt-2 text-xs text-blue-600">31 reactions • 12 supportive comments</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ADHD Tips -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <div class="flex items-center mb-4">
-                    <span class="text-2xl mr-3">🧠</span>
-                    <h3 class="text-lg font-semibold text-gray-900">ADHD Money Tips</h3>
-                </div>
-                <div class="space-y-4">
-                    <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                        <div class="text-sm font-medium text-purple-800 mb-2">Weekly Tip</div>
-                        <p class="text-purple-700 text-sm">
-                            💡 <strong>Executive Function Hack:</strong> Set up automatic transfers on payday 
-                            BEFORE your brain has time to make other spending decisions. Future you will thank present you!
-                        </p>
-                    </div>
-                    
-                    <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                        <div class="text-sm font-medium text-orange-800 mb-2">Hyperfocus Strategy</div>
-                        <p class="text-orange-700 text-sm">
-                            🎯 Use hyperfocus periods productively! When you're obsessed with something expensive, 
-                            research it thoroughly first. Often the research scratches the dopamine itch without the purchase.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Support Groups -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <div class="flex items-center mb-4">
-                    <span class="text-2xl mr-3">🤝</span>
-                    <h3 class="text-lg font-semibold text-gray-900">Support Groups</h3>
-                </div>
-                <div class="space-y-3">
-                    <div class="border border-gray-200 rounded-lg p-3">
-                        <div class="font-medium text-gray-900">Debt Freedom Seekers</div>
-                        <div class="text-sm text-gray-600">142 members • Daily check-ins</div>
-                        <div class="text-xs text-gray-500 mt-1">Supportive accountability for debt reduction</div>
-                    </div>
-                    
-                    <div class="border border-gray-200 rounded-lg p-3">
-                        <div class="font-medium text-gray-900">Emergency Fund Builders</div>
-                        <div class="text-sm text-gray-600">89 members • Weekly progress</div>
-                        <div class="text-xs text-gray-500 mt-1">Building financial security one dollar at a time</div>
-                    </div>
-                    
-                    <div class="border border-gray-200 rounded-lg p-3">
-                        <div class="font-medium text-gray-900">ADHD Side Hustlers</div>
-                        <div class="text-sm text-gray-600">67 members • Ideas & motivation</div>
-                        <div class="text-xs text-gray-500 mt-1">Leveraging ADHD creativity for extra income</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Q&A Forum -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <div class="flex items-center mb-4">
-                    <span class="text-2xl mr-3">❓</span>
-                    <h3 class="text-lg font-semibold text-gray-900">Ask & Answer</h3>
-                </div>
-                <div class="space-y-3">
-                    <div class="bg-gray-50 rounded-lg p-3">
-                        <div class="text-sm font-medium text-gray-900 mb-1">
-                            "How do I stop impulse buying during hyperfocus episodes?"
+    <!-- Main Community Content -->
+    <div class="py-12 px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- Forum Categories (Left Column - 2/3 width) -->
+                <div class="lg:col-span-2">
+                    <div class="backdrop-blur-sm rounded-3xl p-6 mb-8" style="background-color: rgba(255, 255, 255, 0.7); border: 1px solid #380F17;">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-2xl font-bold" style="color: #380F17;">Discussion Forums</h2>
+                            <button id="newPostBtn" class="px-6 py-3 rounded-full font-semibold transition-colors" style="background-color: #380F17; color: #EFDFC5;" onmouseover="this.style.backgroundColor='#8F0B13'" onmouseout="this.style.backgroundColor='#380F17'">
+                                ✨ Start New Topic
+                            </button>
                         </div>
-                        <div class="text-xs text-gray-500">8 helpful answers • 15 people following</div>
-                    </div>
-                    
-                    <div class="bg-gray-50 rounded-lg p-3">
-                        <div class="text-sm font-medium text-gray-900 mb-1">
-                            "Best apps for ADHD-friendly budgeting beyond BrainBudget?"
+
+                        <!-- Forum Categories -->
+                        <div class="space-y-4">
+                            <!-- Getting Started -->
+                            <div class="p-4 rounded-2xl cursor-pointer transition-colors hover:shadow-md" style="background-color: rgba(239, 223, 197, 0.8); border-left: 4px solid #380F17;" onclick="showForum('getting-started')">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <span class="text-2xl">🌱</span>
+                                        <div>
+                                            <h3 class="font-semibold text-lg" style="color: #380F17;">Getting Started</h3>
+                                            <p class="text-sm" style="color: #4C4F54;">New to budgeting? Start here for gentle guidance and support.</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-sm font-semibold" style="color: #252B2B;">24 topics</div>
+                                        <div class="text-xs" style="color: #4C4F54;">Last: 2 hours ago</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ADHD Money Tips -->
+                            <div class="p-4 rounded-2xl cursor-pointer transition-colors hover:shadow-md" style="background-color: rgba(239, 223, 197, 0.8); border-left: 4px solid #8F0B13;" onclick="showForum('adhd-tips')">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <span class="text-2xl">🧠</span>
+                                        <div>
+                                            <h3 class="font-semibold text-lg" style="color: #380F17;">ADHD Money Tips</h3>
+                                            <p class="text-sm" style="color: #4C4F54;">Specific strategies that work for neurodivergent minds.</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-sm font-semibold" style="color: #252B2B;">67 topics</div>
+                                        <div class="text-xs" style="color: #4C4F54;">Last: 45 min ago</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Celebrate Wins -->
+                            <div class="p-4 rounded-2xl cursor-pointer transition-colors hover:shadow-md" style="background-color: rgba(239, 223, 197, 0.8); border-left: 4px solid #252B2B;" onclick="showForum('wins')">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <span class="text-2xl">🎉</span>
+                                        <div>
+                                            <h3 class="font-semibold text-lg" style="color: #380F17;">Celebrate Wins</h3>
+                                            <p class="text-sm" style="color: #4C4F54;">Share your victories, big and small!</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-sm font-semibold" style="color: #252B2B;">156 topics</div>
+                                        <div class="text-xs" style="color: #4C4F54;">Last: 1 hour ago</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Support & Accountability -->
+                            <div class="p-4 rounded-2xl cursor-pointer transition-colors hover:shadow-md" style="background-color: rgba(239, 223, 197, 0.8); border-left: 4px solid #4C4F54;" onclick="showForum('support')">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <span class="text-2xl">💪</span>
+                                        <div>
+                                            <h3 class="font-semibold text-lg" style="color: #380F17;">Support & Accountability</h3>
+                                            <p class="text-sm" style="color: #4C4F54;">Find your accountability partner and get support.</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-sm font-semibold" style="color: #252B2B;">43 topics</div>
+                                        <div class="text-xs" style="color: #4C4F54;">Last: 3 hours ago</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- App Feedback -->
+                            <div class="p-4 rounded-2xl cursor-pointer transition-colors hover:shadow-md" style="background-color: rgba(239, 223, 197, 0.8); border-left: 4px solid #8F0B13;" onclick="showForum('feedback')">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <span class="text-2xl">💭</span>
+                                        <div>
+                                            <h3 class="font-semibold text-lg" style="color: #380F17;">App Feedback & Ideas</h3>
+                                            <p class="text-sm" style="color: #4C4F54;">Help us make BrainBudget even better!</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-sm font-semibold" style="color: #252B2B;">31 topics</div>
+                                        <div class="text-xs" style="color: #4C4F54;">Last: 5 hours ago</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="text-xs text-gray-500">12 helpful answers • 22 people following</div>
                     </div>
-                    
-                    <div class="bg-gray-50 rounded-lg p-3">
-                        <div class="text-sm font-medium text-gray-900 mb-1">
-                            "Managing finances with irregular ADHD work schedule?"
+
+                    <!-- Recent Discussions -->
+                    <div class="backdrop-blur-sm rounded-3xl p-6" style="background-color: rgba(255, 255, 255, 0.7); border: 1px solid #380F17;">
+                        <h2 class="text-2xl font-bold mb-6" style="color: #380F17;">Latest Discussions</h2>
+                        
+                        <div class="space-y-4">
+                            <!-- Sample Discussion 1 -->
+                            <div class="p-4 rounded-2xl hover:shadow-md transition-colors cursor-pointer" style="background-color: rgba(239, 223, 197, 0.6);">
+                                <div class="flex items-start space-x-3">
+                                    <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background-color: #4C4F54;">
+                                        <span class="text-white text-xs font-bold">SM</span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="font-semibold text-sm" style="color: #380F17;">How I stopped impulse buying with the "24-hour rule"</h4>
+                                        <p class="text-xs mt-1" style="color: #4C4F54;">By Sarah M. • 2 hours ago • 12 replies • 🧠 ADHD Money Tips</p>
+                                        <p class="text-sm mt-2 line-clamp-2" style="color: #252B2B;">Just wanted to share something that's been working for me lately. Whenever I want to buy something non-essential, I add it to a "maybe list" and wait 24 hours...</p>
+                                    </div>
+                                    <div class="flex flex-col items-center">
+                                        <span class="text-xs font-semibold" style="color: #8F0B13;">👍 23</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sample Discussion 2 -->
+                            <div class="p-4 rounded-2xl hover:shadow-md transition-colors cursor-pointer" style="background-color: rgba(239, 223, 197, 0.6);">
+                                <div class="flex items-start space-x-3">
+                                    <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background-color: #8F0B13;">
+                                        <span class="text-white text-xs font-bold">MR</span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="font-semibold text-sm" style="color: #380F17;">🎉 Paid off my first credit card!</h4>
+                                        <p class="text-xs mt-1" style="color: #4C4F54;">By Marcus R. • 1 hour ago • 18 replies • 🎉 Celebrate Wins</p>
+                                        <p class="text-sm mt-2 line-clamp-2" style="color: #252B2B;">I can't believe it! After 6 months of using BrainBudget and following the community tips, I just made my final payment on my credit card...</p>
+                                    </div>
+                                    <div class="flex flex-col items-center">
+                                        <span class="text-xs font-semibold" style="color: #8F0B13;">👍 45</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sample Discussion 3 -->
+                            <div class="p-4 rounded-2xl hover:shadow-md transition-colors cursor-pointer" style="background-color: rgba(239, 223, 197, 0.6);">
+                                <div class="flex items-start space-x-3">
+                                    <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background-color: #252B2B;">
+                                        <span class="text-white text-xs font-bold">AT</span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="font-semibold text-sm" style="color: #380F17;">Looking for an accountability buddy for December goals</h4>
+                                        <p class="text-xs mt-1" style="color: #4C4F54;">By Alex T. • 3 hours ago • 7 replies • 💪 Support & Accountability</p>
+                                        <p class="text-sm mt-2 line-clamp-2" style="color: #252B2B;">Hey everyone! I'm trying to save $500 this month for an emergency fund and would love to find someone to check in with weekly...</p>
+                                    </div>
+                                    <div class="flex flex-col items-center">
+                                        <span class="text-xs font-semibold" style="color: #8F0B13;">👍 8</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="text-xs text-gray-500">6 helpful answers • 31 people following</div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Notification Signup -->
-        <div class="mt-8 bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Be the First to Know!</h3>
-            <p class="text-gray-600 mb-6">
-                Get notified when our ADHD community launches. We'll send you early access and special features.
-            </p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
-                <input type="email" placeholder="your@email.com" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
-                <button class="bg-purple-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-purple-600 transition-colors">
-                    Notify Me!
-                </button>
-            </div>
-            <div class="text-xs text-gray-500 mt-3">
-                No spam, just community updates. Unsubscribe anytime.
-            </div>
-        </div>
-        
-        <!-- Current Alternative -->
-        <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-            <div class="text-center">
-                <h3 class="text-lg font-semibold text-blue-800 mb-2">In the meantime...</h3>
-                <p class="text-blue-700 mb-4">
-                    Connect with other ADHD individuals in these existing communities:
-                </p>
-                <div class="flex flex-wrap justify-center gap-4">
-                    <a href="https://reddit.com/r/ADHD" target="_blank" class="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-600 transition-colors">
-                        r/ADHD Reddit
-                    </a>
-                    <a href="https://reddit.com/r/ADHDmemes" target="_blank" class="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-600 transition-colors">
-                        ADHD Memes
-                    </a>
-                    <a href="#" class="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-600 transition-colors">
-                        ADHD Discord
-                    </a>
+                <!-- Sidebar (Right Column - 1/3 width) -->
+                <div class="lg:col-span-1">
+                    <!-- Community Guidelines -->
+                    <div class="backdrop-blur-sm rounded-3xl p-6 mb-6" style="background-color: rgba(255, 255, 255, 0.7); border: 1px solid #380F17;">
+                        <h3 class="text-xl font-bold mb-4" style="color: #380F17;">Community Guidelines</h3>
+                        <div class="space-y-3 text-sm" style="color: #252B2B;">
+                            <div class="flex items-start space-x-2">
+                                <span>💜</span>
+                                <span>Be kind and supportive - we're all learning together</span>
+                            </div>
+                            <div class="flex items-start space-x-2">
+                                <span>🤐</span>
+                                <span>Keep personal financial details private for safety</span>
+                            </div>
+                            <div class="flex items-start space-x-2">
+                                <span>🎯</span>
+                                <span>Stay on topic - focus on ADHD-friendly financial tips</span>
+                            </div>
+                            <div class="flex items-start space-x-2">
+                                <span>🚫</span>
+                                <span>No financial advice - share experiences, not recommendations</span>
+                            </div>
+                            <div class="flex items-start space-x-2">
+                                <span>📢</span>
+                                <span>Report inappropriate content to keep our space safe</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Active Members -->
+                    <div class="backdrop-blur-sm rounded-3xl p-6 mb-6" style="background-color: rgba(255, 255, 255, 0.7); border: 1px solid #380F17;">
+                        <h3 class="text-xl font-bold mb-4" style="color: #380F17;">Active Members</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background-color: #8F0B13;">
+                                    <span class="text-white text-xs font-bold">SM</span>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="text-sm font-semibold" style="color: #252B2B;">Sarah M.</div>
+                                    <div class="text-xs" style="color: #4C4F54;">Community Helper</div>
+                                </div>
+                                <div class="w-2 h-2 rounded-full" style="background-color: #7ED321;"></div>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background-color: #380F17;">
+                                    <span class="text-white text-xs font-bold">MR</span>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="text-sm font-semibold" style="color: #252B2B;">Marcus R.</div>
+                                    <div class="text-xs" style="color: #4C4F54;">Rising Star</div>
+                                </div>
+                                <div class="w-2 h-2 rounded-full" style="background-color: #7ED321;"></div>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background-color: #4C4F54;">
+                                    <span class="text-white text-xs font-bold">AT</span>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="text-sm font-semibold" style="color: #252B2B;">Alex T.</div>
+                                    <div class="text-xs" style="color: #4C4F54;">New Member</div>
+                                </div>
+                                <div class="w-2 h-2 rounded-full" style="background-color: #7ED321;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Your Community Progress -->
+                    <div class="backdrop-blur-sm rounded-3xl p-6" style="background-color: rgba(56, 15, 23, 0.9); color: #EFDFC5;">
+                        <h3 class="text-xl font-bold mb-4">Your Community Progress</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span>Posts & Replies</span>
+                                    <span>12/25</span>
+                                </div>
+                                <div class="w-full rounded-full h-2" style="background-color: rgba(239, 223, 197, 0.3);">
+                                    <div class="h-2 rounded-full" style="background-color: #EFDFC5; width: 48%;"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span>Helpful Reactions</span>
+                                    <span>34</span>
+                                </div>
+                                <div class="text-xs opacity-80">Next milestone: Community Helper at 50</div>
+                            </div>
+                            <div class="pt-3 border-t" style="border-color: rgba(239, 223, 197, 0.3);">
+                                <div class="text-sm font-semibold">Community Level: Active Member</div>
+                                <div class="text-xs opacity-80 mt-1">16 XP to next level</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- New Post Modal -->
+<div id="newPostModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
+    <div class="rounded-3xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto" style="background-color: #EFDFC5;">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-2xl font-bold" style="color: #380F17;">Start New Discussion</h3>
+            <button id="closeModal" class="text-2xl" style="color: #4C4F54;">&times;</button>
+        </div>
+        
+        <form id="newPostForm" class="space-y-4">
+            <!-- Category Selection -->
+            <div>
+                <label class="block text-sm font-semibold mb-2" style="color: #380F17;">Choose Category</label>
+                <select name="category" class="w-full p-3 rounded-xl border-2 border-gray-200 focus:outline-none focus:border-[#380F17]" style="background-color: white;">
+                    <option value="getting-started">🌱 Getting Started</option>
+                    <option value="adhd-tips">🧠 ADHD Money Tips</option>
+                    <option value="wins">🎉 Celebrate Wins</option>
+                    <option value="support">💪 Support & Accountability</option>
+                    <option value="feedback">💭 App Feedback & Ideas</option>
+                </select>
+            </div>
+            
+            <!-- Title -->
+            <div>
+                <label class="block text-sm font-semibold mb-2" style="color: #380F17;">Discussion Title</label>
+                <input type="text" name="title" placeholder="What's your topic?" class="w-full p-3 rounded-xl border-2 border-gray-200 focus:outline-none focus:border-[#380F17]" style="background-color: white;">
+            </div>
+            
+            <!-- Content -->
+            <div>
+                <label class="block text-sm font-semibold mb-2" style="color: #380F17;">Share Your Thoughts</label>
+                <textarea name="content" rows="6" placeholder="Tell the community about your experience, question, or tip..." class="w-full p-3 rounded-xl border-2 border-gray-200 focus:outline-none focus:border-[#380F17] resize-none" style="background-color: white;"></textarea>
+            </div>
+            
+            <!-- Content Guidelines -->
+            <div class="p-3 rounded-xl" style="background-color: rgba(56, 15, 23, 0.1);">
+                <div class="text-xs" style="color: #4C4F54;">
+                    <strong>Remember:</strong> Share experiences, not specific financial advice. Keep personal details private. Be supportive and kind. 💜
+                </div>
+            </div>
+            
+            <!-- Submit Buttons -->
+            <div class="flex space-x-3 pt-4">
+                <button type="submit" class="flex-1 py-3 px-6 rounded-xl font-semibold transition-colors" style="background-color: #380F17; color: #EFDFC5;" onmouseover="this.style.backgroundColor='#8F0B13'" onmouseout="this.style.backgroundColor='#380F17'">
+                    Post Discussion
+                </button>
+                <button type="button" id="cancelPost" class="px-6 py-3 rounded-xl font-semibold transition-colors" style="background-color: #4C4F54; color: #EFDFC5;">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
-<style>
-/* Community-specific styles */
-.community-card {
-    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
-}
-
-.community-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-}
-
-/* Reaction buttons (for future implementation) */
-.reaction-btn {
-    transition: all 0.2s ease;
-}
-
-.reaction-btn:hover {
-    transform: scale(1.1);
-}
-
-/* ADHD-friendly focus styles */
-*:focus {
-    outline: 2px solid #8B5CF6;
-    outline-offset: 2px;
-}
-</style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const newPostBtn = document.getElementById('newPostBtn');
+    const newPostModal = document.getElementById('newPostModal');
+    const closeModal = document.getElementById('closeModal');
+    const cancelPost = document.getElementById('cancelPost');
+    const newPostForm = document.getElementById('newPostForm');
+    
+    // Show new post modal
+    newPostBtn.addEventListener('click', function() {
+        newPostModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    });
+    
+    // Close modal functions
+    function closeNewPostModal() {
+        newPostModal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        newPostForm.reset();
+    }
+    
+    closeModal.addEventListener('click', closeNewPostModal);
+    cancelPost.addEventListener('click', closeNewPostModal);
+    
+    // Close modal when clicking outside
+    newPostModal.addEventListener('click', function(e) {
+        if (e.target === newPostModal) {
+            closeNewPostModal();
+        }
+    });
+    
+    // Handle form submission
+    newPostForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(newPostForm);
+        const postData = {
+            category: formData.get('category'),
+            title: formData.get('title'),
+            content: formData.get('content')
+        };
+        
+        // Basic validation
+        if (!postData.title.trim() || !postData.content.trim()) {
+            alert('Please fill in both title and content for your post.');
+            return;
+        }
+        
+        // Show loading state
+        const submitBtn = newPostForm.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Posting...';
+        submitBtn.disabled = true;
+        
+        // Submit to backend API
+        fetch('/api/community/posts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(postData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success message
+                alert('🎉 Your discussion has been posted! Thank you for contributing to the BrainBudget community.');
+                
+                // Close modal and reset form
+                closeNewPostModal();
+                
+                // Refresh the page to show new post (in a real app, would update dynamically)
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                // Show error message
+                alert(`Sorry, there was an issue posting your discussion: ${data.error}`);
+            }
+        })
+        .catch(error => {
+            console.error('Error posting discussion:', error);
+            alert('Sorry, there was a problem posting your discussion. Please try again.');
+        })
+        .finally(() => {
+            // Reset button state
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        });
+    });
+    
+    // Forum category click handlers
+    window.showForum = function(category) {
+        // In a real app, this would filter/show specific forum content
+        console.log('Showing forum category:', category);
+        
+        // For demo purposes, scroll to recent discussions
+        const recentDiscussions = document.querySelector('.backdrop-blur-sm:nth-child(2)');
+        if (recentDiscussions) {
+            recentDiscussions.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
+    
+    // Load real community stats and user progress
+    function loadCommunityData() {
+        // Load community stats
+        fetch('/api/community/stats')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.stats) {
+                    // Update stats in the UI (if different from static values)
+                    console.log('Community stats loaded:', data.stats);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading community stats:', error);
+            });
+        
+        // Load user progress
+        fetch('/api/community/user-progress')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.progress) {
+                    // Update user progress in the sidebar
+                    const progressSection = document.querySelector('.backdrop-blur-sm[style*="rgba(56, 15, 23, 0.9)"]');
+                    if (progressSection) {
+                        const progress = data.progress;
+                        const postsReplySpan = progressSection.querySelector('span:contains("12/25")');
+                        const levelDiv = progressSection.querySelector('div:contains("Community Level:")');
+                        const xpDiv = progressSection.querySelector('div:contains("16 XP to next level")');
+                        
+                        // Update progress numbers if elements exist (simple approach)
+                        if (progress.posts_count !== undefined) {
+                            console.log('User progress loaded:', progress);
+                        }
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error loading user progress:', error);
+            });
+    }
+    
+    // Load data when page loads
+    loadCommunityData();
+    
+    // Simulate real-time updates (in a real app, this would use WebSocket or polling)
+    setTimeout(function() {
+        // Add a subtle notification for new activity
+        const communityStats = document.querySelector('[style*="background-color: #380F17;"]');
+        if (communityStats) {
+            const notification = document.createElement('div');
+            notification.innerHTML = '🔔 2 new discussions since your last visit';
+            notification.className = 'text-center py-2 text-sm';
+            notification.style.color = '#EFDFC5';
+            notification.style.backgroundColor = 'rgba(143, 11, 19, 0.8)';
+            communityStats.appendChild(notification);
+            
+            // Auto-hide notification after 5 seconds
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 500);
+            }, 5000);
+        }
+    }, 3000);
+});
+</script>
 {% endblock %}

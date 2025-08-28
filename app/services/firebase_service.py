@@ -9,7 +9,7 @@ import json
 
 import firebase_admin
 from firebase_admin import credentials, firestore, storage, auth
-from google.cloud.firestore import Client as FirestoreClien
+from google.cloud.firestore import Client as FirestoreClient
 from google.cloud.storage import Bucket
 
 

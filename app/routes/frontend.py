@@ -24,13 +24,28 @@ def require_auth():
 # LANDING PAGE (Public - No Auth Required)
 # ============================================================================
 @frontend_bp.route('/')
-def index():
+def landing_page():
     """Serve the BrainBudget landing page - entry point for all users."""
     try:
-        return render_template('index.html')
+        logger.info("Landing page route called - serving landing.html template")
+        return render_template('landing.html')
     except Exception as e:
         logger.error(f"Error serving landing page: {e}")
         return render_template('error.html', message="Unable to load the landing page"), 500
+
+@frontend_bp.route('/home')
+def home_page():
+    """Serve the main homepage after authentication."""
+    try:
+        # Check authentication
+        auth_check = require_auth()
+        if auth_check:
+            return auth_check
+            
+        return render_template('home.html')
+    except Exception as e:
+        logger.error(f"Error serving home page: {e}")
+        return render_template('error.html', message="Unable to load the home page"), 500
 
 
 # ============================================================================

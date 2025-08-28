@@ -113,6 +113,7 @@ def register_blueprints(app):
     from app.routes.ml_analytics import ml_analytics_bp
     from app.routes.advice_engine import advice_engine_bp
     from app.routes.guest import guest_bp
+    from app.routes.community import community_bp
 
     # Register API blueprints
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
@@ -127,6 +128,7 @@ def register_blueprints(app):
     app.register_blueprint(ml_analytics_bp)  # Already has /api/analytics prefix
     app.register_blueprint(advice_engine_bp)  # Already has /api/advice prefix
     app.register_blueprint(guest_bp)  # Already has /api/guest prefix
+    app.register_blueprint(community_bp)  # Already has /api/community prefix
 
     # Register frontend blueprint (no prefix for main routes)
     app.register_blueprint(frontend_bp)

@@ -20,7 +20,7 @@ if __name__ == '__main__':
     # Set up argument parser
     parser = argparse.ArgumentParser(description='Run the BrainBudget Flask application.')
     parser.add_argument('--port', type=int, default=os.environ.get('PORT', 5000), help='Port to run the application on.')
-    parser.add_argument('--host', type=str, default=os.environ.get('HOST', '127.0.0.1'), help='Host to bind to.')
+    parser.add_argument('--host', type=str, default=os.environ.get('HOST', '0.0.0.0'), help='Host to bind to.')
     args = parser.parse_args()
 
     # Get configuration from environment
@@ -48,6 +48,15 @@ if __name__ == '__main__':
     Host: {args.host}
     Port: {args.port}
     Debug: {debug_mode}
+    
+    🌐 Access your app at:
+    📍 http://localhost:{args.port}
+    📍 http://127.0.0.1:{args.port}
+    
+    📄 Pages available:
+    🏠 Homepage: http://localhost:{args.port}/
+    🤝 Community: http://localhost:{args.port}/community
+    📊 Dashboard: http://localhost:{args.port}/dashboard
     
     Ready to make budgeting fun and ADHD-friendly! 🎉
     """)
