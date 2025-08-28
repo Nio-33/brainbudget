@@ -81,6 +81,39 @@ def signup_page():
         return render_template('error.html', message="Unable to load the signup page"), 500
 
 
+@frontend_bp.route('/auth/forgot-password')
+def forgot_password_page():
+    """Serve the forgot password page."""
+    try:
+        return render_template('auth/forgot_password.html')
+    except Exception as e:
+        logger.error(f"Error serving forgot password page: {e}")
+        return render_template('error.html', message="Unable to load the forgot password page"), 500
+
+
+# ============================================================================
+# LEGAL PAGES (Public - No Auth Required)
+# ============================================================================
+@frontend_bp.route('/terms')
+def terms_page():
+    """Serve the terms of service page."""
+    try:
+        return render_template('legal/terms.html')
+    except Exception as e:
+        logger.error(f"Error serving terms page: {e}")
+        return render_template('error.html', message="Unable to load the terms of service page"), 500
+
+
+@frontend_bp.route('/privacy')
+def privacy_page():
+    """Serve the privacy policy page."""
+    try:
+        return render_template('legal/privacy.html')
+    except Exception as e:
+        logger.error(f"Error serving privacy page: {e}")
+        return render_template('error.html', message="Unable to load the privacy policy page"), 500
+
+
 # ============================================================================
 # MAIN APP PAGES (Protected - Auth Required)
 # ============================================================================

@@ -1,23 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Privacy Policy - BrainBudget</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background-color: #EFDFC5; font-family: 'Inter', system-ui, sans-serif; }
-        .animate-fadeIn { animation: fadeIn 0.8s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
-</head>
-<body class="min-h-screen">
+{% extends "base.html" %}
+
+{% block title %}Privacy Policy - BrainBudget{% endblock %}
+
+{% block content %}
     <!-- Header -->
     <header class="py-6 animate-fadeIn">
         <div class="max-w-4xl mx-auto px-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold cursor-pointer hover:opacity-80 transition-opacity" style="color: #380F17;" onclick="window.location.href='brainbudget_standalone_final.html'">
+            <a href="/" class="text-2xl font-bold hover:opacity-80 transition-opacity" style="color: #380F17;">
                 BrainBudget
-            </h1>
+            </a>
             <button onclick="window.history.back()" class="text-sm font-medium hover:opacity-80 transition-colors" style="color: #252B2B;">
                 ← Back
             </button>
@@ -169,5 +160,21 @@
             </div>
         </div>
     </main>
-</body>
-</html>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Add fade-in animation styles
+    const style = document.createElement('style');
+    style.textContent = `
+        .animate-fadeIn { 
+            animation: fadeIn 0.8s ease-out forwards; 
+        }
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(20px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+{% endblock %}

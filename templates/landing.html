@@ -3,270 +3,181 @@
 {% block title %}BrainBudget - ADHD-Friendly Financial Management{% endblock %}
 
 {% block content %}
-<!-- Landing Page -->
-<div class="min-h-screen relative overflow-hidden" style="background-color: #EFDFC5;">
-    <!-- Header Navigation -->
-    <div class="absolute top-4 left-4 right-4 z-10">
-        <div class="flex justify-between items-center">
-            <div class="flex items-center space-x-2">
-                <span class="text-3xl">🧠</span>
-                <span class="text-xl font-bold" style="color: #380F17;">BrainBudget</span>
-            </div>
+    <!-- Header -->
+    <header class="absolute top-4 left-4 right-4 z-10 animate-fadeIn">
+        <div class="flex justify-end items-center">
             <div class="flex items-center space-x-4">
-                <a href="/auth/login" class="text-sm hover:opacity-80 transition-colors" style="color: #252B2B;">
-                    Sign In
-                </a>
-                <a href="/auth/register" class="backdrop-blur-sm px-4 py-2 rounded-full hover:opacity-80 transition-colors border text-sm" style="background-color: #380F17; color: #EFDFC5; border-color: #380F17;">
+                <a href="/auth/register" class="px-4 py-2 rounded-full text-sm font-medium text-white brain-gradient hover:shadow-lg transition-all">
                     Get Started
                 </a>
             </div>
         </div>
-    </div>
+    </header>
 
-    <!-- Hero Section -->
-    <div class="flex flex-col items-center justify-center min-h-screen px-4 pt-20">
-        <!-- Main Hero Content -->
-        <div class="text-center mb-12 max-w-4xl">
-            <div class="mb-8">
-                <span class="text-8xl">🧠💰</span>
-            </div>
-            <h1 class="text-6xl md:text-7xl font-bold mb-6" style="color: #380F17;">
-                BrainBudget
-            </h1>
-            <p class="text-xl md:text-2xl mb-8 leading-relaxed" style="color: #252B2B;">
-                The first budgeting app designed specifically for ADHD brains
-            </p>
-            <p class="text-lg max-w-2xl mx-auto leading-relaxed mb-12" style="color: #4C4F54;">
-                Transform your financial chaos into clarity with AI-powered insights, gentle guidance, and neurodivergent-friendly design that actually works with your brain.
-            </p>
-            
-            <!-- Main CTA Button -->
-            <a href="/auth/register" class="inline-block backdrop-blur-sm px-12 py-4 rounded-full font-bold text-xl hover:shadow-xl transition-all duration-300" style="background-color: #380F17; color: #EFDFC5;" onmouseover="this.style.backgroundColor='#8F0B13'" onmouseout="this.style.backgroundColor='#380F17'">
-                🚀 Get Started Free
-            </a>
-            
-            <div class="mt-4">
-                <p class="text-sm" style="color: #4C4F54;">No credit card required • ADHD-friendly onboarding</p>
-            </div>
-        </div>
-
-        <!-- Feature Preview Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl w-full">
-            <!-- Card 1: AI Analysis -->
-            <div class="backdrop-blur-sm rounded-3xl p-6 text-center hover:shadow-lg transition-all duration-300" style="background-color: rgba(255, 255, 255, 0.7); border: 1px solid rgba(56, 15, 23, 0.2);">
-                <div class="text-4xl mb-4">🤖</div>
-                <h3 class="text-lg font-semibold mb-2" style="color: #380F17;">AI-Powered Analysis</h3>
-                <p class="text-sm" style="color: #4C4F54;">Upload your bank statement and get instant, non-judgmental insights about your spending patterns.</p>
-            </div>
-
-            <!-- Card 2: ADHD-Friendly -->
-            <div class="backdrop-blur-sm rounded-3xl p-6 text-center hover:shadow-lg transition-all duration-300" style="background-color: rgba(255, 255, 255, 0.7); border: 1px solid rgba(56, 15, 23, 0.2);">
-                <div class="text-4xl mb-4">🧠</div>
-                <h3 class="text-lg font-semibold mb-2" style="color: #380F17;">Built for ADHD</h3>
-                <p class="text-sm" style="color: #4C4F54;">Every feature designed with executive function challenges in mind. No overwhelming spreadsheets.</p>
-            </div>
-
-            <!-- Card 3: Community -->
-            <div class="backdrop-blur-sm rounded-3xl p-6 text-center hover:shadow-lg transition-all duration-300" style="background-color: rgba(255, 255, 255, 0.7); border: 1px solid rgba(56, 15, 23, 0.2);">
-                <div class="text-4xl mb-4">🤝</div>
-                <h3 class="text-lg font-semibold mb-2" style="color: #380F17;">Supportive Community</h3>
-                <p class="text-sm" style="color: #4C4F54;">Connect with other ADHD individuals on similar financial journeys. Share wins, get support.</p>
-            </div>
-        </div>
-
-        <!-- Scroll Down Arrow -->
-        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2">
-            <div class="animate-bounce">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #380F17;">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-                </svg>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Problems Section -->
-<div class="min-h-screen relative overflow-hidden" style="background-color: #380F17;">
-    <div class="flex flex-col items-center justify-center min-h-screen px-4 py-20">
-        <div class="max-w-6xl w-full">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl md:text-5xl font-bold mb-6" style="color: #EFDFC5;">
-                    Why Traditional Budgeting Apps Fail ADHD Brains
-                </h2>
-                <p class="text-xl max-w-3xl mx-auto leading-relaxed" style="color: rgba(239, 223, 197, 0.8);">
-                    Most financial apps are built for neurotypical brains. We're different.
+    <!-- Main Content -->
+    <main class="flex items-center justify-center min-h-screen px-4 pt-20">
+        <div class="text-center max-w-4xl mx-auto">
+            <!-- Hero Section -->
+            <div class="mb-16 animate-slideUp">
+                <h1 class="text-5xl md:text-7xl font-bold mb-6" style="color: #380F17;">
+                    BrainBudget
+                </h1>
+                <p class="text-xl md:text-2xl mb-8 leading-relaxed" style="color: #252B2B;">
+                    The first budgeting app designed specifically for ADHD brains
                 </p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-                <!-- Problem 1 -->
-                <div class="backdrop-blur-sm rounded-3xl p-8" style="background-color: rgba(143, 11, 19, 0.3);">
-                    <div class="text-5xl mb-4">😵</div>
-                    <h3 class="text-2xl font-bold mb-4" style="color: #EFDFC5;">Overwhelming Complexity</h3>
-                    <p class="leading-relaxed" style="color: rgba(239, 223, 197, 0.8);">
-                        Traditional apps bombard you with charts, categories, and endless settings. Your ADHD brain just shuts down.
-                    </p>
-                </div>
-
-                <!-- Problem 2 -->
-                <div class="backdrop-blur-sm rounded-3xl p-8" style="background-color: rgba(143, 11, 19, 0.3);">
-                    <div class="text-5xl mb-4">😰</div>
-                    <h3 class="text-2xl font-bold mb-4" style="color: #EFDFC5;">Guilt & Shame</h3>
-                    <p class="leading-relaxed" style="color: rgba(239, 223, 197, 0.8);">
-                        "You overspent AGAIN." These apps make you feel worse about money mistakes instead of helping you improve.
-                    </p>
-                </div>
-
-                <!-- Problem 3 -->
-                <div class="backdrop-blur-sm rounded-3xl p-8" style="background-color: rgba(143, 11, 19, 0.3);">
-                    <div class="text-5xl mb-4">📊</div>
-                    <h3 class="text-2xl font-bold mb-4" style="color: #EFDFC5;">Spreadsheet Hell</h3>
-                    <p class="leading-relaxed" style="color: rgba(239, 223, 197, 0.8);">
-                        Manual data entry, complex formulas, and maintenance tasks that feel impossible with executive dysfunction.
-                    </p>
-                </div>
-
-                <!-- Problem 4 -->
-                <div class="backdrop-blur-sm rounded-3xl p-8" style="background-color: rgba(143, 11, 19, 0.3);">
-                    <div class="text-5xl mb-4">🤖</div>
-                    <h3 class="text-2xl font-bold mb-4" style="color: #EFDFC5;">One-Size-Fits-All</h3>
-                    <p class="leading-relaxed" style="color: rgba(239, 223, 197, 0.8);">
-                        Generic advice that doesn't understand impulse spending, hyperfocus purchases, or ADHD money patterns.
-                    </p>
-                </div>
-            </div>
-
-            <!-- CTA -->
-            <div class="text-center">
-                <p class="text-xl mb-8" style="color: #EFDFC5;">There has to be a better way... and there is.</p>
-                <a href="/auth/register" class="inline-block backdrop-blur-sm px-10 py-4 rounded-full font-bold text-lg hover:shadow-xl transition-all duration-300" style="background-color: #EFDFC5; color: #380F17;" onmouseover="this.style.backgroundColor='rgba(239, 223, 197, 0.9)'" onmouseout="this.style.backgroundColor='#EFDFC5'">
-                    🧠 Try the ADHD-Friendly Way
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Solution Section -->
-<div class="min-h-screen relative overflow-hidden" style="background-color: #EFDFC5;">
-    <div class="flex flex-col items-center justify-center min-h-screen px-4 py-20">
-        <div class="max-w-6xl w-full">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl md:text-5xl font-bold mb-6" style="color: #380F17;">
-                    How BrainBudget Works With Your ADHD Brain
-                </h2>
-                <p class="text-xl max-w-3xl mx-auto leading-relaxed" style="color: #252B2B;">
-                    Finally, a financial app that understands how your mind actually works.
+                <p class="text-lg max-w-2xl mx-auto leading-relaxed mb-12" style="color: #4C4F54;">
+                    Transform your financial chaos into clarity with AI-powered insights, gentle guidance, 
+                    and neurodivergent-friendly design that actually works with your brain.
                 </p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-                <!-- Solution 1 -->
-                <div class="backdrop-blur-sm rounded-3xl p-8 text-center hover:shadow-lg transition-all duration-300" style="background-color: rgba(255, 255, 255, 0.8);">
-                    <div class="text-5xl mb-4">📤</div>
-                    <h3 class="text-xl font-bold mb-4" style="color: #380F17;">Simple Upload</h3>
-                    <p class="leading-relaxed" style="color: #4C4F54;">
-                        Just drag and drop your bank statement. No manual data entry, no complicated setup.
-                    </p>
-                </div>
-
-                <!-- Solution 2 -->
-                <div class="backdrop-blur-sm rounded-3xl p-8 text-center hover:shadow-lg transition-all duration-300" style="background-color: rgba(255, 255, 255, 0.8);">
-                    <div class="text-5xl mb-4">🤗</div>
-                    <h3 class="text-xl font-bold mb-4" style="color: #380F17;">Gentle Guidance</h3>
-                    <p class="leading-relaxed" style="color: #4C4F54;">
-                        AI analysis that's encouraging, not judgmental. Celebrates progress, not perfection.
-                    </p>
-                </div>
-
-                <!-- Solution 3 -->
-                <div class="backdrop-blur-sm rounded-3xl p-8 text-center hover:shadow-lg transition-all duration-300" style="background-color: rgba(255, 255, 255, 0.8);">
-                    <div class="text-5xl mb-4">🎯</div>
-                    <h3 class="text-xl font-bold mb-4" style="color: #380F17;">ADHD-Smart Features</h3>
-                    <p class="leading-relaxed" style="color: #4C4F54;">
-                        Visual progress, gamification, and bite-sized insights that work with your dopamine system.
-                    </p>
-                </div>
-
-                <!-- Solution 4 -->
-                <div class="backdrop-blur-sm rounded-3xl p-8 text-center hover:shadow-lg transition-all duration-300" style="background-color: rgba(255, 255, 255, 0.8);">
-                    <div class="text-5xl mb-4">💡</div>
-                    <h3 class="text-xl font-bold mb-4" style="color: #380F17;">Personalized Insights</h3>
-                    <p class="leading-relaxed" style="color: #4C4F54;">
-                        Spending patterns analyzed through an ADHD lens. Understand your unique money behaviors.
-                    </p>
-                </div>
-
-                <!-- Solution 5 -->
-                <div class="backdrop-blur-sm rounded-3xl p-8 text-center hover:shadow-lg transition-all duration-300" style="background-color: rgba(255, 255, 255, 0.8);">
-                    <div class="text-5xl mb-4">🤝</div>
-                    <h3 class="text-xl font-bold mb-4" style="color: #380F17;">Community Support</h3>
-                    <p class="leading-relaxed" style="color: #4C4F54;">
-                        Connect with others who get it. Share wins, get accountability, celebrate progress together.
-                    </p>
-                </div>
-
-                <!-- Solution 6 -->
-                <div class="backdrop-blur-sm rounded-3xl p-8 text-center hover:shadow-lg transition-all duration-300" style="background-color: rgba(255, 255, 255, 0.8);">
-                    <div class="text-5xl mb-4">⚡</div>
-                    <h3 class="text-xl font-bold mb-4" style="color: #380F17;">Executive Function Friendly</h3>
-                    <p class="leading-relaxed" style="color: #4C4F54;">
-                        Minimal cognitive load, clear next steps, and automated insights that work even on tough brain days.
-                    </p>
-                </div>
-            </div>
-
-            <!-- Final CTA -->
-            <div class="text-center">
-                <h3 class="text-2xl font-bold mb-6" style="color: #380F17;">
-                    Ready to make budgeting work with your brain, not against it?
-                </h3>
-                <a href="/auth/register" class="inline-block backdrop-blur-sm px-12 py-4 rounded-full font-bold text-xl hover:shadow-xl transition-all duration-300 mb-4" style="background-color: #380F17; color: #EFDFC5;" onmouseover="this.style.backgroundColor='#8F0B13'" onmouseout="this.style.backgroundColor='#380F17'">
-                    🚀 Start Your ADHD-Friendly Budget
+                
+                <a href="/auth/register" class="px-12 py-4 rounded-full font-bold text-xl text-white brain-gradient hover:shadow-xl transition-all duration-300 mb-4">
+                    🚀 Get Started Free
                 </a>
+                
                 <div class="mt-4">
-                    <p class="text-sm" style="color: #4C4F54;">
-                        Join thousands of ADHD individuals who've transformed their relationship with money
-                    </p>
+                    <p class="text-sm" style="color: #4C4F54;">No credit card required • ADHD-friendly onboarding</p>
+                </div>
+            </div>
+            
+            <!-- 6-Card Features Grid -->
+            <div class="mt-16">
+                <h2 class="text-3xl font-bold text-center mb-12" style="color: #380F17;">
+                    🎯 Why BrainBudget Works for ADHD Minds
+                </h2>
+                
+                <!-- Features Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                    <!-- Card 1: 5+ Advice Categories -->
+                    <div class="bg-white bg-opacity-80 rounded-3xl p-8 text-center card-hover animate-slideUp" style="animation-delay: 1s;">
+                        <h3 class="text-4xl font-bold mb-4" style="color: #380F17;">5+</h3>
+                        <h4 class="text-xl font-semibold mb-4" style="color: #380F17;">Advice Categories</h4>
+                        <p class="leading-relaxed text-sm" style="color: #4C4F54;">
+                            Budgeting, debt, savings, investment, emergency fund
+                        </p>
+                    </div>
+
+                    <!-- Card 2: AI Powered Insights -->
+                    <div class="bg-white bg-opacity-80 rounded-3xl p-8 text-center card-hover animate-slideUp" style="animation-delay: 1.2s;">
+                        <h3 class="text-4xl font-bold mb-4" style="color: #380F17;">AI</h3>
+                        <h4 class="text-xl font-semibold mb-4" style="color: #380F17;">Powered Insights</h4>
+                        <p class="leading-relaxed text-sm" style="color: #4C4F54;">
+                            Machine learning that understands ADHD patterns
+                        </p>
+                    </div>
+
+                    <!-- Card 3: 100% ADHD-Friendly -->
+                    <div class="bg-white bg-opacity-80 rounded-3xl p-8 text-center card-hover animate-slideUp" style="animation-delay: 1.4s;">
+                        <h3 class="text-4xl font-bold mb-4" style="color: #380F17;">100%</h3>
+                        <h4 class="text-xl font-semibold mb-4" style="color: #380F17;">ADHD-Friendly</h4>
+                        <p class="leading-relaxed text-sm" style="color: #4C4F54;">
+                            Every interaction designed for neurodivergent minds
+                        </p>
+                    </div>
+
+                    <!-- Card 4: Tailored Financial Advice -->
+                    <div class="bg-white bg-opacity-80 rounded-3xl p-8 text-center card-hover animate-slideUp" style="animation-delay: 1.6s;">
+                        <div class="text-4xl mb-4">💡</div>
+                        <h4 class="text-xl font-semibold mb-4" style="color: #380F17;">Tailored Financial Advice</h4>
+                        <p class="leading-relaxed text-sm" style="color: #4C4F54;">
+                            Personalized strategies for budgeting, debt reduction, and savings that work with ADHD brains.
+                        </p>
+                    </div>
+
+                    <!-- Card 5: Flexible Goal Setting -->
+                    <div class="bg-white bg-opacity-80 rounded-3xl p-8 text-center card-hover animate-slideUp" style="animation-delay: 1.8s;">
+                        <div class="text-4xl mb-4">🎯</div>
+                        <h4 class="text-xl font-semibold mb-4" style="color: #380F17;">Flexible Goal Setting</h4>
+                        <p class="leading-relaxed text-sm" style="color: #4C4F54;">
+                            ADHD-friendly goals with built-in flexibility, progress celebration, and gentle accountability.
+                        </p>
+                    </div>
+
+                    <!-- Card 6: Clean Dashboard -->
+                    <div class="bg-white bg-opacity-80 rounded-3xl p-8 text-center card-hover animate-slideUp" style="animation-delay: 2s;">
+                        <div class="text-4xl mb-4">📊</div>
+                        <h4 class="text-xl font-semibold mb-4" style="color: #380F17;">Clean Dashboard</h4>
+                        <p class="leading-relaxed text-sm" style="color: #4C4F54;">
+                            Uncluttered overview of your finances with visual progress indicators and celebration of wins.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Additional Features Section -->
+            <div class="mt-24 w-full max-w-6xl mx-auto px-4">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
+                    
+                    <!-- Feature 1: Executive Function Support -->
+                    <div class="flex flex-col items-center animate-slideUp" style="animation-delay: 2.2s;">
+                        <div class="rounded-full p-4 mb-4" style="background-color: #8F0B13;">
+                            <span class="text-white text-2xl">💪</span>
+                        </div>
+                        <h4 class="font-semibold mb-3 text-lg" style="color: #380F17;">Executive Function Support</h4>
+                        <p class="text-sm leading-relaxed" style="color: #4C4F54;">
+                            Automation reduces cognitive fatigue: organize transactions quickly and save energy.
+                        </p>
+                    </div>
+
+                    <!-- Feature 2: Enhanced Recognition -->
+                    <div class="flex flex-col items-center animate-slideUp" style="animation-delay: 2.4s;">
+                        <div class="rounded-full p-4 mb-4" style="background-color: #252B2B;">
+                            <span class="text-white text-2xl">🧠</span>
+                        </div>
+                        <h4 class="font-semibold mb-3 text-lg" style="color: #380F17;">Enhanced Recognition</h4>
+                        <p class="text-sm leading-relaxed" style="color: #4C4F54;">
+                            Seeing wins accelerated your brain's progress toward your goals.
+                        </p>
+                    </div>
+
+                    <!-- Feature 3: Motivation & Dopamine -->
+                    <div class="flex flex-col items-center animate-slideUp" style="animation-delay: 2.6s;">
+                        <div class="rounded-full p-4 mb-4" style="background-color: #380F17;">
+                            <span class="text-white text-2xl">🚀</span>
+                        </div>
+                        <h4 class="font-semibold mb-3 text-lg" style="color: #380F17;">Motivation & Dopamine</h4>
+                        <p class="text-sm leading-relaxed" style="color: #4C4F54;">
+                            Quick wins + Achievements showcase Progress = instant. Neuroatypical self-station.
+                        </p>
+                    </div>
+
+                    <!-- Feature 4: Attention Management -->
+                    <div class="flex flex-col items-center animate-slideUp" style="animation-delay: 2.8s;">
+                        <div class="rounded-full p-4 mb-4" style="background-color: #4C4F54;">
+                            <span class="text-white text-2xl">⚡</span>
+                        </div>
+                        <h4 class="font-semibold mb-3 text-lg" style="color: #380F17;">Attention Management</h4>
+                        <p class="text-sm leading-relaxed" style="color: #4C4F54;">
+                            One-time information. Noise-proofed distraction. What to you based on expert team.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
+    </main>
 
-<!-- Footer Section -->
-<div class="py-8" style="background-color: #4C4F54;">
-    <div class="max-w-6xl mx-auto px-4">
-        <div class="text-center">
-            <div class="flex items-center justify-center space-x-2 mb-4">
-                <span class="text-2xl">🧠</span>
-                <span class="text-lg font-bold" style="color: #EFDFC5;">BrainBudget</span>
-            </div>
-            <p class="text-sm mb-4" style="color: rgba(239, 223, 197, 0.8);">
-                Making budgeting accessible for neurodivergent minds
-            </p>
-            <p class="text-xs" style="color: rgba(239, 223, 197, 0.6);">
-                Powered by <span style="color: #8F0B13;">Niostudio</span> • Built with 💜 for the ADHD community
+    <!-- Footer -->
+    <footer class="py-8 text-center animate-fadeIn" style="animation-delay: 1s;">
+        <div class="max-w-4xl mx-auto px-4">
+            <p class="text-sm" style="color: #4C4F54;">
+                BrainBudget - Making budgeting accessible | powered by <span class="font-semibold" style="color: #8F0B13;">Niostudio</span>
             </p>
         </div>
-    </div>
-</div>
+    </footer>
 {% endblock %}
 
 {% block scripts %}
 <script>
-// Smooth scrolling for arrow
-document.addEventListener('DOMContentLoaded', function() {
-    // Add smooth scrolling behavior
-    const arrow = document.querySelector('.animate-bounce');
-    if (arrow) {
-        arrow.addEventListener('click', function() {
-            window.scrollTo({
-                top: window.innerHeight,
-                behavior: 'smooth'
-            });
+    // Initialize animations
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add stagger effect to elements
+        const elements = document.querySelectorAll('.animate-slideUp');
+        elements.forEach((el, index) => {
+            el.style.animationDelay = `${index * 0.2}s`;
+            el.style.opacity = '0';
+            setTimeout(() => {
+                el.style.opacity = '1';
+            }, index * 200);
         });
-    }
-});
+    });
 </script>
 {% endblock %}

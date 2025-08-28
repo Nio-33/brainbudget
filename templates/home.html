@@ -3,57 +3,44 @@
 {% block title %}BrainBudget - ADHD-Friendly Financial Management{% endblock %}
 
 {% block content %}
-<!-- Main Landing Page -->
-<div class="min-h-screen relative overflow-hidden" style="background-color: #EFDFC5;">
-    <!-- Top Navigation -->
-    <div class="absolute top-4 left-4 right-4 z-10">
-        <div class="flex justify-between items-center">
-            <div class="flex space-x-8" style="color: #252B2B;">
-                <a href="/community" class="flex items-center space-x-2 hover:opacity-80 transition-colors" style="color: #252B2B;">
-                    <span>😊</span>
-                    <span>Community</span>
-                </a>
-                <a href="/settings" class="flex items-center space-x-2 hover:opacity-80 transition-colors" style="color: #252B2B;">
-                    <span>⚙️</span>
-                    <span>Settings</span>
-                </a>
-                <a href="/notifications" class="flex items-center space-x-2 hover:opacity-80 transition-colors" style="color: #252B2B;">
-                    <span>🔔</span>
-                    <span>Notification</span>
-                </a>
-            </div>
-            <div class="flex items-center space-x-4">
-                <a href="/profile" class="flex items-center space-x-2 hover:opacity-80 transition-colors" style="color: #252B2B;">
-                    <span>👤</span>
-                    <span>Profile</span>
-                </a>
-                <a href="/auth/logout" class="backdrop-blur-sm px-6 py-2 rounded-full hover:opacity-80 transition-colors border" style="background-color: #8F0B13; color: #EFDFC5; border-color: #8F0B13;">
-                    Sign Out
-                </a>
+    <!-- Main Homepage -->
+    <div class="min-h-screen relative overflow-hidden">
+        <!-- Top Navigation -->
+        <div class="absolute top-4 left-4 right-4 z-10">
+            <div class="flex justify-between items-center">
+                <div class="flex space-x-8" style="color: #252B2B;">
+                    <a href="#community" onclick="showFeature('community')" class="flex items-center space-x-2 hover:opacity-80 transition-colors" style="color: #252B2B;">
+                        <span>😊</span>
+                        <span>Community</span>
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="#settings" onclick="showFeature('settings')" class="flex items-center space-x-2 hover:opacity-80 transition-colors" style="color: #252B2B;">
+                        <span>⚙️</span>
+                        <span>Settings</span>
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Main Content -->
-    <div class="flex flex-col items-center justify-center min-h-screen px-4 pt-20">
-        <!-- Brain Logo and Title -->
-        <div class="text-center mb-12">
-            <div class="mb-6">
-                <span class="text-6xl">🧠</span>
+        <!-- Main Content -->
+        <div class="flex flex-col items-center justify-center min-h-screen px-4 pt-20">
+            <!-- Brain Logo and Title -->
+            <div class="text-center mb-12">
+                <div class="mb-6">
+                    <span class="text-6xl">🧠</span>
+                </div>
+                <h1 class="text-5xl md:text-6xl font-bold mb-4" style="color: #380F17;">
+                    BrainBudget
+                </h1>
+                <p class="text-lg max-w-lg mx-auto leading-relaxed" style="color: #252B2B;">
+                    Please go ahead and upload your bank statement, and we'll create an insightful analysis of your financial patterns.
+                </p>
             </div>
-            <h1 class="text-5xl md:text-6xl font-bold mb-4" style="color: #380F17;">
-                BrainBudget
-            </h1>
-            <p class="text-lg max-w-lg mx-auto leading-relaxed" style="color: #252B2B;">
-                Please go ahead and upload your bank statement, and we'll create an insightful analysis of your financial patterns.
-            </p>
-        </div>
 
-        <!-- Upload Area -->
-        <div class="w-full max-w-2xl mb-8">
-            <form id="uploadForm" action="/api/upload" method="post" enctype="multipart/form-data">
-                <input type="file" id="fileInput" name="file" accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
-                <div id="uploadArea" class="backdrop-blur-sm rounded-3xl p-12 border-2 border-dashed transition-colors cursor-pointer text-center" style="background-color: rgba(239, 223, 197, 0.9); border-color: #380F17; color: #252B2B;" onmouseover="this.style.borderColor='#8F0B13'" onmouseout="this.style.borderColor='#380F17'">
+            <!-- Upload Area -->
+            <div class="w-full max-w-2xl mb-8">
+                <div id="uploadArea" class="backdrop-blur-sm rounded-3xl p-12 border-2 border-dashed transition-colors cursor-pointer text-center card-hover" style="background-color: rgba(239, 223, 197, 0.9); border-color: #380F17; color: #252B2B;" onclick="uploadFile()">
                     <div class="mb-6">
                         <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #4C4F54;">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
@@ -65,326 +52,193 @@
                     <p class="mb-4" style="color: #4C4F54;">
                         We support PDF files and images (JPG, PNG). Max file size: 16MB
                     </p>
-                    <button type="button" onclick="document.getElementById('fileInput').click()" class="px-6 py-3 rounded-lg transition-colors text-white" style="background-color: #380F17;" onmouseover="this.style.backgroundColor='#8F0B13'" onmouseout="this.style.backgroundColor='#380F17'">
+                    <button class="px-6 py-3 rounded-lg transition-colors text-white brain-gradient hover:shadow-lg">
                         Choose File
                     </button>
                 </div>
-            </form>
-        </div>
-
-        <!-- Analyze Button -->
-        <button id="analyzeBtn" class="backdrop-blur-sm px-8 py-4 rounded-full font-semibold transition-colors border mb-16 opacity-50 cursor-not-allowed" style="background-color: rgba(56, 15, 23, 0.2); color: #380F17; border-color: rgba(56, 15, 23, 0.3);" disabled>
-            🧠 Analyze My Spending
-        </button>
-
-        <!-- Bottom Arrow -->
-        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2">
-            <div class="animate-bounce">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #252B2B;">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-                </svg>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Quick Links Section -->
-<div class="min-h-screen relative overflow-hidden" style="background-color: #EFDFC5;">
-    <div class="flex flex-col items-center justify-center min-h-screen px-4 py-20">
-        <!-- Section Title -->
-        <h2 class="text-3xl md:text-4xl font-light text-center mb-16" style="color: #380F17;">
-            Quick links
-        </h2>
-
-        <!-- Quick Links Grid -->
-        <div class="w-full max-w-5xl relative min-h-[700px]">
-            <!-- Dashboard - Top Right -->
-            <div class="absolute top-0 right-0">
-                <a href="/dashboard" class="group inline-flex items-center justify-center backdrop-blur-sm px-12 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-[380px]" style="background-color: #380F17; color: #EFDFC5;" onmouseover="this.style.backgroundColor='rgba(56, 15, 23, 0.8)'" onmouseout="this.style.backgroundColor='#380F17'">
-                    <span class="font-medium text-lg">Dashboard</span>
-                </a>
             </div>
 
-            <!-- Insights - Left Side -->
-            <div class="absolute top-20 left-0">
-                <a href="/insights" class="group inline-flex items-center justify-center backdrop-blur-sm px-12 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-[380px]" style="background-color: #380F17; color: #EFDFC5;" onmouseover="this.style.backgroundColor='rgba(56, 15, 23, 0.8)'" onmouseout="this.style.backgroundColor='#380F17'">
-                    <span class="font-medium text-lg">Insights</span>
-                </a>
-            </div>
+            <!-- Analyze Button -->
+            <button id="analyzeBtn" onclick="analyzeSpending()" class="backdrop-blur-sm px-8 py-4 rounded-full font-semibold transition-colors border mb-16 brain-gradient text-white hover:shadow-lg">
+                🧠 Analyze My Spending
+            </button>
 
-            <!-- Goals - Middle Right -->
-            <div class="absolute top-40 right-32">
-                <a href="/goals" class="group inline-flex items-center justify-center backdrop-blur-sm px-12 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-[380px]" style="background-color: #380F17; color: #EFDFC5;" onmouseover="this.style.backgroundColor='rgba(56, 15, 23, 0.8)'" onmouseout="this.style.backgroundColor='#380F17'">
-                    <span class="font-medium text-lg">Goals</span>
-                </a>
-            </div>
-
-            <!-- AI Coach - Left Side -->
-            <div class="absolute top-[300px] left-0">
-                <a href="/ai_coach" class="group inline-flex items-center justify-center backdrop-blur-sm px-12 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-[380px]" style="background-color: #380F17; color: #EFDFC5;" onmouseover="this.style.backgroundColor='rgba(56, 15, 23, 0.8)'" onmouseout="this.style.backgroundColor='#380F17'">
-                    <span class="font-medium text-lg">AI Coach</span>
-                </a>
-            </div>
-
-            <!-- Advice - Right Side -->
-            <div class="absolute top-[400px] right-0">
-                <a href="/advice" class="group inline-flex items-center justify-center backdrop-blur-sm px-12 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-[380px]" style="background-color: #380F17; color: #EFDFC5;" onmouseover="this.style.backgroundColor='rgba(56, 15, 23, 0.8)'" onmouseout="this.style.backgroundColor='#380F17'">
-                    <span class="font-medium text-lg">Advice</span>
-                </a>
-            </div>
-
-            <!-- Get Started - Bottom Center (Full Width) -->
-            <div class="absolute top-[550px] left-1/2 transform -translate-x-1/2">
-                <a href="/upload" class="group inline-flex items-center justify-center backdrop-blur-sm px-16 py-5 rounded-full hover:shadow-xl transition-all duration-300 w-[520px]" style="background-color: #380F17; color: #EFDFC5;" onmouseover="this.style.backgroundColor='rgba(56, 15, 23, 0.8)'" onmouseout="this.style.backgroundColor='#380F17'">
-                    <span class="font-medium text-xl">Get Started</span>
-                </a>
-            </div>
-        </div>
-
-        <!-- Mobile Layout (Stacked for smaller screens) -->
-        <div class="md:hidden w-full max-w-sm space-y-4 mt-8">
-            <a href="/dashboard" class="group flex items-center justify-center backdrop-blur-sm px-6 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-full" style="background-color: #380F17; color: #EFDFC5;">
-                <span class="font-medium">Dashboard</span>
-            </a>
-            <a href="/insights" class="group flex items-center justify-center backdrop-blur-sm px-6 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-full" style="background-color: #380F17; color: #EFDFC5;">
-                <span class="font-medium">Insights</span>
-            </a>
-            <a href="/goals" class="group flex items-center justify-center backdrop-blur-sm px-6 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-full" style="background-color: #380F17; color: #EFDFC5;">
-                <span class="font-medium">Goals</span>
-            </a>
-            <a href="/ai_coach" class="group flex items-center justify-center backdrop-blur-sm px-6 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-full" style="background-color: #380F17; color: #EFDFC5;">
-                <span class="font-medium">AI Coach</span>
-            </a>
-            <a href="/advice" class="group flex items-center justify-center backdrop-blur-sm px-6 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-full" style="background-color: #380F17; color: #EFDFC5;">
-                <span class="font-medium">Advice</span>
-            </a>
-            <a href="/upload" class="group flex items-center justify-center backdrop-blur-sm px-8 py-5 rounded-full hover:shadow-xl transition-all duration-300 w-full" style="background-color: #380F17; color: #EFDFC5;">
-                <span class="font-medium text-lg">Get Started</span>
-            </a>
-        </div>
-    </div>
-
-    <!-- Bottom Arrow -->
-    <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2">
-        <div class="animate-bounce">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #380F17;">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-            </svg>
-        </div>
-    </div>
-</div>
-
-<!-- Features Section -->
-<div class="min-h-screen relative overflow-hidden" style="background-color: #380F17;">
-    <div class="flex flex-col items-center justify-center min-h-screen px-4 py-20">
-        
-        <!-- Features Grid -->
-        <div class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-            
-            <!-- Card 1: 5+ Advice Categories -->
-            <div class="backdrop-blur-sm rounded-3xl p-8 text-center" style="background-color: rgba(239, 223, 197, 0.9); color: #252B2B;">
-                <h3 class="text-4xl font-bold mb-4">5+</h3>
-                <h4 class="text-xl font-semibold mb-4">Advice Categories</h4>
-                <p class="leading-relaxed" style="color: #4C4F54;">
-                    Budgeting, debt, savings, investment, emergency fund
-                </p>
-            </div>
-
-            <!-- Card 2: AI Powered Insights -->
-            <div class="backdrop-blur-sm rounded-3xl p-8 text-center" style="background-color: rgba(239, 223, 197, 0.9); color: #252B2B;">
-                <h3 class="text-4xl font-bold mb-4">AI</h3>
-                <h4 class="text-xl font-semibold mb-4">Powered Insights</h4>
-                <p class="leading-relaxed" style="color: #4C4F54;">
-                    Machine learning that understands ADHD patterns
-                </p>
-            </div>
-
-            <!-- Card 3: 100% ADHD-Friendly -->
-            <div class="backdrop-blur-sm rounded-3xl p-8 text-center" style="background-color: rgba(239, 223, 197, 0.9); color: #252B2B;">
-                <h3 class="text-4xl font-bold mb-4">100%</h3>
-                <h4 class="text-xl font-semibold mb-4">ADHD-Friendly</h4>
-                <p class="leading-relaxed" style="color: #4C4F54;">
-                    Every interaction designed for neurodivergent minds
-                </p>
-            </div>
-
-            <!-- Card 4: Tailored Financial Advice -->
-            <div class="backdrop-blur-sm rounded-3xl p-8 text-center" style="background-color: rgba(239, 223, 197, 0.9); color: #252B2B;">
-                <div class="text-4xl mb-4">💡</div>
-                <h4 class="text-xl font-semibold mb-4">Tailored Financial Advice</h4>
-                <p class="leading-relaxed" style="color: #4C4F54;">
-                    Personalized strategies for budgeting, debt reduction, and savings that work with ADHD brains.
-                </p>
-            </div>
-
-            <!-- Card 5: Flexible Goal Setting -->
-            <div class="backdrop-blur-sm rounded-3xl p-8 text-center" style="background-color: rgba(239, 223, 197, 0.9); color: #252B2B;">
-                <div class="text-4xl mb-4">🎯</div>
-                <h4 class="text-xl font-semibold mb-4">Flexible Goal Setting</h4>
-                <p class="leading-relaxed" style="color: #4C4F54;">
-                    ADHD-friendly goals with built-in flexibility, progress celebration, and gentle accountability.
-                </p>
-            </div>
-
-            <!-- Card 6: Clean Dashboard -->
-            <div class="backdrop-blur-sm rounded-3xl p-8 text-center" style="background-color: rgba(239, 223, 197, 0.9); color: #252B2B;">
-                <div class="text-4xl mb-4">📊</div>
-                <h4 class="text-xl font-semibold mb-4">Clean Dashboard</h4>
-                <p class="leading-relaxed" style="color: #4C4F54;">
-                    Uncluttered overview of your finances with visual progress indicators and celebration of wins.
-                </p>
-            </div>
-        </div>
-
-
-        <!-- Bottom Features Row -->
-        <div class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
-            
-            <!-- Feature 1 -->
-            <div class="flex flex-col items-center">
-                <div class="rounded-full p-3 mb-3" style="background-color: #8F0B13;">
-                    <span class="text-white text-xl">💪</span>
+            <!-- Bottom Arrow -->
+            <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+                <div class="animate-bounce cursor-pointer" onclick="scrollToQuickLinks()">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #252B2B;">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                    </svg>
                 </div>
-                <h4 class="font-semibold mb-2" style="color: #EFDFC5;">Executive Function Support</h4>
-                <p class="text-sm" style="color: #EFDFC5;">
-                    Automation reduces cognitive fatigue: organize transactions quickly and save energy.
-                </p>
-            </div>
-
-            <!-- Feature 2 -->
-            <div class="flex flex-col items-center">
-                <div class="rounded-full p-3 mb-3" style="background-color: #252B2B;">
-                    <span class="text-white text-xl">🧠</span>
-                </div>
-                <h4 class="font-semibold mb-2" style="color: #EFDFC5;">Enhanced Recognition</h4>
-                <p class="text-sm" style="color: #EFDFC5;">
-                    Seeing wins accelerated your brain's progress toward your goals.
-                </p>
-            </div>
-
-            <!-- Feature 3 -->
-            <div class="flex flex-col items-center">
-                <div class="rounded-full p-3 mb-3" style="background-color: #380F17;">
-                    <span class="text-white text-xl">🚀</span>
-                </div>
-                <h4 class="font-semibold mb-2" style="color: #EFDFC5;">Motivation & Dopamine</h4>
-                <p class="text-sm" style="color: #EFDFC5;">
-                    Quick wins + Achievements showcase Progress = instant. Neuroatypical self-station.
-                </p>
-            </div>
-
-            <!-- Feature 4 -->
-            <div class="flex flex-col items-center">
-                <div class="rounded-full p-3 mb-3" style="background-color: #4C4F54;">
-                    <span class="text-white text-xl">⚡</span>
-                </div>
-                <h4 class="font-semibold mb-2" style="color: #EFDFC5;">Attention Management</h4>
-                <p class="text-sm" style="color: #EFDFC5;">
-                    One-time information. Noise-proofed distraction. What to you based on expert team.
-                </p>
             </div>
         </div>
     </div>
 
-    </div>
-</div>
+    <!-- Quick Links Section -->
+    <div class="min-h-screen relative overflow-hidden">
+        <div class="flex flex-col items-center justify-center min-h-screen px-4 py-20">
+            <!-- Section Title -->
+            <h2 class="text-3xl md:text-4xl font-light text-center mb-16" style="color: #380F17;">
+                Quick links
+            </h2>
 
-<!-- Footer Section -->
-<div class="py-6" style="background-color: #4C4F54;">
-    <div class="text-center">
-        <p class="text-sm" style="color: #EFDFC5;">
-            BrainBudget - Making budgeting accessible | powered by <span style="color: #8F0B13;">Niostudio</span>
-        </p>
+            <!-- Quick Links Grid -->
+            <div class="w-full max-w-5xl relative min-h-[700px] hidden md:block">
+                <!-- Dashboard - Top Right -->
+                <div class="absolute top-0 right-0">
+                    <button onclick="showFeature('dashboard')" class="group inline-flex items-center justify-center backdrop-blur-sm px-12 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-[380px] brain-gradient text-white">
+                        <span class="font-medium text-lg">Dashboard</span>
+                    </button>
+                </div>
+
+                <!-- Insights - Left Side -->
+                <div class="absolute top-20 left-0">
+                    <button onclick="showFeature('insights')" class="group inline-flex items-center justify-center backdrop-blur-sm px-12 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-[380px] brain-gradient text-white">
+                        <span class="font-medium text-lg">Insights</span>
+                    </button>
+                </div>
+
+                <!-- Goals - Middle Right -->
+                <div class="absolute top-40 right-32">
+                    <button onclick="showFeature('goals')" class="group inline-flex items-center justify-center backdrop-blur-sm px-12 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-[380px] brain-gradient text-white">
+                        <span class="font-medium text-lg">Goals</span>
+                    </button>
+                </div>
+
+                <!-- AI Coach - Left Side -->
+                <div class="absolute top-[300px] left-0">
+                    <button onclick="showFeature('ai_coach')" class="group inline-flex items-center justify-center backdrop-blur-sm px-12 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-[380px] brain-gradient text-white">
+                        <span class="font-medium text-lg">AI Coach</span>
+                    </button>
+                </div>
+
+                <!-- Advice - Right Side -->
+                <div class="absolute top-[400px] right-0">
+                    <button onclick="showFeature('advice')" class="group inline-flex items-center justify-center backdrop-blur-sm px-12 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-[380px] brain-gradient text-white">
+                        <span class="font-medium text-lg">Advice</span>
+                    </button>
+                </div>
+
+                <!-- Profile - Bottom Center (Full Width) -->
+                <div class="absolute top-[550px] left-1/2 transform -translate-x-1/2">
+                    <button onclick="showFeature('profile')" class="group inline-flex items-center justify-center backdrop-blur-sm px-16 py-5 rounded-full hover:shadow-xl transition-all duration-300 w-[520px] brain-gradient text-white">
+                        <span class="font-medium text-xl">Profile</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Layout (Stacked for smaller screens) -->
+            <div class="md:hidden w-full max-w-sm space-y-4 mt-8">
+                <button onclick="showFeature('dashboard')" class="group flex items-center justify-center backdrop-blur-sm px-6 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-full brain-gradient text-white">
+                    <span class="font-medium">Dashboard</span>
+                </button>
+                <button onclick="showFeature('insights')" class="group flex items-center justify-center backdrop-blur-sm px-6 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-full brain-gradient text-white">
+                    <span class="font-medium">Insights</span>
+                </button>
+                <button onclick="showFeature('goals')" class="group flex items-center justify-center backdrop-blur-sm px-6 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-full brain-gradient text-white">
+                    <span class="font-medium">Goals</span>
+                </button>
+                <button onclick="showFeature('ai_coach')" class="group flex items-center justify-center backdrop-blur-sm px-6 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-full brain-gradient text-white">
+                    <span class="font-medium">AI Coach</span>
+                </button>
+                <button onclick="showFeature('advice')" class="group flex items-center justify-center backdrop-blur-sm px-6 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-full brain-gradient text-white">
+                    <span class="font-medium">Advice</span>
+                </button>
+                <button onclick="showFeature('profile')" class="group flex items-center justify-center backdrop-blur-sm px-8 py-5 rounded-full hover:shadow-xl transition-all duration-300 w-full brain-gradient text-white">
+                    <span class="font-medium text-lg">Profile</span>
+                </button>
+            </div>
+        </div>
     </div>
-</div>
+
+    <!-- Feature Modal -->
+    <div id="feature-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl p-8 max-w-md mx-4 shadow-2xl">
+            <div class="text-center">
+                <div id="modal-icon" class="text-6xl mb-4">🎯</div>
+                <h3 id="modal-title" class="text-2xl font-bold mb-4" style="color: #380F17;">Feature Preview</h3>
+                <p id="modal-description" class="text-gray-600 mb-6">This feature will be available in the full BrainBudget application.</p>
+                <button onclick="closeModal()" class="px-6 py-3 brain-gradient text-white rounded-lg hover:shadow-lg transition-all">
+                    Got it! ✨
+                </button>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const uploadArea = document.getElementById('uploadArea');
-    const fileInput = document.getElementById('fileInput');
-    const analyzeBtn = document.getElementById('analyzeBtn');
-    const uploadForm = document.getElementById('uploadForm');
+    // File upload simulation
+    function uploadFile() {
+        showSuccessToast("📁 File upload ready! Full functionality coming with Flask server.");
+    }
     
-    // Handle click to upload
-    uploadArea.addEventListener('click', function(e) {
-        if (e.target.tagName !== 'BUTTON') {
-            fileInput.click();
-        }
-    });
+    // Analyze spending simulation  
+    function analyzeSpending() {
+        showSuccessToast("🧠 AI analysis ready! Upload a statement to see magic happen.");
+    }
     
-    // Handle drag and drop
-    uploadArea.addEventListener('dragover', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        uploadArea.classList.add('border-blue-400', 'bg-blue-50/20');
-    });
-    
-    uploadArea.addEventListener('dragleave', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        uploadArea.classList.remove('border-blue-400', 'bg-blue-50/20');
-    });
-    
-    uploadArea.addEventListener('drop', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        uploadArea.classList.remove('border-blue-400', 'bg-blue-50/20');
+    // Feature preview function
+    function showFeature(feature) {
+        const features = {
+            'dashboard': { icon: '📊', title: 'Dashboard', desc: 'Your personalized financial overview with ADHD-friendly visualizations and progress tracking.' },
+            'insights': { icon: '💡', title: 'AI Insights', desc: 'Intelligent spending pattern analysis designed specifically for neurodivergent minds.' },
+            'goals': { icon: '🎯', title: 'Goal Setting', desc: 'Flexible, ADHD-friendly goal tracking with built-in celebration and accountability.' },
+            'ai_coach': { icon: '🤖', title: 'AI Coach', desc: 'Your personal financial coach that understands ADHD challenges and strengths.' },
+            'advice': { icon: '💬', title: 'Financial Advice', desc: 'Tailored advice for budgeting, debt, and savings that works with ADHD brains.' },
+            'community': { icon: '🤝', title: 'Community', desc: 'Connect with other ADHD individuals on similar financial journeys.' },
+            'settings': { icon: '⚙️', title: 'Settings', desc: 'Customize your BrainBudget experience with neurodivergent-friendly options.' },
+            'notifications': { icon: '🔔', title: 'Notifications', desc: 'Gentle, helpful reminders that support rather than overwhelm.' },
+            'profile': { icon: '👤', title: 'Profile', desc: 'Your personalized BrainBudget profile with ADHD-specific preferences.' }
+        };
         
-        const files = e.dataTransfer.files;
-        if (files.length > 0) {
-            fileInput.files = files;
-            handleFileSelect();
-        }
-    });
-    
-    // Handle file selection
-    fileInput.addEventListener('change', handleFileSelect);
-    
-    function handleFileSelect() {
-        const file = fileInput.files[0];
-        if (file) {
-            // Update UI to show file selected
-            const fileName = file.name.length > 30 ? file.name.substring(0, 30) + '...' : file.name;
-            uploadArea.innerHTML = `
-                <div class="mb-6">
-                    <svg class="w-16 h-16 mx-auto text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-                <h3 class="text-xl font-semibold text-gray-800 mb-2">
-                    File Ready: ${fileName}
-                </h3>
-                <p class="text-gray-600 mb-4">
-                    Great! Your file is ready to analyze.
-                </p>
-                <button type="button" onclick="document.getElementById('fileInput').click()" class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-500 transition-colors mr-2">
-                    Change File
-                </button>
-            `;
-            
-            // Enable analyze button
-            analyzeBtn.disabled = false;
-            analyzeBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-            analyzeBtn.classList.add('hover:bg-white/40');
+        const featureInfo = features[feature];
+        if (featureInfo) {
+            document.getElementById('modal-icon').textContent = featureInfo.icon;
+            document.getElementById('modal-title').textContent = featureInfo.title;
+            document.getElementById('modal-description').textContent = featureInfo.desc;
+            document.getElementById('feature-modal').classList.remove('hidden');
         }
     }
     
-    // Handle analyze button click
-    analyzeBtn.addEventListener('click', function() {
-        if (!fileInput.files[0]) {
-            alert('Please select a file first!');
-            return;
+    function closeModal() {
+        document.getElementById('feature-modal').classList.add('hidden');
+    }
+    
+    function signOut() {
+        showSuccessToast("👋 Sign out ready! Full authentication system available with Flask server.");
+    }
+    
+    // Smooth scrolling
+    function scrollToQuickLinks() {
+        window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
+    }
+    
+    function scrollToFeatures() {
+        window.scrollTo({ top: window.innerHeight * 2, behavior: 'smooth' });
+    }
+    
+    // Close modal when clicking outside
+    document.getElementById('feature-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeModal();
         }
-        
-        // Show loading state
-        analyzeBtn.innerHTML = '🔄 Analyzing...';
-        analyzeBtn.disabled = true;
-        
-        // Submit the form
-        uploadForm.submit();
     });
-});
+    
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add gentle entrance animations
+        const cards = document.querySelectorAll('.card-hover');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    });
 </script>
 {% endblock %}
