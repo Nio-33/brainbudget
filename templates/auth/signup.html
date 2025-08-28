@@ -17,25 +17,8 @@
             <!-- Signup Form -->
             <div class="bg-white bg-opacity-80 rounded-3xl shadow-xl p-8 card-hover">
                 <form id="signup-form" class="space-y-6">
-                    <!-- Progress Indicator -->
-                    <div class="flex items-center justify-center space-x-4 mb-6">
-                        <div class="flex items-center">
-                            <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background-color: #380F17;">
-                                <span class="text-white text-sm font-semibold">1</span>
-                            </div>
-                            <span class="ml-2 text-sm font-medium" style="color: #380F17;">Account</span>
-                        </div>
-                        <div class="w-8 h-1 rounded-full" style="background-color: #4C4F54;"></div>
-                        <div class="flex items-center">
-                            <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                                <span class="text-gray-400 text-sm font-semibold">2</span>
-                            </div>
-                            <span class="ml-2 text-sm text-gray-400">Profile</span>
-                        </div>
-                    </div>
-
-                    <!-- Step 1: Account Details -->
-                    <div id="step-1" class="space-y-4">
+                    <!-- Account Details -->
+                    <div class="space-y-4">
                         <div>
                             <label for="email" class="block text-sm font-medium mb-2" style="color: #252B2B;">
                                 Email Address
@@ -103,10 +86,8 @@
                                 </button>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Step 2: Profile Details (Hidden initially) -->
-                    <div id="step-2" class="hidden space-y-4">
+                        <!-- Profile Details -->
                         <div>
                             <label for="first-name" class="block text-sm font-medium mb-2" style="color: #252B2B;">
                                 First Name
@@ -154,34 +135,13 @@
                         </label>
                     </div>
 
-                    <!-- Action Buttons -->
+                    <!-- Create Account Button -->
                     <div class="space-y-3">
-                        <!-- Step 1 Button -->
-                        <button 
-                            type="button" 
-                            id="next-step-btn"
-                            class="w-full py-3 px-4 rounded-lg font-semibold text-white brain-gradient hover:shadow-lg transition-all duration-200"
-                        >
-                            Continue to Profile
-                        </button>
-                        
-                        <!-- Step 2 Button (Hidden initially) -->
                         <button 
                             type="submit" 
-                            id="signup-btn"
-                            class="hidden w-full py-3 px-4 rounded-lg font-semibold text-white brain-gradient hover:shadow-lg transition-all duration-200"
+                            class="w-full py-3 px-4 rounded-lg font-semibold text-white brain-gradient hover:shadow-lg transition-all duration-200"
                         >
                             🚀 Create Account
-                        </button>
-                        
-                        <!-- Back Button (Hidden initially) -->
-                        <button 
-                            type="button" 
-                            id="back-btn"
-                            class="hidden w-full py-3 px-4 rounded-lg font-semibold hover:shadow-lg transition-all duration-200"
-                            style="background-color: #4C4F54; color: #EFDFC5;"
-                        >
-                            ← Back to Account
                         </button>
                     </div>
 
@@ -230,73 +190,31 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const form = document.getElementById('signup-form');
-        const step1 = document.getElementById('step-1');
-        const step2 = document.getElementById('step-2');
-        const nextBtn = document.getElementById('next-step-btn');
-        const backBtn = document.getElementById('back-btn');
-        const signupBtn = document.getElementById('signup-btn');
         
-        let currentStep = 1;
-        
-        // Step navigation
-        nextBtn.addEventListener('click', function() {
-            if (validateStep1()) {
-                step1.classList.add('hidden');
-                step2.classList.remove('hidden');
-                nextBtn.classList.add('hidden');
-                backBtn.classList.remove('hidden');
-                signupBtn.classList.remove('hidden');
-                currentStep = 2;
-                updateProgress();
-            }
-        });
-        
-        backBtn.addEventListener('click', function() {
-            step1.classList.remove('hidden');
-            step2.classList.add('hidden');
-            nextBtn.classList.remove('hidden');
-            backBtn.classList.add('hidden');
-            signupBtn.classList.add('hidden');
-            currentStep = 1;
-            updateProgress();
-        });
-        
-        function updateProgress() {
-            // Update progress indicator styling based on current step
-            const step1Indicator = document.querySelector('.w-8.h-8:first-of-type');
-            const step2Indicator = document.querySelector('.w-8.h-8:last-of-type');
-            // Progress indicator updates would go here
-        }
-        
-        function validateStep1() {
+        // Form validation and submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirm-password').value;
+            const firstName = document.getElementById('first-name').value;
+            const lastName = document.getElementById('last-name').value;
             const terms = document.getElementById('terms').checked;
             
-            if (!email || !password || !confirmPassword || !terms) {
+            // Validation
+            if (!email || !password || !confirmPassword || !firstName || !lastName || !terms) {
                 showErrorToast('Please fill in all required fields and accept the terms.');
-                return false;
+                return;
             }
             
             if (password !== confirmPassword) {
                 showErrorToast('Passwords do not match.');
-                return false;
+                return;
             }
             
             if (password.length < 8) {
                 showErrorToast('Password must be at least 8 characters long.');
-                return false;
-            }
-            
-            return true;
-        }
-        
-        // Form submission
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            if (!validateStep1()) {
                 return;
             }
             
