@@ -14,10 +14,32 @@ frontend_bp = Blueprint('frontend', __name__, template_folder='../../templates',
 
 def require_auth():
     """Simple authentication check - redirect to login if not authenticated."""
-    # For now, we'll use session-based auth; Firebase integration is handled client-side
-    if not session.get('user_id'):
-        return redirect(url_for('frontend.login_page'))
-    return None
+    # Check server session first
+    if session.get('user_id'):
+        return None
+        
+    # Check for Firebase token in headers
+    auth_header = request.headers.get('Authorization')
+    if auth_header and auth_header.startswith('Bearer '):
+        try:
+            id_token = auth_header.split('Bearer ')[1]
+            firebase_service = current_app.firebase
+            decoded_token = firebase_service.verify_token(id_token)
+            
+            if decoded_token:
+                # Establish session
+                session['user_id'] = decoded_token['uid']
+                session['user_email'] = decoded_token['email']
+                session.permanent = True
+                return None
+        except Exception as e:
+            logger.warning(f"Token verification failed: {e}")
+    
+    # For development, allow access to home page without strict auth
+    if request.endpoint == 'frontend.home_page':
+        return None
+    
+    return redirect(url_for('frontend.login_page'))
 
 def get_template_context():
     """Get common template context including Firebase config."""

@@ -120,6 +120,10 @@ class BrainBudgetAuth {
             
             this.showSuccess('Welcome back! 🎉');
             
+            // Send token to server to establish session
+            const idToken = await user.getIdToken();
+            await this.establishServerSession(idToken, email, password);
+            
             // Redirect to dashboard
             setTimeout(() => {
                 window.location.href = '/dashboard';
@@ -173,6 +177,10 @@ class BrainBudgetAuth {
             
             this.showSuccess('Account created successfully! Welcome to BrainBudget! 🎉');
             
+            // Send token to server to establish session
+            const idToken = await user.getIdToken();
+            await this.establishServerSession(idToken, email, password);
+            
             // Redirect to dashboard
             setTimeout(() => {
                 window.location.href = '/dashboard';
@@ -225,11 +233,15 @@ class BrainBudgetAuth {
         }
     }
     
-    handleAuthStateChange(user) {
+    async handleAuthStateChange(user) {
         this.currentUser = user;
         
         if (user) {
             console.log('✅ User signed in:', user.email);
+            
+            // Establish server session if not already done
+            const idToken = await user.getIdToken();
+            await this.establishServerSession(idToken, user.email, '');
             
             // Update UI for authenticated user
             this.updateAuthUI(true);
@@ -392,6 +404,28 @@ class BrainBudgetAuth {
         } catch (error) {
             console.error('Error getting auth token:', error);
             return null;
+        }
+    }
+    
+    async establishServerSession(idToken, email, password) {
+        try {
+            const response = await fetch('/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    idToken: idToken,
+                    email: email,
+                    password: password
+                })
+            });
+            
+            if (!response.ok) {
+                console.warn('Failed to establish server session');
+            }
+        } catch (error) {
+            console.error('Error establishing server session:', error);
         }
     }
 }
