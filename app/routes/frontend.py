@@ -2,7 +2,7 @@
 Frontend routes for BrainBudget web application.
 Serves HTML pages and handles static file requests.
 """
-from flask import Blueprint, render_template, request, jsonify, send_from_directory, redirect, url_for, session
+from flask import Blueprint, render_template, request, jsonify, send_from_directory, redirect, url_for, session, current_app
 import logging
 import os
 
@@ -19,6 +19,19 @@ def require_auth():
         return redirect(url_for('frontend.login_page'))
     return None
 
+def get_template_context():
+    """Get common template context including Firebase config."""
+    return {
+        'config': {
+            'FIREBASE_API_KEY': current_app.config.get('FIREBASE_API_KEY'),
+            'FIREBASE_AUTH_DOMAIN': current_app.config.get('FIREBASE_AUTH_DOMAIN'),
+            'FIREBASE_PROJECT_ID': current_app.config.get('FIREBASE_PROJECT_ID'),
+            'FIREBASE_STORAGE_BUCKET': current_app.config.get('FIREBASE_STORAGE_BUCKET'),
+            'FIREBASE_MESSAGING_SENDER_ID': current_app.config.get('FIREBASE_MESSAGING_SENDER_ID'),
+            'FIREBASE_APP_ID': current_app.config.get('FIREBASE_APP_ID')
+        }
+    }
+
 
 # ============================================================================
 # LANDING PAGE (Public - No Auth Required)
@@ -28,7 +41,7 @@ def landing_page():
     """Serve the BrainBudget landing page - entry point for all users."""
     try:
         logger.info("Landing page route called - serving landing.html template")
-        return render_template('landing.html')
+        return render_template('landing.html', **get_template_context())
     except Exception as e:
         logger.error(f"Error serving landing page: {e}")
         return render_template('error.html', message="Unable to load the landing page"), 500
@@ -42,7 +55,7 @@ def home_page():
         if auth_check:
             return auth_check
             
-        return render_template('home.html')
+        return render_template('home.html', **get_template_context())
     except Exception as e:
         logger.error(f"Error serving home page: {e}")
         return render_template('error.html', message="Unable to load the home page"), 500
@@ -55,7 +68,7 @@ def home_page():
 def login_page():
     """Handle user login."""
     if request.method == 'GET':
-        return render_template('auth/login.html')
+        return render_template('auth/login.html', **get_template_context())
     
     try:
         # Handle POST request - user login
@@ -68,18 +81,36 @@ def login_page():
         if not email or not password:
             return jsonify({'success': False, 'error': 'Email and password are required'}), 400
         
-        # For demo purposes, accept any login (in production, verify credentials)
-        session['user_id'] = email
-        session['user_email'] = email
-        session['user_name'] = email.split('@')[0].title()
-        session.permanent = True  # Make session persistent across requests
+        # Real authentication is handled by Firebase client-side
+        # This endpoint can be used for server-side session management
+        id_token = data.get('idToken')
         
-        logger.info(f"User logged in successfully: {email}")
+        if id_token:
+            # Verify Firebase token (optional server-side verification)
+            try:
+                firebase_service = current_app.firebase
+                decoded_token = firebase_service.verify_token(id_token)
+                
+                if decoded_token:
+                    session['user_id'] = decoded_token['uid']
+                    session['user_email'] = decoded_token['email']
+                    session['user_name'] = decoded_token.get('name', decoded_token['email'].split('@')[0].title())
+                    session.permanent = True
+                    
+                    logger.info(f"User logged in successfully: {decoded_token['email']}")
+                    return jsonify({
+                        'success': True, 
+                        'message': 'Welcome back!',
+                        'redirect': '/dashboard'
+                    })
+                    
+            except Exception as e:
+                logger.error(f"Token verification failed: {e}")
+        
         return jsonify({
-            'success': True, 
-            'message': 'Welcome back!',
-            'redirect': '/home'
-        })
+            'success': False, 
+            'error': 'Authentication failed'
+        }), 401
         
     except Exception as e:
         logger.error(f"Error during login: {e}")
@@ -90,7 +121,7 @@ def login_page():
 def register_page():
     """Handle user registration."""
     if request.method == 'GET':
-        return render_template('auth/signup.html')
+        return render_template('auth/signup.html', **get_template_context())
     
     try:
         # Handle POST request - user registration
@@ -112,18 +143,35 @@ def register_page():
         if len(password) < 8:
             return jsonify({'success': False, 'error': 'Password must be at least 8 characters'}), 400
         
-        # For now, create a simple session (in production, use proper user registration)
-        session['user_id'] = email
-        session['user_name'] = f"{first_name} {last_name}"
-        session['user_email'] = email
-        session.permanent = True  # Make session persistent across requests
+        # Real registration is handled by Firebase client-side
+        # This endpoint can be used for server-side user document creation
+        id_token = data.get('idToken')
         
-        logger.info(f"User registered successfully: {email}")
+        if id_token:
+            try:
+                firebase_service = current_app.firebase
+                decoded_token = firebase_service.verify_token(id_token)
+                
+                if decoded_token:
+                    session['user_id'] = decoded_token['uid']
+                    session['user_email'] = decoded_token['email']
+                    session['user_name'] = f"{first_name} {last_name}" if first_name and last_name else decoded_token.get('name', '')
+                    session.permanent = True
+                    
+                    logger.info(f"New user registered: {decoded_token['email']}")
+                    return jsonify({
+                        'success': True, 
+                        'message': 'Account created successfully! Welcome to BrainBudget!',
+                        'redirect': '/dashboard'
+                    })
+                    
+            except Exception as e:
+                logger.error(f"Token verification failed: {e}")
+        
         return jsonify({
-            'success': True, 
-            'message': 'Account created successfully!',
-            'redirect': '/home'
-        })
+            'success': False, 
+            'error': 'Registration failed'
+        }), 401
         
     except Exception as e:
         logger.error(f"Error during registration: {e}")
@@ -207,7 +255,7 @@ def dashboard_page():
         if auth_check:
             return auth_check
             
-        return render_template('dashboard.html')
+        return render_template('dashboard.html', **get_template_context())
     except Exception as e:
         logger.error(f"Error serving dashboard page: {e}")
         return render_template('error.html', message="Unable to load the dashboard page"), 500
@@ -222,7 +270,7 @@ def goals_page():
         if auth_check:
             return auth_check
             
-        return render_template('goals.html')
+        return render_template('goals.html', **get_template_context())
     except Exception as e:
         logger.error(f"Error serving goals page: {e}")
         return render_template('error.html', message="Unable to load the goals page"), 500
@@ -237,7 +285,7 @@ def advice_page():
         if auth_check:
             return auth_check
             
-        return render_template('advice.html')
+        return render_template('advice.html', **get_template_context())
     except Exception as e:
         logger.error(f"Error serving advice page: {e}")
         return render_template('error.html', message="Unable to load the advice page"), 500
@@ -252,7 +300,7 @@ def insights_page():
         if auth_check:
             return auth_check
             
-        return render_template('insights.html')
+        return render_template('insights.html', **get_template_context())
     except Exception as e:
         logger.error(f"Error serving insights page: {e}")
         return render_template('error.html', message="Unable to load the insights page"), 500
@@ -312,7 +360,7 @@ def settings_page():
         if auth_check:
             return auth_check
             
-        return render_template('settings.html')
+        return render_template('settings.html', **get_template_context())
     except Exception as e:
         logger.error(f"Error serving settings page: {e}")
         return render_template('error.html', message="Unable to load the settings page"), 500
@@ -351,14 +399,6 @@ def profile_page():
         return render_template('error.html', message="Unable to load the profile page"), 500
 
 
-@frontend_bp.route('/charts-demo')
-def charts_demo():
-    """Serve the charts demonstration page."""
-    try:
-        return render_template('charts_demo.html')
-    except Exception as e:
-        logger.error(f"Error serving charts demo: {e}")
-        return render_template('error.html', message="Unable to load the charts demo"), 500
 
 
 # ============================================================================

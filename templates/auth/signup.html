@@ -55,7 +55,7 @@
 
             <!-- Signup Form -->
             <div class="rounded-3xl shadow-xl p-8 card-hover auth-form-card" style="background-color: #EFDFC5 !important;">
-                <form id="signup-form" class="space-y-6">
+                <form id="signupForm" class="space-y-6">
                     <!-- Account Details -->
                     <div class="space-y-4">
                         <div>
@@ -101,14 +101,14 @@
                         </div>
                         
                         <div>
-                            <label for="confirm-password" class="block text-sm font-medium mb-2" style="color: #252B2B;">
+                            <label for="confirmPassword" class="block text-sm font-medium mb-2" style="color: #252B2B;">
                                 Confirm Password
                             </label>
                             <div class="relative">
                                 <input 
                                     type="password" 
-                                    id="confirm-password" 
-                                    name="confirm-password" 
+                                    id="confirmPassword" 
+                                    name="confirmPassword" 
                                     required
                                     class="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all duration-200"
                                     placeholder="Confirm your password"
@@ -116,9 +116,9 @@
                                 <button 
                                     type="button" 
                                     class="absolute inset-y-0 right-0 pr-3 flex items-center"
-                                    onclick="togglePassword('confirm-password')"
+                                    onclick="togglePassword('confirmPassword')"
                                 >
-                                    <svg id="confirm-password-eye" class="h-5 w-5" style="color: #4C4F54;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <svg id="confirmPassword-eye" class="h-5 w-5" style="color: #4C4F54;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                     </svg>
@@ -133,8 +133,8 @@
                             </label>
                             <input 
                                 type="text" 
-                                id="first-name" 
-                                name="first-name" 
+                                id="firstName" 
+                                name="firstName" 
                                 required
                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all duration-200"
                                 placeholder="Your first name"
@@ -147,8 +147,8 @@
                             </label>
                             <input 
                                 type="text" 
-                                id="last-name" 
-                                name="last-name" 
+                                id="lastName" 
+                                name="lastName" 
                                 required
                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all duration-200"
                                 placeholder="Your last name"
@@ -227,73 +227,6 @@
 
 {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('signup-form');
-        
-        // Form validation and submission
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirm-password').value;
-            const firstName = document.getElementById('first-name').value;
-            const lastName = document.getElementById('last-name').value;
-            const terms = document.getElementById('terms').checked;
-            
-            // Validation
-            if (!email || !password || !confirmPassword || !firstName || !lastName || !terms) {
-                showErrorToast('Please fill in all required fields and accept the terms.');
-                return;
-            }
-            
-            if (password !== confirmPassword) {
-                showErrorToast('Passwords do not match.');
-                return;
-            }
-            
-            if (password.length < 8) {
-                showErrorToast('Password must be at least 8 characters long.');
-                return;
-            }
-            
-            // Submit to backend
-            fetch('/auth/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    email: email,
-                    password: password,
-                    confirm_password: confirmPassword,
-                    first_name: firstName,
-                    last_name: lastName
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showSuccessToast('🎉 ' + data.message);
-                    setTimeout(() => {
-                        window.location.href = data.redirect || '/home';
-                    }, 2000);
-                } else {
-                    showErrorToast(data.error || 'Registration failed');
-                }
-            })
-            .catch(error => {
-                console.error('Registration error:', error);
-                showErrorToast('Registration failed. Please try again.');
-            });
-        });
-        
-        // Google signup
-        document.getElementById('google-signup-btn').addEventListener('click', function() {
-            showSuccessToast('Google signup coming soon!');
-        });
-    });
-    
     // Password toggle function
     function togglePassword(fieldId) {
         const field = document.getElementById(fieldId);

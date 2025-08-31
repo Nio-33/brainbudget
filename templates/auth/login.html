@@ -55,7 +55,7 @@
 
             <!-- Signin Form -->
             <div class="rounded-3xl shadow-xl p-8 card-hover auth-form-card" style="background-color: #EFDFC5 !important;">
-                <form id="signin-form" class="space-y-6">
+                <form id="loginForm" class="space-y-6">
                     <div>
                         <label for="email" class="block text-sm font-medium mb-2" style="color: #252B2B;">
                             Email Address
@@ -100,13 +100,13 @@
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
                             <input 
-                                id="remember-me" 
-                                name="remember-me" 
+                                id="rememberMe" 
+                                name="rememberMe" 
                                 type="checkbox" 
                                 class="h-4 w-4 rounded" 
                                 style="color: #380F17;"
                             >
-                            <label for="remember-me" class="ml-2 block text-sm" style="color: #4C4F54;">
+                            <label for="rememberMe" class="ml-2 block text-sm" style="color: #4C4F54;">
                                 Remember me
                             </label>
                         </div>
@@ -167,52 +167,9 @@
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('signin-form');
+        const form = document.getElementById('loginForm');
         
-        // Form submission
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            if (!email || !password) {
-                showErrorToast('Please fill in all fields.');
-                return;
-            }
-            
-            // Submit to backend
-            fetch('/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    email: email,
-                    password: password
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showSuccessToast('🎉 ' + data.message);
-                    setTimeout(() => {
-                        window.location.href = data.redirect || '/home';
-                    }, 2000);
-                } else {
-                    showErrorToast(data.error || 'Login failed');
-                }
-            })
-            .catch(error => {
-                console.error('Login error:', error);
-                showErrorToast('Login failed. Please try again.');
-            });
-        });
-        
-        // Google signin
-        document.getElementById('google-signin-btn').addEventListener('click', function() {
-            showSuccessToast('Google signin coming soon!');
-        });
+        // Authentication is handled by auth.js via Firebase SDK
     });
     
     // Password toggle function
