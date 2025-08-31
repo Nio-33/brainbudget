@@ -123,7 +123,7 @@ def login_page():
                     return jsonify({
                         'success': True, 
                         'message': 'Welcome back!',
-                        'redirect': '/dashboard'
+                        'redirect': '/home'
                     })
                     
             except Exception as e:
@@ -184,7 +184,7 @@ def register_page():
                     return jsonify({
                         'success': True, 
                         'message': 'Account created successfully! Welcome to BrainBudget!',
-                        'redirect': '/dashboard'
+                        'redirect': '/home'
                     })
                     
             except Exception as e:

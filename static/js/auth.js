@@ -124,9 +124,9 @@ class BrainBudgetAuth {
             const idToken = await user.getIdToken();
             await this.establishServerSession(idToken, email, password);
             
-            // Redirect to dashboard
+            // Redirect to homepage
             setTimeout(() => {
-                window.location.href = '/dashboard';
+                window.location.href = '/home';
             }, 1500);
             
         } catch (error) {
@@ -181,9 +181,9 @@ class BrainBudgetAuth {
             const idToken = await user.getIdToken();
             await this.establishServerSession(idToken, email, password);
             
-            // Redirect to dashboard
+            // Redirect to homepage
             setTimeout(() => {
-                window.location.href = '/dashboard';
+                window.location.href = '/home';
             }, 1500);
             
         } catch (error) {
