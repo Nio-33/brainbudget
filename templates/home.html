@@ -370,10 +370,10 @@
         
         // Create FormData for file upload
         const formData = new FormData();
-        formData.append('statement', uploadedFile);
+        formData.append('file', uploadedFile);
         
         // Send to backend for analysis
-        fetch('/api/analyze-statement', {
+        fetch('/api/analysis/analyze', {
             method: 'POST',
             body: formData
         })
