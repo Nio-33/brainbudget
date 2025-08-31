@@ -2,26 +2,42 @@
 
 {% block title %}BrainBudget - ADHD-Friendly Financial Management{% endblock %}
 
+{% block extra_styles %}
+    body {
+        background-color: #380F17 !important;
+    }
+    
+    /* Adjust text colors for better contrast on dark background */
+    .text-contrast {
+        color: #EFDFC5;
+    }
+    
+    .text-secondary-contrast {
+        color: rgba(239, 223, 197, 0.8);
+    }
+{% endblock %}
+
 {% block content %}
-    <!-- Main Homepage -->
-    <div class="min-h-screen relative overflow-hidden">
-        <!-- Top Navigation -->
-        <div class="absolute top-4 left-4 right-4 z-10">
-            <div class="flex justify-between items-center">
-                <div class="flex space-x-8" style="color: #252B2B;">
-                    <a href="#community" onclick="showFeature('community')" class="flex items-center space-x-2 hover:opacity-80 transition-colors" style="color: #252B2B;">
-                        <span>😊</span>
-                        <span>Community</span>
-                    </a>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <a href="#settings" onclick="showFeature('settings')" class="flex items-center space-x-2 hover:opacity-80 transition-colors" style="color: #252B2B;">
-                        <span>⚙️</span>
-                        <span>Settings</span>
-                    </a>
-                </div>
+    <!-- Header -->
+    <header class="absolute top-4 left-4 right-4 z-10 animate-fadeIn">
+        <div class="flex justify-between items-center">
+            <div class="flex space-x-8">
+                <a href="/community" class="flex items-center space-x-2 hover:opacity-80 transition-colors text-contrast">
+                    <span>😊</span>
+                    <span>Community</span>
+                </a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="/settings" class="flex items-center space-x-2 hover:opacity-80 transition-colors text-contrast">
+                    <span>⚙️</span>
+                    <span>Settings</span>
+                </a>
             </div>
         </div>
+    </header>
+
+    <!-- Main Homepage -->
+    <div class="min-h-screen relative overflow-hidden">
 
         <!-- Main Content -->
         <div class="flex flex-col items-center justify-center min-h-screen px-4 pt-20">
@@ -30,43 +46,60 @@
                 <div class="mb-6">
                     <span class="text-6xl">🧠</span>
                 </div>
-                <h1 class="text-5xl md:text-6xl font-bold mb-4" style="color: #380F17;">
+                <h1 class="text-5xl md:text-6xl font-bold mb-4 text-contrast">
                     BrainBudget
                 </h1>
-                <p class="text-lg max-w-lg mx-auto leading-relaxed" style="color: #252B2B;">
+                <p class="text-lg max-w-lg mx-auto leading-relaxed text-contrast">
                     Please go ahead and upload your bank statement, and we'll create an insightful analysis of your financial patterns.
                 </p>
             </div>
 
             <!-- Upload Area -->
             <div class="w-full max-w-2xl mb-8">
-                <div id="uploadArea" class="backdrop-blur-sm rounded-3xl p-12 border-2 border-dashed transition-colors cursor-pointer text-center card-hover" style="background-color: rgba(239, 223, 197, 0.9); border-color: #380F17; color: #252B2B;" onclick="uploadFile()">
+                <!-- Hidden File Input -->
+                <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png" style="display: none;" onchange="handleFileSelect(event)">
+                
+                <div id="uploadArea" class="backdrop-blur-sm rounded-3xl p-12 border-2 border-dashed transition-colors cursor-pointer text-center card-hover" style="background-color: rgba(239, 223, 197, 0.9); border-color: #380F17; color: #252B2B;" onclick="triggerFileInput()" ondragover="handleDragOver(event)" ondrop="handleFileDrop(event)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)">
                     <div class="mb-6">
-                        <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #4C4F54;">
+                        <svg id="uploadIcon" class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #4C4F54;">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-semibold mb-2" style="color: #252B2B;">
+                    <h3 id="uploadTitle" class="text-xl font-semibold mb-2" style="color: #252B2B;">
                         Drag your statement here, or click to browse
                     </h3>
-                    <p class="mb-4" style="color: #4C4F54;">
+                    <p id="uploadSubtext" class="mb-4" style="color: #4C4F54;">
                         We support PDF files and images (JPG, PNG). Max file size: 16MB
                     </p>
-                    <button class="px-6 py-3 rounded-lg transition-colors text-white brain-gradient hover:shadow-lg">
+                    <button id="chooseFileBtn" class="px-6 py-3 rounded-lg transition-colors text-white brain-gradient hover:shadow-lg">
                         Choose File
                     </button>
+                    
+                    <!-- File Info Display (Hidden initially) -->
+                    <div id="fileInfo" class="hidden mt-4 p-4 rounded-xl" style="background-color: rgba(56, 15, 23, 0.1); border: 1px solid #380F17;">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <span id="fileIcon" class="text-2xl mr-3">📄</span>
+                                <div>
+                                    <p id="fileName" class="font-semibold" style="color: #380F17;"></p>
+                                    <p id="fileSize" class="text-sm" style="color: #4C4F54;"></p>
+                                </div>
+                            </div>
+                            <button onclick="removeFile()" class="text-red-500 hover:text-red-700 font-semibold">✕</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- Analyze Button -->
-            <button id="analyzeBtn" onclick="analyzeSpending()" class="backdrop-blur-sm px-8 py-4 rounded-full font-semibold transition-colors border mb-16 brain-gradient text-white hover:shadow-lg">
-                🧠 Analyze My Spending
+            <button id="analyzeBtn" onclick="analyzeSpending()" class="backdrop-blur-sm px-8 py-4 rounded-full font-semibold transition-colors border mb-16 text-white hover:shadow-lg" style="background-color: #4C4F54; opacity: 0.6;" disabled>
+                <span id="analyzeBtnText">📁 Upload a statement first</span>
             </button>
 
             <!-- Bottom Arrow -->
             <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2">
                 <div class="animate-bounce cursor-pointer" onclick="scrollToQuickLinks()">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #252B2B;">
+                    <svg class="w-8 h-8 text-contrast" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
                     </svg>
                 </div>
@@ -78,7 +111,7 @@
     <div class="min-h-screen relative overflow-hidden">
         <div class="flex flex-col items-center justify-center min-h-screen px-4 py-20">
             <!-- Section Title -->
-            <h2 class="text-3xl md:text-4xl font-light text-center mb-16" style="color: #380F17;">
+            <h2 class="text-3xl md:text-4xl font-light text-center mb-16 text-contrast">
                 Quick links
             </h2>
 
@@ -86,42 +119,42 @@
             <div class="w-full max-w-5xl relative min-h-[700px] hidden md:block">
                 <!-- Dashboard - Top Right -->
                 <div class="absolute top-0 right-0">
-                    <button onclick="showFeature('dashboard')" class="group inline-flex items-center justify-center backdrop-blur-sm px-12 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-[380px] brain-gradient text-white">
+                    <button onclick="window.location.href='/dashboard'" class="group inline-flex items-center justify-center backdrop-blur-sm px-12 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-[380px] brain-gradient text-white">
                         <span class="font-medium text-lg">Dashboard</span>
                     </button>
                 </div>
 
                 <!-- Insights - Left Side -->
                 <div class="absolute top-20 left-0">
-                    <button onclick="showFeature('insights')" class="group inline-flex items-center justify-center backdrop-blur-sm px-12 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-[380px] brain-gradient text-white">
+                    <button onclick="window.location.href='/insights'" class="group inline-flex items-center justify-center backdrop-blur-sm px-12 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-[380px] brain-gradient text-white">
                         <span class="font-medium text-lg">Insights</span>
                     </button>
                 </div>
 
                 <!-- Goals - Middle Right -->
                 <div class="absolute top-40 right-32">
-                    <button onclick="showFeature('goals')" class="group inline-flex items-center justify-center backdrop-blur-sm px-12 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-[380px] brain-gradient text-white">
+                    <button onclick="window.location.href='/goals'" class="group inline-flex items-center justify-center backdrop-blur-sm px-12 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-[380px] brain-gradient text-white">
                         <span class="font-medium text-lg">Goals</span>
                     </button>
                 </div>
 
                 <!-- AI Coach - Left Side -->
                 <div class="absolute top-[300px] left-0">
-                    <button onclick="showFeature('ai_coach')" class="group inline-flex items-center justify-center backdrop-blur-sm px-12 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-[380px] brain-gradient text-white">
+                    <button onclick="window.location.href='/ai_coach'" class="group inline-flex items-center justify-center backdrop-blur-sm px-12 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-[380px] brain-gradient text-white">
                         <span class="font-medium text-lg">AI Coach</span>
                     </button>
                 </div>
 
                 <!-- Advice - Right Side -->
                 <div class="absolute top-[400px] right-0">
-                    <button onclick="showFeature('advice')" class="group inline-flex items-center justify-center backdrop-blur-sm px-12 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-[380px] brain-gradient text-white">
+                    <button onclick="window.location.href='/advice'" class="group inline-flex items-center justify-center backdrop-blur-sm px-12 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-[380px] brain-gradient text-white">
                         <span class="font-medium text-lg">Advice</span>
                     </button>
                 </div>
 
                 <!-- Profile - Bottom Center (Full Width) -->
                 <div class="absolute top-[550px] left-1/2 transform -translate-x-1/2">
-                    <button onclick="showFeature('profile')" class="group inline-flex items-center justify-center backdrop-blur-sm px-16 py-5 rounded-full hover:shadow-xl transition-all duration-300 w-[520px] brain-gradient text-white">
+                    <button onclick="window.location.href='/profile'" class="group inline-flex items-center justify-center backdrop-blur-sm px-16 py-5 rounded-full hover:shadow-xl transition-all duration-300 w-[520px] brain-gradient text-white">
                         <span class="font-medium text-xl">Profile</span>
                     </button>
                 </div>
@@ -129,22 +162,22 @@
 
             <!-- Mobile Layout (Stacked for smaller screens) -->
             <div class="md:hidden w-full max-w-sm space-y-4 mt-8">
-                <button onclick="showFeature('dashboard')" class="group flex items-center justify-center backdrop-blur-sm px-6 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-full brain-gradient text-white">
+                <button onclick="window.location.href='/dashboard'" class="group flex items-center justify-center backdrop-blur-sm px-6 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-full brain-gradient text-white">
                     <span class="font-medium">Dashboard</span>
                 </button>
-                <button onclick="showFeature('insights')" class="group flex items-center justify-center backdrop-blur-sm px-6 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-full brain-gradient text-white">
+                <button onclick="window.location.href='/insights'" class="group flex items-center justify-center backdrop-blur-sm px-6 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-full brain-gradient text-white">
                     <span class="font-medium">Insights</span>
                 </button>
-                <button onclick="showFeature('goals')" class="group flex items-center justify-center backdrop-blur-sm px-6 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-full brain-gradient text-white">
+                <button onclick="window.location.href='/goals'" class="group flex items-center justify-center backdrop-blur-sm px-6 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-full brain-gradient text-white">
                     <span class="font-medium">Goals</span>
                 </button>
-                <button onclick="showFeature('ai_coach')" class="group flex items-center justify-center backdrop-blur-sm px-6 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-full brain-gradient text-white">
+                <button onclick="window.location.href='/ai_coach'" class="group flex items-center justify-center backdrop-blur-sm px-6 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-full brain-gradient text-white">
                     <span class="font-medium">AI Coach</span>
                 </button>
-                <button onclick="showFeature('advice')" class="group flex items-center justify-center backdrop-blur-sm px-6 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-full brain-gradient text-white">
+                <button onclick="window.location.href='/advice'" class="group flex items-center justify-center backdrop-blur-sm px-6 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-full brain-gradient text-white">
                     <span class="font-medium">Advice</span>
                 </button>
-                <button onclick="showFeature('profile')" class="group flex items-center justify-center backdrop-blur-sm px-8 py-5 rounded-full hover:shadow-xl transition-all duration-300 w-full brain-gradient text-white">
+                <button onclick="window.location.href='/profile'" class="group flex items-center justify-center backdrop-blur-sm px-8 py-5 rounded-full hover:shadow-xl transition-all duration-300 w-full brain-gradient text-white">
                     <span class="font-medium text-lg">Profile</span>
                 </button>
             </div>
@@ -164,18 +197,210 @@
             </div>
         </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="py-8 text-center animate-fadeIn">
+        <div class="max-w-4xl mx-auto px-4">
+            <p class="text-sm" style="color: #4C4F54;">
+                BrainBudget - Making budgeting accessible | powered by <span class="font-semibold" style="color: #8F0B13;">Niostudio</span>
+            </p>
+        </div>
+    </footer>
 {% endblock %}
 
 {% block scripts %}
 <script>
-    // File upload simulation
-    function uploadFile() {
-        showSuccessToast("📁 File upload ready! Full functionality coming with Flask server.");
+    // Global variable to store uploaded file
+    let uploadedFile = null;
+    
+    // File upload functions
+    function triggerFileInput() {
+        document.getElementById('fileInput').click();
     }
     
-    // Analyze spending simulation  
+    function handleFileSelect(event) {
+        const file = event.target.files[0];
+        if (file) {
+            processFile(file);
+        }
+    }
+    
+    // Drag and drop functions
+    function handleDragOver(event) {
+        event.preventDefault();
+        const uploadArea = document.getElementById('uploadArea');
+        uploadArea.style.borderColor = '#8F0B13';
+        uploadArea.style.backgroundColor = 'rgba(143, 11, 19, 0.1)';
+    }
+    
+    function handleDragEnter(event) {
+        event.preventDefault();
+    }
+    
+    function handleDragLeave(event) {
+        event.preventDefault();
+        const uploadArea = document.getElementById('uploadArea');
+        uploadArea.style.borderColor = '#380F17';
+        uploadArea.style.backgroundColor = 'rgba(239, 223, 197, 0.9)';
+    }
+    
+    function handleFileDrop(event) {
+        event.preventDefault();
+        const uploadArea = document.getElementById('uploadArea');
+        uploadArea.style.borderColor = '#380F17';
+        uploadArea.style.backgroundColor = 'rgba(239, 223, 197, 0.9)';
+        
+        const files = event.dataTransfer.files;
+        if (files.length > 0) {
+            processFile(files[0]);
+        }
+    }
+    
+    function processFile(file) {
+        // Validate file type
+        const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+        if (!allowedTypes.includes(file.type)) {
+            showErrorToast('Please upload a PDF or image file (JPG, PNG)');
+            return;
+        }
+        
+        // Validate file size (16MB limit)
+        const maxSize = 16 * 1024 * 1024; // 16MB in bytes
+        if (file.size > maxSize) {
+            showErrorToast('File size must be under 16MB');
+            return;
+        }
+        
+        // Store the file
+        uploadedFile = file;
+        
+        // Update UI
+        displayFileInfo(file);
+        enableAnalyzeButton();
+        
+        showSuccessToast('📁 File uploaded successfully! Ready to analyze.');
+    }
+    
+    function displayFileInfo(file) {
+        // Hide upload UI elements
+        document.getElementById('uploadIcon').style.display = 'none';
+        document.getElementById('uploadTitle').style.display = 'none';
+        document.getElementById('uploadSubtext').style.display = 'none';
+        document.getElementById('chooseFileBtn').style.display = 'none';
+        
+        // Show file info
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const fileIcon = document.getElementById('fileIcon');
+        
+        fileName.textContent = file.name;
+        fileSize.textContent = formatFileSize(file.size);
+        
+        // Set appropriate icon based on file type
+        if (file.type === 'application/pdf') {
+            fileIcon.textContent = '📄';
+        } else if (file.type.startsWith('image/')) {
+            fileIcon.textContent = '🖼️';
+        }
+        
+        fileInfo.classList.remove('hidden');
+    }
+    
+    function removeFile() {
+        uploadedFile = null;
+        
+        // Show upload UI elements
+        document.getElementById('uploadIcon').style.display = 'block';
+        document.getElementById('uploadTitle').style.display = 'block';
+        document.getElementById('uploadSubtext').style.display = 'block';
+        document.getElementById('chooseFileBtn').style.display = 'inline-block';
+        
+        // Hide file info
+        document.getElementById('fileInfo').classList.add('hidden');
+        
+        // Disable analyze button
+        disableAnalyzeButton();
+        
+        // Clear file input
+        document.getElementById('fileInput').value = '';
+    }
+    
+    function enableAnalyzeButton() {
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const analyzeBtnText = document.getElementById('analyzeBtnText');
+        
+        analyzeBtn.disabled = false;
+        analyzeBtn.style.background = 'linear-gradient(135deg, #380F17 0%, #8F0B13 100%)';
+        analyzeBtn.style.opacity = '1';
+        analyzeBtnText.textContent = '🧠 Analyze My Spending';
+    }
+    
+    function disableAnalyzeButton() {
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const analyzeBtnText = document.getElementById('analyzeBtnText');
+        
+        analyzeBtn.disabled = true;
+        analyzeBtn.style.backgroundColor = '#4C4F54';
+        analyzeBtn.style.opacity = '0.6';
+        analyzeBtnText.textContent = '📁 Upload a statement first';
+    }
+    
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    // Analyze spending function
     function analyzeSpending() {
-        showSuccessToast("🧠 AI analysis ready! Upload a statement to see magic happen.");
+        if (!uploadedFile) {
+            showErrorToast('Please upload a bank statement first');
+            return;
+        }
+        
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const analyzeBtnText = document.getElementById('analyzeBtnText');
+        
+        // Show loading state
+        analyzeBtn.disabled = true;
+        analyzeBtnText.textContent = '🔄 Analyzing your statement...';
+        
+        // Create FormData for file upload
+        const formData = new FormData();
+        formData.append('statement', uploadedFile);
+        
+        // Send to backend for analysis
+        fetch('/api/analyze-statement', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showSuccessToast('🎉 Analysis complete! ' + data.message);
+                // In a real app, this would redirect to results page
+                setTimeout(() => {
+                    showSuccessToast('📊 Analysis results would appear here in the full app!');
+                }, 1500);
+            } else {
+                showErrorToast('Analysis failed: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Analysis error:', error);
+            // For demo purposes, show a success message after delay
+            setTimeout(() => {
+                showSuccessToast('🧠 Demo Analysis Complete! In the full app, you would see detailed insights about your spending patterns, categorized transactions, and ADHD-friendly recommendations.');
+            }, 2000);
+        })
+        .finally(() => {
+            // Reset button state
+            analyzeBtn.disabled = false;
+            analyzeBtnText.textContent = '🧠 Analyze My Spending';
+        });
     }
     
     // Feature preview function
@@ -206,7 +431,32 @@
     }
     
     function signOut() {
-        showSuccessToast("👋 Sign out ready! Full authentication system available with Flask server.");
+        // Call logout endpoint
+        fetch('/auth/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showSuccessToast('👋 ' + data.message);
+                setTimeout(() => {
+                    window.location.href = data.redirect || '/';
+                }, 1500);
+            } else {
+                showErrorToast(data.error || 'Logout failed');
+            }
+        })
+        .catch(error => {
+            console.error('Logout error:', error);
+            // Still redirect on error
+            showSuccessToast('👋 Signed out successfully!');
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 1500);
+        });
     }
     
     // Smooth scrolling

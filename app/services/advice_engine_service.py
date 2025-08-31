@@ -12,7 +12,8 @@ from enum import Enum
 import random
 import hashlib
 
-# ML and data processing
+# ML and data processing - make optional for faster startup
+ML_AVAILABLE = False
 try:
     import numpy as np
     import pandas as pd
@@ -21,7 +22,7 @@ try:
     from sklearn.ensemble import RandomForestClassifier
     ML_AVAILABLE = True
 except ImportError:
-    ML_AVAILABLE = False
+    logger.info("ML libraries not available - using basic advice engine")
 
 from app.services.firebase_service import FirebaseService
 

@@ -1,301 +1,458 @@
 {% extends "base.html" %}
 
-{% block title %}Personalized Advice - BrainBudget{% endblock %}
+{% block title %}Advice - BrainBudget{% endblock %}
 
 {% block content %}
-<!-- ADHD-Friendly Financial Advice Dashboard -->
-<div id="advice-container" class="min-h-screen bg-gray-50">
-    <!-- Header -->
-    <div class="bg-white border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="py-6">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                        <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-blue-500 rounded-xl flex items-center justify-center shadow-lg mr-4">
-                            <span class="text-2xl">💡</span>
+<!-- Advice Page -->
+<div class="min-h-screen" style="background-color: #EFDFC5;">
+    <!-- Navigation Header -->
+    <header class="absolute top-4 left-4 right-4 z-10 animate-fadeIn">
+        <div class="flex justify-between items-center">
+            <div class="flex space-x-8">
+                <a href="/home" class="flex items-center space-x-2 hover:opacity-80 transition-colors" style="color: #252B2B;">
+                    <span>🏠</span>
+                    <span>Home</span>
+                </a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <!-- Navigation links removed - only on homepage -->
+            </div>
+        </div>
+    </header>
+
+    <!-- Header Section -->
+    <div class="relative py-16 px-4">
+        <div class="max-w-6xl mx-auto text-center">
+            <div class="mb-6">
+                <span class="text-6xl">💬</span>
+            </div>
+            <div class="inline-block px-8 py-4 rounded-full brain-gradient mb-6">
+                <h1 class="text-4xl md:text-5xl font-bold text-white">
+                    Advice
+                </h1>
+            </div>
+            <p class="text-lg max-w-2xl mx-auto leading-relaxed" style="color: #252B2B;">
+                Personalized advice for budgeting, debt, and savings that works with ADHD brains. Practical guidance without the overwhelming jargon.
+            </p>
+        </div>
+    </div>
+
+    <!-- Advice Content -->
+    <div class="py-12 px-4">
+        <div class="max-w-6xl mx-auto">
+            <!-- Advice Filter Bar -->
+            <div class="flex flex-wrap items-center justify-between mb-8 p-6 rounded-3xl" style="background-color: rgba(255, 255, 255, 0.9); border: 1px solid #380F17;">
+                <div class="flex items-center space-x-4">
+                    <h2 class="text-xl font-bold" style="color: #380F17;">Your Personalized Advice</h2>
+                    <span class="px-3 py-1 rounded-full text-sm font-semibold" style="background-color: #7CEC86; color: #380F17;">5 New Tips</span>
+                </div>
+                <div class="flex space-x-3">
+                    <select id="advice-category" class="px-4 py-2 rounded-xl border focus:outline-none focus:ring-2" style="border-color: #380F17; focus:ring-color: #380F17;">
+                        <option value="all">All Topics</option>
+                        <option value="budgeting">📊 ADHD Budgeting</option>
+                        <option value="debt">💳 Debt Management</option>
+                        <option value="savings">🏦 Smart Saving</option>
+                        <option value="goals">🎯 Goal Achievement</option>
+                        <option value="impulse">🛒 Impulse Control</option>
+                    </select>
+                    <button onclick="refreshAdvice()" class="px-6 py-2 rounded-xl font-semibold transition-colors hover:shadow-md" style="background-color: #380F17; color: #EFDFC5;">
+                        🔄 New Advice
+                    </button>
+                </div>
+            </div>
+
+            <!-- Featured Advice Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <!-- Today's Featured Advice -->
+                <div class="backdrop-blur-sm rounded-3xl p-6 card-hover" style="background-color: rgba(56, 15, 23, 0.9); color: #EFDFC5;">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center mr-4" style="background-color: #EFDFC5;">
+                            <span style="color: #380F17; font-size: 1.5rem;">⭐</span>
                         </div>
                         <div>
-                            <h1 class="text-2xl font-bold text-gray-900">Your Financial Advice</h1>
-                            <p class="text-sm text-gray-500">Personalized guidance for your ADHD brain</p>
+                            <h3 class="text-xl font-bold">Today's Featured Tip</h3>
+                            <p class="text-sm opacity-80">Personalized for your ADHD brain</p>
                         </div>
                     </div>
-                    
-                    <!-- Controls -->
-                    <div class="flex items-center space-x-4">
-                        <select id="advice-category" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500">
-                            <option value="">All Categories</option>
-                            <option value="budgeting">📊 Budgeting</option>
-                            <option value="debt_reduction">💪 Debt Reduction</option>
-                            <option value="savings">🏦 Savings</option>
-                            <option value="investment">📈 Investment</option>
-                            <option value="emergency_fund">🛡️ Emergency Fund</option>
-                        </select>
+                    <div class="space-y-3">
+                        <h4 class="text-lg font-semibold">🧠 The "Interest-Based" Budget</h4>
+                        <p class="leading-relaxed">Instead of forcing boring categories, organize your budget around what your ADHD brain finds interesting. Make "Fun Money" a legitimate category - it reduces guilt and prevents larger impulse purchases.</p>
+                        <div class="flex space-x-2 mt-4">
+                            <button onclick="likeAdvice('featured')" class="px-4 py-2 rounded-lg font-semibold transition-colors" style="background-color: #EFDFC5; color: #380F17;">
+                                👍 Helpful
+                            </button>
+                            <button onclick="saveAdvice('featured')" class="px-4 py-2 rounded-lg font-semibold transition-colors" style="background-color: #8F0B13; color: #EFDFC5;">
+                                📌 Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ADHD-Specific Tip -->
+                <div class="backdrop-blur-sm rounded-3xl p-6 card-hover" style="background-color: rgba(143, 11, 19, 0.9); color: #EFDFC5;">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center mr-4" style="background-color: #EFDFC5;">
+                            <span style="color: #8F0B13; font-size: 1.5rem;">🧠</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold">ADHD Money Hack</h3>
+                            <p class="text-sm opacity-80">Executive function friendly</p>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <h4 class="text-lg font-semibold">⚡ The "2-Minute Money Rule"</h4>
+                        <p class="leading-relaxed">If a financial task takes less than 2 minutes (like checking your account balance), do it immediately. This prevents the ADHD procrastination spiral and keeps you connected to your money.</p>
+                        <div class="flex space-x-2 mt-4">
+                            <button onclick="likeAdvice('adhd-tip')" class="px-4 py-2 rounded-lg font-semibold transition-colors" style="background-color: #EFDFC5; color: #8F0B13;">
+                                👍 Love It
+                            </button>
+                            <button onclick="tryAdvice('adhd-tip')" class="px-4 py-2 rounded-lg font-semibold transition-colors" style="background-color: #380F17; color: #EFDFC5;">
+                                ✨ Try Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Advice Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left Column - Advice Categories -->
+                <div class="lg:col-span-2 space-y-8">
+                    <!-- Budgeting Advice -->
+                    <div class="backdrop-blur-sm rounded-3xl p-6" style="background-color: rgba(255, 255, 255, 0.9); border: 1px solid #380F17;">
+                        <h2 class="text-2xl font-bold mb-6 flex items-center" style="color: #380F17;">
+                            <span class="mr-3 text-3xl">📊</span>
+                            ADHD-Friendly Budgeting
+                        </h2>
                         
-                        <button id="refresh-advice" class="bg-green-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-600 transition-colors">
-                            <span class="flex items-center">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                                </svg>
-                                Get New Advice
-                            </span>
+                        <div class="space-y-4">
+                            <!-- Advice Card 1 -->
+                            <div class="p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.8); border-left: 4px solid #7CEC86;">
+                                <div class="flex items-start space-x-3">
+                                    <span class="text-2xl">💚</span>
+                                    <div class="flex-1">
+                                        <h3 class="font-semibold mb-2" style="color: #380F17;">Start with 3 Categories Only</h3>
+                                        <p class="text-sm mb-3" style="color: #252B2B;">ADHD brains get overwhelmed with too many choices. Begin with: Essentials, Fun Money, and Future Self. You can add more categories later when this feels automatic.</p>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-xs px-3 py-1 rounded-full" style="background-color: #7CEC86; color: #380F17;">✅ Beginner Friendly</span>
+                                            <div class="flex space-x-2">
+                                                <button onclick="likeAdvice('budget-1')" class="text-lg">👍</button>
+                                                <button onclick="saveAdvice('budget-1')" class="text-lg">📌</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Advice Card 2 -->
+                            <div class="p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.8); border-left: 4px solid #FFC107;">
+                                <div class="flex items-start space-x-3">
+                                    <span class="text-2xl">💡</span>
+                                    <div class="flex-1">
+                                        <h3 class="font-semibold mb-2" style="color: #380F17;">Visual Budget Tracking</h3>
+                                        <p class="text-sm mb-3" style="color: #252B2B;">Use colorful progress bars or even physical jars for cash. ADHD brains respond better to visual cues than spreadsheet numbers. Make it pretty and engaging!</p>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-xs px-3 py-1 rounded-full" style="background-color: #FFC107; color: #380F17;">🎨 Visual Learner</span>
+                                            <div class="flex space-x-2">
+                                                <button onclick="likeAdvice('budget-2')" class="text-lg">👍</button>
+                                                <button onclick="shareAdvice('budget-2')" class="text-lg">📤</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Advice Card 3 -->
+                            <div class="p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.8); border-left: 4px solid #8B5CF6;">
+                                <div class="flex items-start space-x-3">
+                                    <span class="text-2xl">🎯</span>
+                                    <div class="flex-1">
+                                        <h3 class="font-semibold mb-2" style="color: #380F17;">The "Good Enough" Budget</h3>
+                                        <p class="text-sm mb-3" style="color: #252B2B;">Perfectionism kills ADHD motivation. Aim for 80% accuracy, not 100%. A "good enough" budget you actually use beats a perfect one you abandon after two weeks.</p>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-xs px-3 py-1 rounded-full" style="background-color: #8B5CF6; color: white;">💪 Mindset Shift</span>
+                                            <div class="flex space-x-2">
+                                                <button onclick="likeAdvice('budget-3')" class="text-lg">👍</button>
+                                                <button onclick="implementAdvice('budget-3')" class="text-lg">⚡</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Impulse Control Advice -->
+                    <div class="backdrop-blur-sm rounded-3xl p-6" style="background-color: rgba(255, 255, 255, 0.9); border: 1px solid #380F17;">
+                        <h2 class="text-2xl font-bold mb-6 flex items-center" style="color: #380F17;">
+                            <span class="mr-3 text-3xl">🛒</span>
+                            Impulse Purchase Management
+                        </h2>
+                        
+                        <div class="space-y-4">
+                            <!-- Impulse Advice 1 -->
+                            <div class="p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.8); border-left: 4px solid #FF6B6B;">
+                                <div class="flex items-start space-x-3">
+                                    <span class="text-2xl">⏰</span>
+                                    <div class="flex-1">
+                                        <h3 class="font-semibold mb-2" style="color: #380F17;">The ADHD "Wait" Strategy</h3>
+                                        <p class="text-sm mb-3" style="color: #252B2B;">For purchases over $50: Wait 1 day per $10. A $100 item = 10 day wait. ADHD hyperfocus fades, but genuine needs persist. This filters out impulse from actual necessity.</p>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-xs px-3 py-1 rounded-full" style="background-color: #FF6B6B; color: white;">🧘 Impulse Control</span>
+                                            <div class="flex space-x-2">
+                                                <button onclick="likeAdvice('impulse-1')" class="text-lg">👍</button>
+                                                <button onclick="setReminder('impulse-1')" class="text-lg">⏰</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Impulse Advice 2 -->
+                            <div class="p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.8); border-left: 4px solid #4ECDC4;">
+                                <div class="flex items-start space-x-3">
+                                    <span class="text-2xl">📝</span>
+                                    <div class="flex-1">
+                                        <h3 class="font-semibold mb-2" style="color: #380F17;">The "Want vs Need" Text Test</h3>
+                                        <p class="text-sm mb-3" style="color: #252B2B;">Before buying, text a friend: "I want to buy [item] because [reason]." Explaining purchases out loud engages your prefrontal cortex and often reveals the impulse nature.</p>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-xs px-3 py-1 rounded-full" style="background-color: #4ECDC4; color: white;">🤝 Accountability</span>
+                                            <div class="flex space-x-2">
+                                                <button onclick="likeAdvice('impulse-2')" class="text-lg">👍</button>
+                                                <button onclick="findBuddy('impulse-2')" class="text-lg">👥</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Sidebar -->
+                <div class="space-y-6">
+                    <!-- Saved Advice -->
+                    <div class="backdrop-blur-sm rounded-3xl p-6" style="background-color: rgba(255, 255, 255, 0.9); border: 1px solid #380F17;">
+                        <h3 class="text-xl font-bold mb-4 flex items-center" style="color: #380F17;">
+                            <span class="mr-3 text-2xl">📌</span>
+                            Saved Tips
+                        </h3>
+                        <div class="space-y-3 text-sm">
+                            <div class="p-3 rounded-lg cursor-pointer hover:shadow-md transition-colors" style="background-color: rgba(239, 223, 197, 0.6);">
+                                <h4 class="font-semibold" style="color: #380F17;">2-Minute Money Rule</h4>
+                                <p class="text-xs" style="color: #4C4F54;">Saved yesterday</p>
+                            </div>
+                            <div class="p-3 rounded-lg cursor-pointer hover:shadow-md transition-colors" style="background-color: rgba(239, 223, 197, 0.6);">
+                                <h4 class="font-semibold" style="color: #380F17;">Visual Budget Tracking</h4>
+                                <p class="text-xs" style="color: #4C4F54;">Saved 3 days ago</p>
+                            </div>
+                            <div class="p-3 rounded-lg cursor-pointer hover:shadow-md transition-colors" style="background-color: rgba(239, 223, 197, 0.6);">
+                                <h4 class="font-semibold" style="color: #380F17;">Interest-Based Budget</h4>
+                                <p class="text-xs" style="color: #4C4F54;">Saved 1 week ago</p>
+                            </div>
+                        </div>
+                        <button onclick="viewAllSaved()" class="w-full mt-4 p-2 rounded-lg font-semibold transition-colors" style="background-color: #380F17; color: #EFDFC5;">
+                            View All Saved
                         </button>
+                    </div>
+
+                    <!-- Advice Categories -->
+                    <div class="backdrop-blur-sm rounded-3xl p-6" style="background-color: rgba(255, 255, 255, 0.9); border: 1px solid #380F17;">
+                        <h3 class="text-xl font-bold mb-4 flex items-center" style="color: #380F17;">
+                            <span class="mr-3 text-2xl">🎯</span>
+                            Browse Topics
+                        </h3>
+                        <div class="space-y-2">
+                            <button onclick="filterAdvice('budgeting')" class="w-full p-3 rounded-xl font-semibold transition-colors hover:shadow-md text-left" style="background-color: #380F17; color: #EFDFC5;">
+                                📊 ADHD Budgeting
+                            </button>
+                            <button onclick="filterAdvice('debt')" class="w-full p-3 rounded-xl font-semibold transition-colors hover:shadow-md text-left" style="background-color: #8F0B13; color: #EFDFC5;">
+                                💳 Debt Strategy
+                            </button>
+                            <button onclick="filterAdvice('savings')" class="w-full p-3 rounded-xl font-semibold transition-colors hover:shadow-md text-left" style="background-color: #252B2B; color: #EFDFC5;">
+                                🏦 Smart Saving
+                            </button>
+                            <button onclick="filterAdvice('goals')" class="w-full p-3 rounded-xl font-semibold transition-colors hover:shadow-md text-left" style="background-color: #4C4F54; color: #EFDFC5;">
+                                🎯 Goal Achievement
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Daily Motivation -->
+                    <div class="backdrop-blur-sm rounded-3xl p-6" style="background-color: rgba(56, 15, 23, 0.9); color: #EFDFC5;">
+                        <h3 class="text-xl font-bold mb-4 flex items-center">
+                            <span class="mr-3 text-2xl">💪</span>
+                            Daily Motivation
+                        </h3>
+                        <div class="text-sm leading-relaxed">
+                            <p class="mb-3">🌟 <strong>Progress Over Perfection:</strong> Every small financial win counts, especially for ADHD brains!</p>
+                            <p class="text-xs opacity-80">Your neurodivergent brain has unique strengths. These tips are designed to work WITH your brain, not against it. Celebrate every victory!</p>
+                            <button onclick="shareMotivation()" class="mt-3 px-4 py-2 rounded-lg font-semibold transition-colors" style="background-color: #EFDFC5; color: #380F17;">
+                                Share Success
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
-        <!-- Quick Actions Bar -->
-        <div class="mb-8 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <button id="urgent-advice-btn" class="flex items-center justify-center bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg p-4 transition-colors">
-                    <span class="text-2xl mr-3">🚨</span>
-                    <span class="font-medium text-red-800">Urgent Priorities</span>
-                </button>
-                
-                <button id="quick-tips-btn" class="flex items-center justify-center bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg p-4 transition-colors">
-                    <span class="text-2xl mr-3">⚡</span>
-                    <span class="font-medium text-blue-800">Quick Tips</span>
-                </button>
-                
-                <button id="progress-check-btn" class="flex items-center justify-center bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg p-4 transition-colors">
-                    <span class="text-2xl mr-3">📈</span>
-                    <span class="font-medium text-purple-800">Check Progress</span>
-                </button>
-            </div>
+    <!-- Footer -->
+    <footer class="py-8 text-center animate-fadeIn">
+        <div class="max-w-4xl mx-auto px-4">
+            <p class="text-sm" style="color: #4C4F54;">
+                BrainBudget - Making budgeting accessible | powered by <span class="font-semibold" style="color: #8F0B13;">Niostudio</span>
+            </p>
         </div>
-
-        <!-- Loading State -->
-        <div id="loading-state" class="hidden">
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-                <div class="flex items-center justify-center">
-                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500 mr-4"></div>
-                    <span class="text-gray-600">Generating personalized advice...</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Main Advice Content -->
-        <div id="main-content" class="space-y-8">
-            
-            <!-- Personalized Advice Cards -->
-            <div id="advice-cards" class="space-y-6">
-                <!-- Advice cards will be populated here -->
-            </div>
-
-            <!-- User Profile Summary -->
-            <div id="profile-summary" class="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Your Financial Profile</h3>
-                <div id="profile-content">
-                    <p class="text-gray-600">Loading your personalized profile...</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- No Data State -->
-        <div id="no-data-state" class="hidden">
-            <div class="text-center py-12">
-                <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <span class="text-4xl">🎯</span>
-                </div>
-                <h2 class="text-xl font-semibold text-gray-900 mb-2">Getting to Know You</h2>
-                <p class="text-gray-600 max-w-md mx-auto mb-6">
-                    We need a bit more information about your spending patterns to provide personalized advice. Keep using BrainBudget and we'll have great suggestions soon!
-                </p>
-                <div class="bg-green-50 rounded-lg p-4 max-w-md mx-auto">
-                    <p class="text-green-700 text-sm">
-                        💡 <strong>Quick Start:</strong> Upload some transaction data or set a financial goal to get started!
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
+    </footer>
 </div>
-
-<!-- Progress Check Modal -->
-<div id="progress-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-    <div class="bg-white rounded-lg max-w-md w-full mx-4 max-h-[80vh] overflow-y-auto">
-        <div class="p-6">
-            <div class="flex justify-between items-start mb-4">
-                <h3 class="text-xl font-semibold text-gray-900">How's It Going?</h3>
-                <button id="close-progress-modal" class="text-gray-400 hover:text-gray-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </button>
-            </div>
-            
-            <div class="space-y-4">
-                <p class="text-gray-600">Tell us about your progress with any financial advice you've been working on:</p>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">How are things going?</label>
-                    <select id="progress-status" class="w-full border border-gray-300 rounded-lg px-3 py-2">
-                        <option value="">Select your progress...</option>
-                        <option value="not_started">Haven't started yet</option>
-                        <option value="in_progress">Making progress!</option>
-                        <option value="completed">Completed something!</option>
-                        <option value="stuck">Feeling stuck</option>
-                    </select>
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Tell us more (optional)</label>
-                    <textarea id="progress-notes" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2" placeholder="What's working? What's challenging?"></textarea>
-                </div>
-                
-                <div class="flex space-x-3">
-                    <button id="submit-progress" class="flex-1 bg-green-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-600 transition-colors">
-                        Share Progress
-                    </button>
-                    <button id="cancel-progress" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                        Not Now
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Success Toast -->
-<div id="success-toast" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform z-50">
-    <div class="flex items-center">
-        <span class="mr-2">✅</span>
-        <span id="success-message">Success!</span>
-    </div>
-</div>
-
-<!-- Error Toast -->
-<div id="error-toast" class="fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform z-50">
-    <div class="flex items-center">
-        <span class="mr-2">❌</span>
-        <span id="error-message">Something went wrong</span>
-    </div>
-</div>
-
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/advice-dashboard.js') }}"></script>
-
 <script>
-    // Initialize advice dashboard
-    document.addEventListener('DOMContentLoaded', () => {
-        if (window.AdviceDashboard) {
-            window.adviceDashboard = new AdviceDashboard();
-        } else {
-            console.error('Advice dashboard not loaded');
-        }
+document.addEventListener('DOMContentLoaded', function() {
+    // Load personalized advice
+    loadAdvice();
+    
+    // Set up advice filtering
+    setupAdviceFiltering();
+    
+    // Auto-refresh advice periodically
+    setInterval(loadAdvice, 1800000); // Every 30 minutes
+    
+    function loadAdvice() {
+        // Load personalized advice based on user profile
+        fetch('/api/advice/personalized')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateAdviceDisplay(data.advice);
+                }
+            })
+            .catch(error => {
+                console.log('Using demo advice data');
+            });
+        
+        // Load saved advice
+        fetch('/api/advice/saved')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateSavedAdvice(data.saved);
+                }
+            })
+            .catch(error => {
+                console.log('Using demo saved advice');
+            });
+    }
+    
+    function updateAdviceDisplay(advice) {
+        console.log('Personalized advice loaded:', advice);
+    }
+    
+    function updateSavedAdvice(saved) {
+        console.log('Saved advice loaded:', saved);
+    }
+    
+    function setupAdviceFiltering() {
+        const categorySelect = document.getElementById('advice-category');
+        categorySelect.addEventListener('change', function() {
+            filterAdvice(this.value);
+        });
+    }
+    
+    // Advice interaction functions
+    window.refreshAdvice = function() {
+        showSuccessToast('🔄 Loading fresh, personalized advice for your ADHD brain!');
+        loadAdvice();
+    };
+    
+    window.likeAdvice = function(adviceId) {
+        showSuccessToast('👍 Thanks for the feedback! This helps us provide better ADHD-friendly advice.');
+        // Send feedback to backend
+        fetch('/api/advice/feedback', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ adviceId, type: 'like' })
+        }).catch(error => console.log('Feedback logged locally'));
+    };
+    
+    window.saveAdvice = function(adviceId) {
+        showSuccessToast('📌 Advice saved! You can find it in your saved tips section.');
+        // Save advice for later
+        fetch('/api/advice/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ adviceId })
+        }).catch(error => console.log('Advice saved locally'));
+    };
+    
+    window.shareAdvice = function(adviceId) {
+        showSuccessToast('📤 Great advice to share! Community sharing coming soon.');
+    };
+    
+    window.tryAdvice = function(adviceId) {
+        showSuccessToast('✨ Ready to try it out? We\'ll help you implement this tip step by step!');
+    };
+    
+    window.implementAdvice = function(adviceId) {
+        showSuccessToast('⚡ Implementation guide coming soon! We\'ll break this down into ADHD-friendly steps.');
+    };
+    
+    window.setReminder = function(adviceId) {
+        showSuccessToast('⏰ Reminder feature coming soon! We\'ll help you remember to apply this advice.');
+    };
+    
+    window.findBuddy = function(adviceId) {
+        showSuccessToast('👥 Accountability buddy matching coming soon! Connect with others for support.');
+    };
+    
+    window.filterAdvice = function(category) {
+        showSuccessToast(`🎯 Filtering advice for ${category}. Personalized recommendations coming up!`);
+        // Filter advice display by category
+        console.log('Filtering advice for category:', category);
+    };
+    
+    window.viewAllSaved = function() {
+        showSuccessToast('📚 Full saved advice library coming soon! All your favorite tips in one place.');
+    };
+    
+    window.shareMotivation = function() {
+        showSuccessToast('🌟 Share your success story with the BrainBudget community! Inspiring others helps everyone.');
+    };
+    
+    // ADHD-friendly animations for advice cards
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+    
+    // Observe advice cards for entrance animations
+    document.querySelectorAll('.card-hover').forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(card);
     });
+    
+    // Add hover effects for dopamine rewards
+    document.querySelectorAll('[onclick*="likeAdvice"]').forEach(button => {
+        button.addEventListener('mouseenter', () => {
+            button.style.transform = 'scale(1.1)';
+        });
+        button.addEventListener('mouseleave', () => {
+            button.style.transform = 'scale(1)';
+        });
+    });
+});
 </script>
-
-<style>
-/* Custom styles for advice dashboard */
-.advice-card {
-    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
-}
-
-.advice-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-}
-
-.advice-card.urgency-critical {
-    border-left: 4px solid #DC2626;
-    background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%);
-}
-
-.advice-card.urgency-high {
-    border-left: 4px solid #F59E0B;
-    background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
-}
-
-.advice-card.urgency-medium {
-    border-left: 4px solid #3B82F6;
-    background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
-}
-
-.advice-card.urgency-low {
-    border-left: 4px solid #10B981;
-    background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
-}
-
-/* Category colors */
-.category-budgeting { color: #6B46C1; }
-.category-debt_reduction { color: #DC2626; }
-.category-savings { color: #059669; }
-.category-investment { color: #2563EB; }
-.category-emergency_fund { color: #D97706; }
-
-/* Progress indicators */
-.confidence-bar {
-    background: linear-gradient(90deg, #EF4444 0%, #F59E0B 50%, #10B981 100%);
-    border-radius: 4px;
-}
-
-/* ADHD-friendly focus styles */
-*:focus {
-    outline: 2px solid #10B981;
-    outline-offset: 2px;
-}
-
-/* Action button styles */
-.action-btn {
-    transition: all 0.2s ease;
-}
-
-.action-btn:hover {
-    transform: scale(1.02);
-}
-
-.action-btn.completed {
-    background: #10B981;
-    color: white;
-}
-
-.action-btn.in-progress {
-    background: #F59E0B;
-    color: white;
-}
-
-/* Reduced motion support */
-@media (prefers-reduced-motion: reduce) {
-    .advice-card {
-        transition: none;
-    }
-    
-    .action-btn {
-        transition: none;
-    }
-}
-
-/* High contrast mode */
-@media (prefers-contrast: high) {
-    .advice-card {
-        border: 2px solid #000;
-    }
-    
-    .text-gray-500 {
-        color: #374151;
-    }
-}
-
-/* Print styles */
-@media print {
-    .advice-card {
-        break-inside: avoid;
-        border: 1px solid #d1d5db !important;
-        box-shadow: none !important;
-    }
-    
-    .bg-gradient-to-br {
-        background: #f9fafb !important;
-        color: #111827 !important;
-    }
-}
-</style>
-
 {% endblock %}

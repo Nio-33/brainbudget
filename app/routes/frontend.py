@@ -51,34 +51,100 @@ def home_page():
 # ============================================================================
 # AUTHENTICATION PAGES (Public - No Auth Required)
 # ============================================================================
-@frontend_bp.route('/auth/login')
+@frontend_bp.route('/auth/login', methods=['GET', 'POST'])
 def login_page():
-    """Serve the authentication login page."""
-    try:
+    """Handle user login."""
+    if request.method == 'GET':
         return render_template('auth/login.html')
+    
+    try:
+        # Handle POST request - user login
+        data = request.get_json()
+        
+        email = data.get('email')
+        password = data.get('password')
+        
+        # Basic validation
+        if not email or not password:
+            return jsonify({'success': False, 'error': 'Email and password are required'}), 400
+        
+        # For demo purposes, accept any login (in production, verify credentials)
+        session['user_id'] = email
+        session['user_email'] = email
+        session['user_name'] = email.split('@')[0].title()
+        session.permanent = True  # Make session persistent across requests
+        
+        logger.info(f"User logged in successfully: {email}")
+        return jsonify({
+            'success': True, 
+            'message': 'Welcome back!',
+            'redirect': '/home'
+        })
+        
     except Exception as e:
-        logger.error(f"Error serving login page: {e}")
-        return render_template('error.html', message="Unable to load the login page"), 500
+        logger.error(f"Error during login: {e}")
+        return jsonify({'success': False, 'error': 'Login failed. Please try again.'}), 500
 
 
-@frontend_bp.route('/auth/register')
+@frontend_bp.route('/auth/register', methods=['GET', 'POST'])
 def register_page():
-    """Serve the authentication register page."""
-    try:
+    """Handle user registration."""
+    if request.method == 'GET':
         return render_template('auth/signup.html')
+    
+    try:
+        # Handle POST request - user registration
+        data = request.get_json()
+        
+        email = data.get('email')
+        password = data.get('password') 
+        confirm_password = data.get('confirm_password')
+        first_name = data.get('first_name')
+        last_name = data.get('last_name')
+        
+        # Basic validation
+        if not all([email, password, confirm_password, first_name, last_name]):
+            return jsonify({'success': False, 'error': 'All fields are required'}), 400
+            
+        if password != confirm_password:
+            return jsonify({'success': False, 'error': 'Passwords do not match'}), 400
+            
+        if len(password) < 8:
+            return jsonify({'success': False, 'error': 'Password must be at least 8 characters'}), 400
+        
+        # For now, create a simple session (in production, use proper user registration)
+        session['user_id'] = email
+        session['user_name'] = f"{first_name} {last_name}"
+        session['user_email'] = email
+        session.permanent = True  # Make session persistent across requests
+        
+        logger.info(f"User registered successfully: {email}")
+        return jsonify({
+            'success': True, 
+            'message': 'Account created successfully!',
+            'redirect': '/home'
+        })
+        
     except Exception as e:
-        logger.error(f"Error serving register page: {e}")
-        return render_template('error.html', message="Unable to load the registration page"), 500
+        logger.error(f"Error during registration: {e}")
+        return jsonify({'success': False, 'error': 'Registration failed. Please try again.'}), 500
 
 
-@frontend_bp.route('/auth/signup')
+@frontend_bp.route('/auth/signup', methods=['GET', 'POST'])
 def signup_page():
-    """Serve the dedicated signup page."""
+    """Handle user signup (alias for register)."""
+    return register_page()
+
+
+@frontend_bp.route('/auth/logout', methods=['POST'])
+def logout():
+    """Handle user logout."""
     try:
-        return render_template('auth/signup.html')
+        session.clear()
+        return jsonify({'success': True, 'message': 'Logged out successfully', 'redirect': '/'})
     except Exception as e:
-        logger.error(f"Error serving signup page: {e}")
-        return render_template('error.html', message="Unable to load the signup page"), 500
+        logger.error(f"Error during logout: {e}")
+        return jsonify({'success': False, 'error': 'Logout failed'}), 500
 
 
 @frontend_bp.route('/auth/forgot-password')
@@ -156,7 +222,7 @@ def goals_page():
         if auth_check:
             return auth_check
             
-        return render_template('goal_wizard.html')
+        return render_template('goals.html')
     except Exception as e:
         logger.error(f"Error serving goals page: {e}")
         return render_template('error.html', message="Unable to load the goals page"), 500
@@ -195,6 +261,21 @@ def insights_page():
 @frontend_bp.route('/coach')
 def ai_coach_page():
     """Serve the AI coach page."""
+    try:
+        # Check authentication
+        auth_check = require_auth()
+        if auth_check:
+            return auth_check
+            
+        return render_template('ai_coach.html')
+    except Exception as e:
+        logger.error(f"Error serving AI coach page: {e}")
+        return render_template('error.html', message="Unable to load the AI coach page"), 500
+
+
+@frontend_bp.route('/ai_coach')
+def ai_coach_page_alt():
+    """Serve the AI coach page (alternative URL)."""
     try:
         # Check authentication
         auth_check = require_auth()
@@ -264,7 +345,7 @@ def profile_page():
         if auth_check:
             return auth_check
             
-        return render_template('auth/profile.html')
+        return render_template('profile.html')
     except Exception as e:
         logger.error(f"Error serving profile page: {e}")
         return render_template('error.html', message="Unable to load the profile page"), 500

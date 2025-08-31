@@ -16,6 +16,12 @@ class Config:
     # Flask configuration
     SECRET_KEY = os.environ.get('SECRET_KEY') or secrets.token_hex(32)
     DEBUG = os.environ.get('DEBUG', 'False').lower() in ['true', '1', 'yes']
+    
+    # Session configuration
+    PERMANENT_SESSION_LIFETIME = timedelta(hours=24)  # 24 hour session duration
+    SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
 
     # Firebase configuration
     FIREBASE_PROJECT_ID = os.environ.get('FIREBASE_PROJECT_ID')

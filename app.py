@@ -23,8 +23,8 @@ if __name__ == '__main__':
     parser.add_argument('--host', type=str, default=os.environ.get('HOST', '0.0.0.0'), help='Host to bind to.')
     args = parser.parse_args()
 
-    # Get configuration from environment
-    debug_mode = os.environ.get('DEBUG', 'False').lower() in ['true', '1', 'yes']
+    # Get configuration from environment - disable debug for startup testing
+    debug_mode = False  # Temporarily disabled to avoid reloader issues
     
     # Configure logging for development
     if debug_mode:
@@ -63,6 +63,7 @@ if __name__ == '__main__':
     
     # Run the application
     try:
+        print(f"🚀 Starting Flask server on {args.host}:{args.port}...")
         app.run(
             host=args.host,
             port=args.port,

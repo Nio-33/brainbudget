@@ -1,383 +1,422 @@
 {% extends "base.html" %}
 
-{% block title %}AI Financial Coach - BrainBudget{% endblock %}
+{% block title %}AI Coach - BrainBudget{% endblock %}
 
 {% block content %}
-<!-- AI Coach Chat Interface -->
-<div id="ai-coach-container" class="min-h-screen bg-gray-50 flex flex-col">
-    <!-- Header -->
-    <div class="bg-white border-b border-gray-200 px-4 py-4 sm:px-6">
-        <div class="flex items-center justify-between max-w-4xl mx-auto">
-            <div class="flex items-center">
-                <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg mr-4">
-                    <span class="text-2xl">🤖</span>
-                </div>
-                <div>
-                    <h1 class="text-xl font-semibold text-gray-900">Your AI Financial Coach</h1>
-                    <p class="text-sm text-gray-500" id="coach-status">Ready to help with your finances</p>
-                </div>
+<!-- AI Coach Page -->
+<div class="min-h-screen" style="background-color: #EFDFC5;">
+    <!-- Navigation Header -->
+    <header class="absolute top-4 left-4 right-4 z-10 animate-fadeIn">
+        <div class="flex justify-between items-center">
+            <div class="flex space-x-8">
+                <a href="/home" class="flex items-center space-x-2 hover:opacity-80 transition-colors" style="color: #252B2B;">
+                    <span>🏠</span>
+                    <span>Home</span>
+                </a>
             </div>
-            
-            <!-- Options Menu -->
-            <div class="relative">
-                <button id="options-menu" class="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
-                    </svg>
-                </button>
-                <div id="options-dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 hidden z-10">
-                    <a href="#" id="new-conversation" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">🔄 New Conversation</a>
-                    <a href="#" id="conversation-history" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">📚 History</a>
-                    <a href="#" id="feedback-button" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">⭐ Rate Conversation</a>
-                </div>
+            <div class="flex items-center space-x-4">
+                <!-- Navigation links removed - only on homepage -->
             </div>
         </div>
-    </div>
+    </header>
 
-    <!-- Chat Messages Container -->
-    <div class="flex-1 overflow-hidden">
-        <div class="max-w-4xl mx-auto h-full flex flex-col">
-            
-            <!-- Messages Area -->
-            <div id="messages-container" class="flex-1 overflow-y-auto px-4 py-6 space-y-4" role="main" aria-label="Chat messages">
-                
-                <!-- Welcome Message (placeholder) -->
-                <div class="flex justify-center mb-6">
-                    <div class="bg-purple-50 border border-purple-200 rounded-xl p-6 max-w-2xl text-center">
-                        <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <span class="text-3xl">💜</span>
-                        </div>
-                        <h2 class="text-lg font-semibold text-purple-800 mb-2">Welcome to your AI Financial Coach!</h2>
-                        <p class="text-purple-700">I'm here to provide warm, judgment-free support for your financial journey. Let's chat about whatever's on your mind! 🌟</p>
-                    </div>
-                </div>
-                
-            </div>
-
-            <!-- Quick Actions Bar -->
-            <div id="quick-actions-bar" class="px-4 py-3 bg-white border-t border-gray-200">
-                <div class="flex flex-wrap gap-2 justify-center" id="quick-actions-container">
-                    <!-- Quick action buttons will be loaded here -->
-                </div>
-            </div>
-
-            <!-- Message Input Area -->
-            <div class="bg-white border-t border-gray-200 px-4 py-4">
-                <form id="message-form" class="flex items-end space-x-3">
-                    <div class="flex-1">
-                        <label for="message-input" class="sr-only">Type your message</label>
-                        <textarea
-                            id="message-input"
-                            name="message"
-                            rows="1"
-                            class="w-full resize-none border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm"
-                            placeholder="Ask me anything about your finances..."
-                            aria-describedby="input-help"
-                            maxlength="2000"
-                        ></textarea>
-                        <div id="input-help" class="text-xs text-gray-500 mt-1 hidden">
-                            <span id="char-count">0/2000</span> characters
-                        </div>
-                    </div>
-                    
-                    <button
-                        type="submit"
-                        id="send-button"
-                        class="bg-purple-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-600 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        aria-label="Send message"
-                    >
-                        <span class="flex items-center">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
-                            </svg>
-                            Send
-                        </span>
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Loading Overlay -->
-<div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-    <div class="bg-white rounded-lg p-6 flex items-center space-x-4">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
-        <span class="text-gray-700">Your coach is thinking...</span>
-    </div>
-</div>
-
-<!-- Conversation History Modal -->
-<div id="history-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-    <div class="bg-white rounded-lg max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-            <h3 class="text-lg font-semibold text-gray-900">Conversation History</h3>
-            <button id="close-history" class="text-gray-400 hover:text-gray-600">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-            </button>
-        </div>
-        <div id="history-content" class="p-6 overflow-y-auto max-h-96">
-            <!-- History will be loaded here -->
-        </div>
-    </div>
-</div>
-
-<!-- Feedback Modal -->
-<div id="feedback-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-    <div class="bg-white rounded-lg max-w-md w-full mx-4">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-900">Rate this conversation</h3>
-            <p class="text-sm text-gray-600 mt-1">Your feedback helps me improve!</p>
-        </div>
-        <div class="p-6">
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">How helpful was I?</label>
-                <div class="flex space-x-2" id="rating-stars">
-                    <button class="star text-2xl text-gray-300 hover:text-yellow-400 transition-colors" data-rating="1">⭐</button>
-                    <button class="star text-2xl text-gray-300 hover:text-yellow-400 transition-colors" data-rating="2">⭐</button>
-                    <button class="star text-2xl text-gray-300 hover:text-yellow-400 transition-colors" data-rating="3">⭐</button>
-                    <button class="star text-2xl text-gray-300 hover:text-yellow-400 transition-colors" data-rating="4">⭐</button>
-                    <button class="star text-2xl text-gray-300 hover:text-yellow-400 transition-colors" data-rating="5">⭐</button>
-                </div>
-            </div>
-            
+    <!-- Header Section -->
+    <div class="relative py-16 px-4">
+        <div class="max-w-6xl mx-auto text-center">
             <div class="mb-6">
-                <label for="feedback-text" class="block text-sm font-medium text-gray-700 mb-2">Additional feedback (optional)</label>
-                <textarea
-                    id="feedback-text"
-                    rows="3"
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                    placeholder="Let me know how I can improve..."
-                ></textarea>
+                <span class="text-6xl">🤖</span>
             </div>
-            
-            <div class="flex space-x-3">
-                <button id="submit-feedback" class="flex-1 bg-purple-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-purple-600 transition-colors disabled:opacity-50">
-                    Submit Feedback
-                </button>
-                <button id="cancel-feedback" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                    Cancel
-                </button>
+            <div class="inline-block px-8 py-4 rounded-full brain-gradient mb-6">
+                <h1 class="text-4xl md:text-5xl font-bold text-white">
+                    AI Coach
+                </h1>
+            </div>
+            <p class="text-lg max-w-2xl mx-auto leading-relaxed" style="color: #252B2B;">
+                Personal financial coaching that understands ADHD challenges and strengths. Get support, accountability, and guidance tailored to your neurodivergent brain.
+            </p>
+        </div>
+    </div>
+
+    <!-- AI Coach Content -->
+    <div class="py-12 px-4">
+        <div class="max-w-6xl mx-auto">
+            <!-- Chat Interface -->
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <!-- Main Chat Area -->
+                <div class="lg:col-span-3">
+                    <div class="backdrop-blur-sm rounded-3xl p-6 h-[600px] flex flex-col" style="background-color: rgba(255, 255, 255, 0.9); border: 1px solid #380F17;">
+                        <!-- Chat Header -->
+                        <div class="flex items-center justify-between mb-6 pb-4 border-b" style="border-color: rgba(56, 15, 23, 0.1);">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 rounded-full flex items-center justify-center brain-gradient">
+                                    <span class="text-white text-xl">🤖</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold" style="color: #380F17;">ADHD Financial Coach</h3>
+                                    <p class="text-sm" style="color: #4C4F54;" id="coach-status">Ready to help with your finances</p>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button onclick="startNewConversation()" class="px-4 py-2 rounded-lg font-semibold transition-colors" style="background-color: #380F17; color: #EFDFC5;">
+                                    🔄 New Chat
+                                </button>
+                                <button onclick="showHistory()" class="px-4 py-2 rounded-lg font-semibold transition-colors" style="background-color: #4C4F54; color: #EFDFC5;">
+                                    📚 History
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Messages Area -->
+                        <div id="messages-container" class="flex-1 overflow-y-auto space-y-4 mb-6">
+                            <!-- Welcome Message -->
+                            <div class="flex items-start space-x-3">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center brain-gradient">
+                                    <span class="text-white text-sm">🤖</span>
+                                </div>
+                                <div class="flex-1 p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.8);">
+                                    <p class="text-sm font-semibold mb-2" style="color: #380F17;">Your AI Coach</p>
+                                    <p style="color: #252B2B;">Hi there! I'm your ADHD-aware financial coach. I understand the unique challenges and strengths that come with having a neurodivergent brain. How can I help you today?</p>
+                                    <div class="mt-3 flex flex-wrap gap-2">
+                                        <button onclick="sendQuickMessage('Help me budget with ADHD')" class="px-3 py-1 rounded-lg text-xs font-semibold transition-colors" style="background-color: #380F17; color: #EFDFC5;">
+                                            💰 ADHD Budgeting
+                                        </button>
+                                        <button onclick="sendQuickMessage('I made an impulse purchase')" class="px-3 py-1 rounded-lg text-xs font-semibold transition-colors" style="background-color: #8F0B13; color: #EFDFC5;">
+                                            🛒 Impulse Purchase Help
+                                        </button>
+                                        <button onclick="sendQuickMessage('Struggling with executive function')" class="px-3 py-1 rounded-lg text-xs font-semibold transition-colors" style="background-color: #252B2B; color: #EFDFC5;">
+                                            🧠 Executive Function
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sample conversation for demo -->
+                            <div id="demo-messages" class="space-y-4">
+                                <!-- User message -->
+                                <div class="flex items-start space-x-3 justify-end">
+                                    <div class="flex-1 max-w-xs p-4 rounded-2xl" style="background-color: rgba(56, 15, 23, 0.1);">
+                                        <p style="color: #252B2B;">I keep forgetting to check my budget and then overspend. It's so frustrating!</p>
+                                    </div>
+                                    <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background-color: #8F0B13;">
+                                        <span class="text-white text-sm">👤</span>
+                                    </div>
+                                </div>
+
+                                <!-- AI Coach response -->
+                                <div class="flex items-start space-x-3">
+                                    <div class="w-10 h-10 rounded-full flex items-center justify-center brain-gradient">
+                                        <span class="text-white text-sm">🤖</span>
+                                    </div>
+                                    <div class="flex-1 p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.8);">
+                                        <p class="text-sm font-semibold mb-2" style="color: #380F17;">Your AI Coach</p>
+                                        <p style="color: #252B2B;">I completely understand! This is so common with ADHD - our brains aren't wired for routine tasks like budget checking. Let's create some ADHD-friendly strategies:</p>
+                                        <div class="mt-3 space-y-2">
+                                            <div class="p-2 rounded-lg" style="background-color: rgba(56, 15, 23, 0.1);">
+                                                <p class="text-sm font-semibold" style="color: #380F17;">🔔 Smart Reminders</p>
+                                                <p class="text-xs" style="color: #4C4F54;">Set up gentle budget notifications when you're near spending limits</p>
+                                            </div>
+                                            <div class="p-2 rounded-lg" style="background-color: rgba(56, 15, 23, 0.1);">
+                                                <p class="text-sm font-semibold" style="color: #380F17;">📱 Dopamine Triggers</p>
+                                                <p class="text-xs" style="color: #4C4F54;">Use visual cues and celebrations to make budget checking rewarding</p>
+                                            </div>
+                                            <div class="p-2 rounded-lg" style="background-color: rgba(56, 15, 23, 0.1);">
+                                                <p class="text-sm font-semibold" style="color: #380F17;">⚡ Executive Function Support</p>
+                                                <p class="text-xs" style="color: #4C4F54;">Break budget management into tiny, specific steps</p>
+                                            </div>
+                                        </div>
+                                        <p class="mt-3 text-sm" style="color: #252B2B;">Would you like me to help you set up any of these strategies?</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Input Area -->
+                        <div class="border-t pt-4" style="border-color: rgba(56, 15, 23, 0.1);">
+                            <div class="flex space-x-3">
+                                <input 
+                                    type="text" 
+                                    id="user-input" 
+                                    placeholder="Ask your AI coach anything about managing money with ADHD..."
+                                    class="flex-1 p-3 rounded-xl border focus:outline-none focus:ring-2"
+                                    style="border-color: #380F17; focus:ring-color: #380F17;"
+                                    onkeypress="handleKeyPress(event)"
+                                >
+                                <button 
+                                    onclick="sendMessage()" 
+                                    class="px-6 py-3 rounded-xl font-semibold transition-colors brain-gradient text-white hover:shadow-lg"
+                                >
+                                    Send
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Sidebar -->
+                <div class="space-y-6">
+                    <!-- Coach Specialties -->
+                    <div class="backdrop-blur-sm rounded-3xl p-6" style="background-color: rgba(255, 255, 255, 0.9); border: 1px solid #380F17;">
+                        <h3 class="text-xl font-bold mb-4 flex items-center" style="color: #380F17;">
+                            <span class="mr-3 text-2xl">🎯</span>
+                            I Specialize In
+                        </h3>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex items-center space-x-3 p-2 rounded-lg" style="background-color: rgba(239, 223, 197, 0.6);">
+                                <span class="text-lg">🧠</span>
+                                <span style="color: #380F17;">ADHD budgeting strategies</span>
+                            </div>
+                            <div class="flex items-center space-x-3 p-2 rounded-lg" style="background-color: rgba(239, 223, 197, 0.6);">
+                                <span class="text-lg">⚡</span>
+                                <span style="color: #380F17;">Executive function support</span>
+                            </div>
+                            <div class="flex items-center space-x-3 p-2 rounded-lg" style="background-color: rgba(239, 223, 197, 0.6);">
+                                <span class="text-lg">🛒</span>
+                                <span style="color: #380F17;">Impulse purchase management</span>
+                            </div>
+                            <div class="flex items-center space-x-3 p-2 rounded-lg" style="background-color: rgba(239, 223, 197, 0.6);">
+                                <span class="text-lg">🎉</span>
+                                <span style="color: #380F17;">Dopamine-driven motivation</span>
+                            </div>
+                            <div class="flex items-center space-x-3 p-2 rounded-lg" style="background-color: rgba(239, 223, 197, 0.6);">
+                                <span class="text-lg">📊</span>
+                                <span style="color: #380F17;">Goal flexibility & adaptation</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="backdrop-blur-sm rounded-3xl p-6" style="background-color: rgba(255, 255, 255, 0.9); border: 1px solid #380F17;">
+                        <h3 class="text-xl font-bold mb-4 flex items-center" style="color: #380F17;">
+                            <span class="mr-3 text-2xl">⚡</span>
+                            Quick Help
+                        </h3>
+                        <div class="space-y-3">
+                            <button onclick="sendQuickMessage('Help me create an ADHD-friendly budget')" class="w-full p-3 rounded-xl font-semibold transition-colors hover:shadow-md text-left" style="background-color: #380F17; color: #EFDFC5;">
+                                💰 Budget Setup
+                            </button>
+                            <button onclick="sendQuickMessage('I just made an impulse purchase and feel guilty')" class="w-full p-3 rounded-xl font-semibold transition-colors hover:shadow-md text-left" style="background-color: #8F0B13; color: #EFDFC5;">
+                                🛍️ Impulse Purchase Support
+                            </button>
+                            <button onclick="sendQuickMessage('How can I remember to check my spending?')" class="w-full p-3 rounded-xl font-semibold transition-colors hover:shadow-md text-left" style="background-color: #252B2B; color: #EFDFC5;">
+                                🔔 Memory Strategies
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Conversation History -->
+                    <div class="backdrop-blur-sm rounded-3xl p-6" style="background-color: rgba(255, 255, 255, 0.9); border: 1px solid #380F17;">
+                        <h3 class="text-xl font-bold mb-4 flex items-center" style="color: #380F17;">
+                            <span class="mr-3 text-2xl">📚</span>
+                            Recent Topics
+                        </h3>
+                        <div class="space-y-2 text-sm">
+                            <div class="p-2 rounded-lg cursor-pointer hover:shadow-md transition-colors" style="background-color: rgba(239, 223, 197, 0.6);">
+                                <p class="font-semibold" style="color: #380F17;">Emergency Fund Strategy</p>
+                                <p class="text-xs" style="color: #4C4F54;">Yesterday • 15 min conversation</p>
+                            </div>
+                            <div class="p-2 rounded-lg cursor-pointer hover:shadow-md transition-colors" style="background-color: rgba(239, 223, 197, 0.6);">
+                                <p class="font-semibold" style="color: #380F17;">Hyperfocus Spending</p>
+                                <p class="text-xs" style="color: #4C4F54;">3 days ago • 8 min conversation</p>
+                            </div>
+                            <div class="p-2 rounded-lg cursor-pointer hover:shadow-md transition-colors" style="background-color: rgba(239, 223, 197, 0.6);">
+                                <p class="font-semibold" style="color: #380F17;">Grocery Budget Tips</p>
+                                <p class="text-xs" style="color: #4C4F54;">1 week ago • 12 min conversation</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ADHD Support Widget -->
+                    <div class="backdrop-blur-sm rounded-3xl p-6" style="background-color: rgba(56, 15, 23, 0.9); color: #EFDFC5;">
+                        <h3 class="text-xl font-bold mb-4 flex items-center">
+                            <span class="mr-3 text-2xl">💜</span>
+                            ADHD-Friendly Reminder
+                        </h3>
+                        <div class="text-sm leading-relaxed">
+                            <p class="mb-3">🧠 <strong>Your Brain is Different, Not Broken:</strong> ADHD brains are wired for interest, not importance.</p>
+                            <p class="text-xs opacity-80">Financial management can be challenging with ADHD, but that doesn't mean you can't succeed. I'm here to help you work WITH your brain, not against it.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="py-8 text-center animate-fadeIn">
+        <div class="max-w-4xl mx-auto px-4">
+            <p class="text-sm" style="color: #4C4F54;">
+                BrainBudget - Making budgeting accessible | powered by <span class="font-semibold" style="color: #8F0B13;">Niostudio</span>
+            </p>
+        </div>
+    </footer>
 </div>
-
-<!-- Error Toast -->
-<div id="error-toast" class="fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform z-50">
-    <div class="flex items-center">
-        <span class="mr-2">❌</span>
-        <span id="error-message">Something went wrong</span>
-    </div>
-</div>
-
-<!-- Success Toast -->
-<div id="success-toast" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform z-50">
-    <div class="flex items-center">
-        <span class="mr-2">✅</span>
-        <span id="success-message">Success!</span>
-    </div>
-</div>
-
-<!-- Accessibility Features -->
-<div class="sr-only" aria-live="polite" id="screen-reader-announcements"></div>
-
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/ai-coach.js') }}"></script>
-
 <script>
-    // Initialize AI Coach interface
-    document.addEventListener('DOMContentLoaded', () => {
-        if (window.AICoachInterface) {
-            window.aiCoach = new AICoachInterface();
-        } else {
-            console.error('AI Coach interface not loaded');
-        }
-    });
-
-    // Auto-resize textarea
-    const messageInput = document.getElementById('message-input');
-    messageInput.addEventListener('input', function() {
-        this.style.height = 'auto';
-        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
-        
-        // Update character count
-        const charCount = this.value.length;
-        const charCountEl = document.getElementById('char-count');
-        if (charCountEl) {
-            charCountEl.textContent = `${charCount}/2000`;
-            
-            // Show/hide character count
-            const helpEl = document.getElementById('input-help');
-            if (charCount > 1500) {
-                helpEl.classList.remove('hidden');
-                if (charCount > 2000) {
-                    helpEl.classList.add('text-red-500');
-                } else {
-                    helpEl.classList.remove('text-red-500');
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize chat interface
+    initializeChat();
+    
+    // Load conversation history
+    loadConversationHistory();
+    
+    function initializeChat() {
+        // Set up chat functionality
+        const messagesContainer = document.getElementById('messages-container');
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    function loadConversationHistory() {
+        // Load recent conversations
+        fetch('/api/coach/conversations')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateConversationHistory(data.conversations);
                 }
-            } else {
-                helpEl.classList.add('hidden');
-            }
-        }
-    });
-
-    // Keyboard shortcuts
-    messageInput.addEventListener('keydown', function(e) {
-        // Send on Ctrl+Enter or Cmd+Enter
-        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-            e.preventDefault();
-            document.getElementById('message-form').dispatchEvent(new Event('submit'));
-        }
-    });
-
-    // Options dropdown
-    document.getElementById('options-menu').addEventListener('click', function(e) {
-        e.preventDefault();
-        const dropdown = document.getElementById('options-dropdown');
-        dropdown.classList.toggle('hidden');
-    });
-
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function(e) {
-        const menu = document.getElementById('options-menu');
-        const dropdown = document.getElementById('options-dropdown');
+            })
+            .catch(error => {
+                console.log('Using demo conversation history');
+            });
+    }
+    
+    function updateConversationHistory(conversations) {
+        console.log('Conversation history loaded:', conversations);
+    }
+    
+    // Chat functions
+    window.sendMessage = function() {
+        const input = document.getElementById('user-input');
+        const message = input.value.trim();
         
-        if (!menu.contains(e.target) && !dropdown.contains(e.target)) {
-            dropdown.classList.add('hidden');
-        }
-    });
-
-    // Accessibility: Focus management
-    const messagesContainer = document.getElementById('messages-container');
-    
-    // Announce new messages to screen readers
-    const announceMessage = (message, isFromUser = false) => {
-        const announcer = document.getElementById('screen-reader-announcements');
-        const speaker = isFromUser ? 'You said' : 'AI Coach said';
-        announcer.textContent = `${speaker}: ${message}`;
+        if (!message) return;
+        
+        // Add user message to chat
+        addUserMessage(message);
+        
+        // Clear input
+        input.value = '';
+        
+        // Show typing indicator
+        showTypingIndicator();
+        
+        // Send to AI coach (simulate for demo)
+        setTimeout(() => {
+            hideTypingIndicator();
+            addCoachResponse(generateCoachResponse(message));
+        }, 1500 + Math.random() * 1000);
     };
-
-    // Focus on input when page loads
+    
+    window.sendQuickMessage = function(message) {
+        document.getElementById('user-input').value = message;
+        sendMessage();
+    };
+    
+    window.handleKeyPress = function(event) {
+        if (event.key === 'Enter') {
+            sendMessage();
+        }
+    };
+    
+    function addUserMessage(message) {
+        const messagesContainer = document.getElementById('messages-container');
+        const messageElement = document.createElement('div');
+        messageElement.className = 'flex items-start space-x-3 justify-end';
+        messageElement.innerHTML = `
+            <div class="flex-1 max-w-xs p-4 rounded-2xl" style="background-color: rgba(56, 15, 23, 0.1);">
+                <p style="color: #252B2B;">${message}</p>
+            </div>
+            <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background-color: #8F0B13;">
+                <span class="text-white text-sm">👤</span>
+            </div>
+        `;
+        messagesContainer.appendChild(messageElement);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    function addCoachResponse(response) {
+        const messagesContainer = document.getElementById('messages-container');
+        const messageElement = document.createElement('div');
+        messageElement.className = 'flex items-start space-x-3';
+        messageElement.innerHTML = `
+            <div class="w-10 h-10 rounded-full flex items-center justify-center brain-gradient">
+                <span class="text-white text-sm">🤖</span>
+            </div>
+            <div class="flex-1 p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.8);">
+                <p class="text-sm font-semibold mb-2" style="color: #380F17;">Your AI Coach</p>
+                <p style="color: #252B2B;">${response}</p>
+            </div>
+        `;
+        messagesContainer.appendChild(messageElement);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    function showTypingIndicator() {
+        const messagesContainer = document.getElementById('messages-container');
+        const typingElement = document.createElement('div');
+        typingElement.id = 'typing-indicator';
+        typingElement.className = 'flex items-start space-x-3';
+        typingElement.innerHTML = `
+            <div class="w-10 h-10 rounded-full flex items-center justify-center brain-gradient">
+                <span class="text-white text-sm">🤖</span>
+            </div>
+            <div class="flex-1 p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.8);">
+                <p class="text-sm font-semibold mb-2" style="color: #380F17;">Your AI Coach</p>
+                <div class="flex space-x-1">
+                    <div class="w-2 h-2 rounded-full animate-pulse" style="background-color: #380F17;"></div>
+                    <div class="w-2 h-2 rounded-full animate-pulse" style="background-color: #380F17; animation-delay: 0.2s;"></div>
+                    <div class="w-2 h-2 rounded-full animate-pulse" style="background-color: #380F17; animation-delay: 0.4s;"></div>
+                </div>
+            </div>
+        `;
+        messagesContainer.appendChild(typingElement);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    function hideTypingIndicator() {
+        const typingIndicator = document.getElementById('typing-indicator');
+        if (typingIndicator) {
+            typingIndicator.remove();
+        }
+    }
+    
+    function generateCoachResponse(userMessage) {
+        const responses = [
+            "I understand how challenging money management can be with ADHD. Let's work together to find strategies that work with your brain, not against it. What specific area would you like to focus on first?",
+            "That's such a common experience for people with ADHD! Your brain is wired differently, and traditional budgeting advice often doesn't account for that. Let me suggest some neurodivergent-friendly approaches...",
+            "I hear the frustration in your message, and I want you to know that's completely valid. ADHD brains have unique strengths too - like creativity and hyperfocus - that we can leverage for your financial goals.",
+            "Great question! ADHD affects executive function, which makes tasks like budgeting feel overwhelming. Let's break this down into smaller, more manageable steps that work with your brain.",
+            "You're not alone in this struggle. Many people with ADHD face similar challenges with money management. The key is finding systems that provide the right amount of stimulation and structure for your brain."
+        ];
+        
+        return responses[Math.floor(Math.random() * responses.length)];
+    }
+    
+    // Additional functions
+    window.startNewConversation = function() {
+        document.getElementById('messages-container').innerHTML = `
+            <div class="flex items-start space-x-3">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center brain-gradient">
+                    <span class="text-white text-sm">🤖</span>
+                </div>
+                <div class="flex-1 p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.8);">
+                    <p class="text-sm font-semibold mb-2" style="color: #380F17;">Your AI Coach</p>
+                    <p style="color: #252B2B;">Hi! I'm here to help you navigate financial management with your ADHD brain. What's on your mind today?</p>
+                </div>
+            </div>
+        `;
+        showSuccessToast('🔄 Started new conversation with your AI coach!');
+    };
+    
+    window.showHistory = function() {
+        showSuccessToast('📚 Conversation history coming soon! You\'ll be able to review and continue previous coaching sessions.');
+    };
+    
+    // Auto-focus on input when page loads
     setTimeout(() => {
-        messageInput.focus();
-    }, 100);
+        document.getElementById('user-input').focus();
+    }, 1000);
+});
 </script>
-
-<style>
-/* Custom styles for AI coach interface */
-.message-bubble {
-    animation: fadeInUp 0.3s ease-out;
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Smooth scrolling for messages */
-#messages-container {
-    scroll-behavior: smooth;
-}
-
-/* Loading animation */
-.typing-indicator {
-    display: inline-flex;
-    align-items: center;
-}
-
-.typing-indicator span {
-    height: 8px;
-    width: 8px;
-    border-radius: 50%;
-    background-color: #9CA3AF;
-    display: inline-block;
-    margin-right: 4px;
-    animation: typing 1.4s infinite ease-in-out;
-}
-
-.typing-indicator span:nth-child(1) {
-    animation-delay: -0.32s;
-}
-
-.typing-indicator span:nth-child(2) {
-    animation-delay: -0.16s;
-}
-
-@keyframes typing {
-    0%, 80%, 100% {
-        transform: scale(0.8);
-        opacity: 0.5;
-    }
-    40% {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-
-/* Focus styles for accessibility */
-.quick-action-btn:focus,
-button:focus,
-textarea:focus {
-    outline: 2px solid #8B5CF6;
-    outline-offset: 2px;
-}
-
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-    .bg-purple-500 {
-        background-color: #6D28D9;
-    }
-    
-    .text-gray-500 {
-        color: #374151;
-    }
-}
-
-/* Reduced motion support */
-@media (prefers-reduced-motion: reduce) {
-    .message-bubble {
-        animation: none;
-    }
-    
-    .typing-indicator span {
-        animation: none;
-    }
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-    #ai-coach-container {
-        background-color: #111827;
-    }
-    
-    .bg-white {
-        background-color: #1F2937;
-        color: #F9FAFB;
-    }
-    
-    .border-gray-200 {
-        border-color: #374151;
-    }
-    
-    .text-gray-900 {
-        color: #F9FAFB;
-    }
-    
-    .text-gray-500 {
-        color: #9CA3AF;
-    }
-}
-</style>
-
 {% endblock %}

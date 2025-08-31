@@ -2,879 +2,404 @@
 
 {% block title %}Dashboard - BrainBudget{% endblock %}
 
-{% block extra_head %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/charts.css') }}">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        /* Hide the top navigation on dashboard */
-        nav[role="navigation"] {
-            display: none !important;
-        }
-        body {
-            background: #f8fafc;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-        }
-        
-        .dashboard-container {
-            display: flex;
-            min-h: screen;
-        }
-        
-        /* Dark Sidebar */
-        .sidebar {
-            width: 280px;
-            background: #1a1d29;
-            color: white;
-            padding: 0;
-            position: fixed;
-            height: 100vh;
-            left: 0;
-            top: 0;
-            overflow-y: auto;
-        }
-        
-        .sidebar-header {
-            padding: 24px 20px;
-            border-bottom: 1px solid #2d3142;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        
-        .logo:hover {
-            opacity: 0.8;
-        }
-        
-        .logo-icon {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-        }
-        
-        .sidebar-nav {
-            padding: 20px 0;
-        }
-        
-        .nav-section {
-            margin-bottom: 32px;
-        }
-        
-        .nav-section-title {
-            color: #6b7280;
-            font-size: 12px;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 0 20px;
-            margin-bottom: 8px;
-        }
-        
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 20px;
-            color: #9ca3af;
-            text-decoration: none;
-            transition: all 0.2s;
-            margin: 2px 12px;
-            border-radius: 8px;
-        }
-        
-        .nav-item:hover, .nav-item.active {
-            background: #2d3142;
-            color: white;
-        }
-        
-        .nav-item.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        
-        .nav-icon {
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        /* Main Content */
-        .main-content {
-            margin-left: 280px;
-            flex: 1;
-            padding: 24px;
-        }
-        
-        .dashboard-header {
-            display: flex;
-            justify-content: between;
-            align-items: flex-start;
-            margin-bottom: 32px;
-        }
-        
-        .greeting {
-            flex: 1;
-        }
-        
-        .greeting h1 {
-            font-size: 28px;
-            font-weight: 600;
-            color: #1f2937;
-            margin: 0 0 8px 0;
-        }
-        
-        .greeting p {
-            color: #6b7280;
-            margin: 0;
-        }
-        
-        /* Calendar Widget */
-        .calendar-widget {
-            background: white;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            width: 280px;
-        }
-        
-        .calendar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-        
-        .calendar-title {
-            font-weight: 600;
-            color: #1f2937;
-        }
-        
-        .calendar-nav {
-            display: flex;
-            gap: 8px;
-        }
-        
-        .calendar-nav button {
-            width: 32px;
-            height: 32px;
-            border: none;
-            background: #f3f4f6;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .calendar-nav button:hover {
-            background: #e5e7eb;
-        }
-        
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 4px;
-            margin-bottom: 16px;
-        }
-        
-        .calendar-day-header {
-            text-align: center;
-            font-size: 12px;
-            color: #6b7280;
-            font-weight: 500;
-            padding: 8px 0;
-        }
-        
-        .calendar-day {
-            text-align: center;
-            padding: 8px 4px;
-            font-size: 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .calendar-day:hover {
-            background: #f3f4f6;
-        }
-        
-        .calendar-day.active {
-            background: #1f2937;
-            color: white;
-        }
-        
-        .calendar-day.today {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        
-        /* Dashboard Grid */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 1fr 280px;
-            gap: 24px;
-            margin-bottom: 24px;
-        }
-        
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-        
-        /* Gradient Cards */
-        .gradient-card {
-            border-radius: 16px;
-            padding: 24px;
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .gradient-card.yellow {
-            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-        }
-        
-        .gradient-card.purple {
-            background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
-        }
-        
-        .gradient-card.green {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        }
-        
-        .gradient-card.blue {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-        }
-        
-        .gradient-card.pink {
-            background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
-        }
-        
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 16px;
-        }
-        
-        .card-title {
-            font-size: 16px;
-            font-weight: 600;
-            opacity: 0.9;
-        }
-        
-        .card-icon {
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-        }
-        
-        .card-value {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-        
-        .card-subtitle {
-            opacity: 0.8;
-            font-size: 14px;
-        }
-        
-        .card-chart {
-            position: absolute;
-            right: -10px;
-            bottom: -10px;
-            opacity: 0.3;
-            width: 120px;
-            height: 60px;
-        }
-        
-        /* White Cards */
-        .white-card {
-            background: white;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-        
-        .white-card h3 {
-            font-size: 18px;
-            font-weight: 600;
-            color: #1f2937;
-            margin: 0 0 16px 0;
-        }
-        
-        /* Transaction List */
-        .transaction-list {
-            space-y: 12px;
-        }
-        
-        .transaction-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 0;
-            border-bottom: 1px solid #f3f4f6;
-        }
-        
-        .transaction-item:last-child {
-            border-bottom: none;
-        }
-        
-        .transaction-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            font-weight: 600;
-        }
-        
-        .transaction-info {
-            flex: 1;
-        }
-        
-        .transaction-name {
-            font-weight: 600;
-            color: #1f2937;
-            margin: 0 0 4px 0;
-        }
-        
-        .transaction-details {
-            color: #6b7280;
-            font-size: 14px;
-            margin: 0;
-        }
-        
-        .transaction-amount {
-            font-weight: 600;
-            font-size: 16px;
-        }
-        
-        .transaction-amount.positive {
-            color: #10b981;
-        }
-        
-        .transaction-amount.negative {
-            color: #ef4444;
-        }
-        
-        /* Status Badge */
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-        
-        .status-badge.completed {
-            background: #dcfce7;
-            color: #16a34a;
-        }
-        
-        .status-badge.pending {
-            background: #fef3c7;
-            color: #d97706;
-        }
-        
-        .status-badge.overdue {
-            background: #fecaca;
-            color: #dc2626;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s;
-                z-index: 1000;
-            }
-            
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            
-            .main-content {
-                margin-left: 0;
-            }
-            
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .cards-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .mobile-menu-btn {
-            display: none;
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 1001;
-            background: white;
-            border: none;
-            border-radius: 12px;
-            width: 48px;
-            height: 48px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        
-        @media (max-width: 768px) {
-            .mobile-menu-btn {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-        }
-    </style>
-{% endblock %}
-
 {% block content %}
-<div class="dashboard-container">
-    <!-- Mobile Menu Button -->
-    <button class="mobile-menu-btn" onclick="toggleSidebar()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path stroke="currentColor" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-        </svg>
-    </button>
-
-    <!-- Sidebar -->
-    <nav class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <a href="/" class="logo" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 12px; transition: opacity 0.2s;">
-                <div class="logo-icon">🧠</div>
-                <span>BrainBudget</span>
-            </a>
-        </div>
-        
-        <div class="sidebar-nav">
-            <div class="nav-section">
-                <div class="nav-section-title">General</div>
-                <a href="/dashboard" class="nav-item active">
-                    <div class="nav-icon">📊</div>
-                    <span>Dashboard</span>
-                </a>
-                <a href="/upload" class="nav-item">
-                    <div class="nav-icon">📋</div>
-                    <span>Upload</span>
-                </a>
-                <a href="/goals/create" class="nav-item">
-                    <div class="nav-icon">🎯</div>
-                    <span>Goals</span>
-                </a>
-                <a href="/insights" class="nav-item">
-                    <div class="nav-icon">🧠</div>
-                    <span>Insights</span>
-                </a>
-                <a href="/advice" class="nav-item">
-                    <div class="nav-icon">💡</div>
-                    <span>Advice</span>
+<!-- Dashboard Page -->
+<div class="min-h-screen" style="background-color: #EFDFC5;">
+    <!-- Navigation Header -->
+    <header class="absolute top-4 left-4 right-4 z-10 animate-fadeIn">
+        <div class="flex justify-between items-center">
+            <div class="flex space-x-8">
+                <a href="/home" class="flex items-center space-x-2 hover:opacity-80 transition-colors" style="color: #252B2B;">
+                    <span>🏠</span>
+                    <span>Home</span>
                 </a>
             </div>
-            
-            <div class="nav-section">
-                <div class="nav-section-title">AI Tools</div>
-                <a href="/coach" class="nav-item">
-                    <div class="nav-icon">🤖</div>
-                    <span>AI Coach</span>
-                </a>
-                <a href="/charts-demo" class="nav-item">
-                    <div class="nav-icon">📈</div>
-                    <span>Charts & Analytics</span>
-                </a>
-                <a href="/connect-bank" class="nav-item">
-                    <div class="nav-icon">🏦</div>
-                    <span>Connect Bank</span>
-                </a>
-                <a href="/settings" class="nav-item">
-                    <div class="nav-icon">⚙️</div>
-                    <span>Settings</span>
-                </a>
-            </div>
-            
-            <div class="nav-section">
-                <a href="#" id="logout-btn" class="nav-item" data-action="logout">
-                    <div class="nav-icon">🚪</div>
-                    <span>Log out</span>
-                </a>
+            <div class="flex items-center space-x-4">
+                <!-- Navigation links removed - only on homepage -->
             </div>
         </div>
-    </nav>
+    </header>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <div class="dashboard-grid">
-            <div>
-                <!-- Header -->
-                <div class="dashboard-header">
-                    <div class="greeting">
-                        <h1>Good morning, <span id="user-name">Alex</span>! 👋</h1>
-                        <p>Here's your financial overview. Today is perfect to check your spending and plan your financial goals.</p>
+    <!-- Header Section -->
+    <div class="relative py-16 px-4">
+        <div class="max-w-6xl mx-auto text-center">
+            <div class="mb-6">
+                <span class="text-6xl">📊</span>
+            </div>
+            <div class="inline-block px-8 py-4 rounded-full brain-gradient mb-6">
+                <h1 class="text-4xl md:text-5xl font-bold text-white">
+                    Dashboard
+                </h1>
+            </div>
+            <p class="text-lg max-w-2xl mx-auto leading-relaxed" style="color: #252B2B;">
+                A clear, ADHD-friendly overview of your finances with visual cues and gentle insights to help you stay on track.
+            </p>
+        </div>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div class="py-12 px-4">
+        <div class="max-w-6xl mx-auto">
+            <!-- Quick Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Account Balance -->
+                <div class="backdrop-blur-sm rounded-3xl p-6 card-hover" style="background-color: rgba(56, 15, 23, 0.9); color: #EFDFC5;">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-3xl">💰</span>
+                        <div class="text-right">
+                            <div class="text-sm opacity-80">Account Balance</div>
+                            <div class="text-2xl font-bold">$3,247.83</div>
+                        </div>
                     </div>
+                    <div class="text-xs opacity-80">+$127 from last month</div>
                 </div>
-                
-                <!-- Stats Cards Grid -->
-                <div class="cards-grid">
-                    <!-- Balance Card -->
-                    <div class="gradient-card yellow">
-                        <div class="card-header">
-                            <div>
-                                <div class="card-title">Balance:</div>
-                                <div class="card-value" id="total-balance">$4,850</div>
-                                <div class="card-subtitle">Available funds</div>
-                            </div>
-                            <div class="card-icon">💰</div>
-                        </div>
-                        <canvas class="card-chart" id="balance-chart"></canvas>
-                    </div>
-                    
-                    <!-- Spending Summary Card -->
-                    <div class="gradient-card purple">
-                        <div class="card-header">
-                            <div>
-                                <div class="card-title">Spending summary:</div>
-                                <div class="card-value" id="monthly-spending">$1,240</div>
-                                <div class="card-subtitle">This month</div>
-                            </div>
-                            <div class="card-icon">📊</div>
-                        </div>
-                        <canvas class="card-chart" id="spending-chart"></canvas>
-                    </div>
-                    
-                    <!-- Budget Goals Card -->
-                    <div class="gradient-card green">
-                        <div class="card-header">
-                            <div>
-                                <div class="card-title">By goals:</div>
-                                <div class="card-value">73%</div>
-                                <div class="card-subtitle">Goals achieved</div>
-                            </div>
-                            <div class="card-icon">🎯</div>
+
+                <!-- Monthly Spending -->
+                <div class="backdrop-blur-sm rounded-3xl p-6 card-hover" style="background-color: rgba(143, 11, 19, 0.9); color: #EFDFC5;">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-3xl">💸</span>
+                        <div class="text-right">
+                            <div class="text-sm opacity-80">This Month</div>
+                            <div class="text-2xl font-bold">$1,856.42</div>
                         </div>
                     </div>
-                    
-                    <!-- Sessions/Activities Card -->
-                    <div class="gradient-card blue">
-                        <div class="card-header">
-                            <div>
-                                <div class="card-title">Activities:</div>
-                                <div class="card-value">15</div>
-                                <div class="card-subtitle">Financial tasks completed</div>
-                            </div>
-                            <div class="card-icon">✅</div>
-                        </div>
-                    </div>
+                    <div class="text-xs opacity-80">-$203 from last month</div>
                 </div>
-                
-                <!-- Transaction List and Details -->
-                <div class="cards-grid">
-                    <div class="white-card">
-                        <h3>Recent Transactions</h3>
-                        <div class="transaction-list" id="transaction-list">
-                            <div class="transaction-item">
-                                <div class="transaction-avatar" style="background: #fef3c7; color: #d97706;">🛒</div>
-                                <div class="transaction-info">
-                                    <div class="transaction-name">Grocery Shopping</div>
-                                    <div class="transaction-details">Whole Foods • Today</div>
-                                </div>
-                                <div class="transaction-amount negative">-$85.50</div>
-                            </div>
-                            <div class="transaction-item">
-                                <div class="transaction-avatar" style="background: #dcfce7; color: #16a34a;">💼</div>
-                                <div class="transaction-info">
-                                    <div class="transaction-name">Salary Deposit</div>
-                                    <div class="transaction-details">Employer • Yesterday</div>
-                                </div>
-                                <div class="transaction-amount positive">+$2,500.00</div>
-                            </div>
-                            <div class="transaction-item">
-                                <div class="transaction-avatar" style="background: #fecaca; color: #dc2626;">⚡</div>
-                                <div class="transaction-info">
-                                    <div class="transaction-name">Electric Bill</div>
-                                    <div class="transaction-details">City Power • 2 days ago</div>
-                                </div>
-                                <div class="transaction-amount negative">-$120.00</div>
-                            </div>
-                            <div class="transaction-item">
-                                <div class="transaction-avatar" style="background: #e0e7ff; color: #4f46e5;">☕</div>
-                                <div class="transaction-info">
-                                    <div class="transaction-name">Coffee Shop</div>
-                                    <div class="transaction-details">Starbucks • 3 days ago</div>
-                                </div>
-                                <div class="transaction-amount negative">-$5.75</div>
-                            </div>
-                        </div>
-                        <div style="text-align: center; margin-top: 16px;">
-                            <button style="background: #1f2937; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 14px;">View all details</button>
+
+                <!-- Budget Status -->
+                <div class="backdrop-blur-sm rounded-3xl p-6 card-hover" style="background-color: rgba(37, 43, 43, 0.9); color: #EFDFC5;">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-3xl">🎯</span>
+                        <div class="text-right">
+                            <div class="text-sm opacity-80">Budget Status</div>
+                            <div class="text-2xl font-bold">72%</div>
                         </div>
                     </div>
-                    
-                    <!-- Goals Details -->
-                    <div class="white-card">
-                        <h3>Financial Goals</h3>
-                        <div class="transaction-list">
-                            <div class="transaction-item">
-                                <div class="transaction-avatar" style="background: #dcfce7; color: #16a34a;">🎯</div>
-                                <div class="transaction-info">
-                                    <div class="transaction-name">Emergency Fund</div>
-                                    <div class="transaction-details">$2,800 of $5,000</div>
-                                </div>
-                                <div class="status-badge completed">56%</div>
-                            </div>
-                            <div class="transaction-item">
-                                <div class="transaction-avatar" style="background: #fef3c7; color: #d97706;">🏠</div>
-                                <div class="transaction-info">
-                                    <div class="transaction-name">House Down Payment</div>
-                                    <div class="transaction-details">$8,400 of $15,000</div>
-                                </div>
-                                <div class="status-badge pending">56%</div>
-                            </div>
-                            <div class="transaction-item">
-                                <div class="transaction-avatar" style="background: #fecaca; color: #dc2626;">🚗</div>
-                                <div class="transaction-info">
-                                    <div class="transaction-name">New Car Fund</div>
-                                    <div class="transaction-details">$1,200 of $8,000</div>
-                                </div>
-                                <div class="status-badge overdue">15%</div>
-                            </div>
+                    <div class="text-xs opacity-80">$560 remaining this month</div>
+                </div>
+
+                <!-- Savings Goal -->
+                <div class="backdrop-blur-sm rounded-3xl p-6 card-hover" style="background-color: rgba(76, 79, 84, 0.9); color: #EFDFC5;">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-3xl">🏆</span>
+                        <div class="text-right">
+                            <div class="text-sm opacity-80">Emergency Fund</div>
+                            <div class="text-2xl font-bold">$1,200</div>
                         </div>
                     </div>
+                    <div class="text-xs opacity-80">48% of $2,500 goal</div>
                 </div>
             </div>
-            
-            <!-- Right Sidebar with Calendar -->
-            <div>
-                <div class="calendar-widget">
-                    <div class="calendar-header">
-                        <div class="calendar-title">May 2024</div>
-                        <div class="calendar-nav">
-                            <button onclick="previousMonth()">‹</button>
-                            <button onclick="nextMonth()">›</button>
-                        </div>
-                    </div>
-                    
-                    <div class="calendar-grid">
-                        <div class="calendar-day-header">Su</div>
-                        <div class="calendar-day-header">Mo</div>
-                        <div class="calendar-day-header">Tu</div>
-                        <div class="calendar-day-header">We</div>
-                        <div class="calendar-day-header">Th</div>
-                        <div class="calendar-day-header">Fr</div>
-                        <div class="calendar-day-header">Sa</div>
+
+            <!-- Main Dashboard Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left Column - 2/3 width -->
+                <div class="lg:col-span-2 space-y-8">
+                    <!-- Spending Overview Chart -->
+                    <div class="backdrop-blur-sm rounded-3xl p-6" style="background-color: rgba(255, 255, 255, 0.9); border: 1px solid #380F17;">
+                        <h2 class="text-2xl font-bold mb-6 flex items-center" style="color: #380F17;">
+                            <span class="mr-3 text-3xl">📈</span>
+                            Spending Trends
+                        </h2>
                         
-                        <div class="calendar-day"></div>
-                        <div class="calendar-day"></div>
-                        <div class="calendar-day"></div>
-                        <div class="calendar-day">1</div>
-                        <div class="calendar-day">2</div>
-                        <div class="calendar-day">3</div>
-                        <div class="calendar-day">4</div>
-                        <div class="calendar-day">5</div>
-                        <div class="calendar-day">6</div>
-                        <div class="calendar-day">7</div>
-                        <div class="calendar-day">8</div>
-                        <div class="calendar-day">9</div>
-                        <div class="calendar-day">10</div>
-                        <div class="calendar-day">11</div>
-                        <div class="calendar-day">12</div>
-                        <div class="calendar-day">13</div>
-                        <div class="calendar-day">14</div>
-                        <div class="calendar-day today">15</div>
-                        <div class="calendar-day">16</div>
-                        <div class="calendar-day">17</div>
-                        <div class="calendar-day">18</div>
-                        <div class="calendar-day">19</div>
-                        <div class="calendar-day">20</div>
-                        <div class="calendar-day">21</div>
-                        <div class="calendar-day">22</div>
-                        <div class="calendar-day">23</div>
-                        <div class="calendar-day">24</div>
-                        <div class="calendar-day">25</div>
-                        <div class="calendar-day">26</div>
-                        <div class="calendar-day">27</div>
-                        <div class="calendar-day">28</div>
-                        <div class="calendar-day">29</div>
-                        <div class="calendar-day">30</div>
-                        <div class="calendar-day">31</div>
+                        <!-- Simple Visual Chart -->
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.8);">
+                                <div class="flex items-center space-x-3">
+                                    <span class="text-2xl">🛒</span>
+                                    <div>
+                                        <h3 class="font-semibold" style="color: #380F17;">Groceries & Food</h3>
+                                        <p class="text-sm" style="color: #4C4F54;">$487.23 this month</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="w-32 bg-gray-200 rounded-full h-3 mb-2">
+                                        <div class="h-3 rounded-full brain-gradient" style="width: 65%;"></div>
+                                    </div>
+                                    <div class="text-xs" style="color: #4C4F54;">65% of budget</div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.8);">
+                                <div class="flex items-center space-x-3">
+                                    <span class="text-2xl">🚗</span>
+                                    <div>
+                                        <h3 class="font-semibold" style="color: #380F17;">Transportation</h3>
+                                        <p class="text-sm" style="color: #4C4F54;">$312.89 this month</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="w-32 bg-gray-200 rounded-full h-3 mb-2">
+                                        <div class="h-3 rounded-full" style="background-color: #8F0B13; width: 42%;"></div>
+                                    </div>
+                                    <div class="text-xs" style="color: #4C4F54;">42% of budget</div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.8);">
+                                <div class="flex items-center space-x-3">
+                                    <span class="text-2xl">🎮</span>
+                                    <div>
+                                        <h3 class="font-semibold" style="color: #380F17;">Entertainment</h3>
+                                        <p class="text-sm" style="color: #4C4F54;">$156.78 this month</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="w-32 bg-gray-200 rounded-full h-3 mb-2">
+                                        <div class="h-3 rounded-full" style="background-color: #252B2B; width: 31%;"></div>
+                                    </div>
+                                    <div class="text-xs" style="color: #4C4F54;">31% of budget</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <div style="margin-top: 16px;">
-                        <button style="background: #1f2937; color: white; border: none; padding: 8px 16px; border-radius: 8px; width: 100%; font-size: 14px;">Add event</button>
+
+                    <!-- Recent Transactions -->
+                    <div class="backdrop-blur-sm rounded-3xl p-6" style="background-color: rgba(255, 255, 255, 0.9); border: 1px solid #380F17;">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-2xl font-bold flex items-center" style="color: #380F17;">
+                                <span class="mr-3 text-3xl">💳</span>
+                                Recent Transactions
+                            </h2>
+                            <a href="#" class="text-sm font-semibold hover:underline" style="color: #8F0B13;">View All</a>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.6);">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background-color: #380F17;">
+                                        <span class="text-white text-sm">🛒</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-sm" style="color: #380F17;">Whole Foods Market</h4>
+                                        <p class="text-xs" style="color: #4C4F54;">Today, 2:30 PM • Groceries</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-semibold" style="color: #8F0B13;">-$67.42</div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.6);">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background-color: #8F0B13;">
+                                        <span class="text-white text-sm">⛽</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-sm" style="color: #380F17;">Shell Gas Station</h4>
+                                        <p class="text-xs" style="color: #4C4F54;">Yesterday, 8:15 AM • Transportation</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-semibold" style="color: #8F0B13;">-$45.20</div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.6);">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background-color: #252B2B;">
+                                        <span class="text-white text-sm">💰</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-sm" style="color: #380F17;">Salary Deposit</h4>
+                                        <p class="text-xs" style="color: #4C4F54;">Dec 15 • Income</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-semibold" style="color: #7ED321;">+$2,850.00</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                
-                <!-- Quick Actions -->
-                <div class="white-card" style="margin-top: 16px;">
-                    <h3>Today's Timeline</h3>
-                    <div style="font-size: 14px; color: #6b7280; margin-top: 16px;">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                            <div style="width: 8px; height: 8px; background: #10b981; border-radius: 50%;"></div>
+
+                <!-- Right Sidebar -->
+                <div class="lg:col-span-1 space-y-6">
+                    <!-- ADHD-Friendly Quick Actions -->
+                    <div class="backdrop-blur-sm rounded-3xl p-6" style="background-color: rgba(255, 255, 255, 0.9); border: 1px solid #380F17;">
+                        <h3 class="text-xl font-bold mb-4 flex items-center" style="color: #380F17;">
+                            <span class="mr-3 text-2xl">⚡</span>
+                            Quick Actions
+                        </h3>
+                        <div class="space-y-3">
+                            <button onclick="showFeature('add-expense')" class="w-full p-3 rounded-xl font-semibold transition-colors hover:shadow-md" style="background-color: #380F17; color: #EFDFC5;">
+                                💸 Log Expense
+                            </button>
+                            <button onclick="showFeature('set-budget')" class="w-full p-3 rounded-xl font-semibold transition-colors hover:shadow-md" style="background-color: #8F0B13; color: #EFDFC5;">
+                                🎯 Update Budget
+                            </button>
+                            <button onclick="showFeature('savings')" class="w-full p-3 rounded-xl font-semibold transition-colors hover:shadow-md" style="background-color: #252B2B; color: #EFDFC5;">
+                                🏆 Add to Savings
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Monthly Goals Progress -->
+                    <div class="backdrop-blur-sm rounded-3xl p-6" style="background-color: rgba(255, 255, 255, 0.9); border: 1px solid #380F17;">
+                        <h3 class="text-xl font-bold mb-4 flex items-center" style="color: #380F17;">
+                            <span class="mr-3 text-2xl">🎯</span>
+                            Monthly Goals
+                        </h3>
+                        <div class="space-y-4">
                             <div>
-                                <div style="font-weight: 500; color: #1f2937;">Budget review</div>
-                                <div>Monthly spending check</div>
+                                <div class="flex justify-between text-sm mb-2" style="color: #252B2B;">
+                                    <span>Stay Under Budget</span>
+                                    <span>72%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-3">
+                                    <div class="h-3 rounded-full brain-gradient" style="width: 72%;"></div>
+                                </div>
+                                <div class="text-xs mt-1" style="color: #4C4F54;">$560 remaining</div>
+                            </div>
+                            
+                            <div>
+                                <div class="flex justify-between text-sm mb-2" style="color: #252B2B;">
+                                    <span>Emergency Fund</span>
+                                    <span>48%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-3">
+                                    <div class="h-3 rounded-full" style="background-color: #8F0B13; width: 48%;"></div>
+                                </div>
+                                <div class="text-xs mt-1" style="color: #4C4F54;">$1,200 of $2,500</div>
+                            </div>
+                            
+                            <div>
+                                <div class="flex justify-between text-sm mb-2" style="color: #252B2B;">
+                                    <span>Reduce Takeout</span>
+                                    <span>85%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-3">
+                                    <div class="h-3 rounded-full" style="background-color: #7ED321; width: 85%;"></div>
+                                </div>
+                                <div class="text-xs mt-1" style="color: #4C4F54;">Great progress! 🎉</div>
                             </div>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                            <div style="width: 8px; height: 8px; background: #f59e0b; border-radius: 50%;"></div>
-                            <div>
-                                <div style="font-weight: 500; color: #1f2937;">Bill payment</div>
-                                <div>Internet bill due today</div>
-                            </div>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <div style="width: 8px; height: 8px; background: #3b82f6; border-radius: 50%;"></div>
-                            <div>
-                                <div style="font-weight: 500; color: #1f2937;">Savings goal</div>
-                                <div>Emergency fund update</div>
-                            </div>
+                    </div>
+
+                    <!-- ADHD Support Widget -->
+                    <div class="backdrop-blur-sm rounded-3xl p-6" style="background-color: rgba(56, 15, 23, 0.9); color: #EFDFC5;">
+                        <h3 class="text-xl font-bold mb-4 flex items-center">
+                            <span class="mr-3 text-2xl">🧠</span>
+                            ADHD Tip of the Day
+                        </h3>
+                        <div class="text-sm leading-relaxed">
+                            <p class="mb-3">💡 <strong>Dopamine Reward:</strong> You logged 3 expenses this week! Your brain loves these small wins.</p>
+                            <p class="text-xs opacity-80">Remember: Progress over perfection. Every small step counts toward your financial wellness.</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-8 text-center animate-fadeIn">
+        <div class="max-w-4xl mx-auto px-4">
+            <p class="text-sm" style="color: #4C4F54;">
+                BrainBudget - Making budgeting accessible | powered by <span class="font-semibold" style="color: #8F0B13;">Niostudio</span>
+            </p>
+        </div>
+    </footer>
 </div>
 {% endblock %}
 
 {% block scripts %}
-<!-- Firebase SDK -->
-<script type="module">
-    // Import Firebase modules
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
-    import { getAuth, signOut } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
-    
-    // Initialize Firebase
-    try {
-        const response = await fetch('/api/auth/firebase-config');
-        const config = await response.json();
-        
-        if (config.success) {
-            const app = initializeApp(config.config);
-            const auth = getAuth(app);
-            
-            // Make Firebase available globally
-            window.firebase = { 
-                auth: () => auth,
-                app: app
-            };
-            
-            console.log('Firebase initialized for dashboard');
-        } else {
-            console.warn('Failed to get Firebase config:', config.error);
-        }
-    } catch (error) {
-        console.error('Firebase initialization failed:', error);
-    }
-</script>
-
-<script src="{{ url_for('static', filename='js/auth.js') }}"></script>
-<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
 <script>
-    function toggleSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        sidebar.classList.toggle('open');
-    }
+document.addEventListener('DOMContentLoaded', function() {
+    // Load dashboard data
+    loadDashboardData();
     
-    function previousMonth() {
-        // Calendar navigation logic
-        console.log('Previous month');
-    }
+    // Simulate real-time updates
+    setInterval(updateDashboard, 30000); // Update every 30 seconds
     
-    function nextMonth() {
-        // Calendar navigation logic
-        console.log('Next month');
-    }
-    
-    // Initialize mini charts
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize small charts for cards
-        initializeMiniCharts();
-    });
-    
-    function initializeMiniCharts() {
-        // Balance trend mini chart
-        const balanceCtx = document.getElementById('balance-chart');
-        if (balanceCtx) {
-            new Chart(balanceCtx, {
-                type: 'line',
-                data: {
-                    labels: ['', '', '', '', '', ''],
-                    datasets: [{
-                        data: [3200, 3800, 3400, 4200, 4600, 4850],
-                        borderColor: 'rgba(255, 255, 255, 0.8)',
-                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 0,
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { 
-                        x: { display: false },
-                        y: { display: false }
-                    }
+    function loadDashboardData() {
+        // Load account balance
+        fetch('/api/dashboard/balance')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update balance display
+                    console.log('Balance loaded:', data.balance);
                 }
+            })
+            .catch(error => {
+                console.log('Using demo data for balance');
             });
-        }
         
-        // Spending trend mini chart
-        const spendingCtx = document.getElementById('spending-chart');
-        if (spendingCtx) {
-            new Chart(spendingCtx, {
-                type: 'line',
-                data: {
-                    labels: ['', '', '', '', '', ''],
-                    datasets: [{
-                        data: [1800, 1200, 1500, 1100, 900, 1240],
-                        borderColor: 'rgba(255, 255, 255, 0.8)',
-                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 0,
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { 
-                        x: { display: false },
-                        y: { display: false }
-                    }
+        // Load spending data
+        fetch('/api/dashboard/spending')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update spending charts
+                    console.log('Spending data loaded:', data);
                 }
+            })
+            .catch(error => {
+                console.log('Using demo data for spending');
             });
+        
+        // Load recent transactions
+        fetch('/api/dashboard/transactions')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update transactions list
+                    console.log('Transactions loaded:', data.transactions);
+                }
+            })
+            .catch(error => {
+                console.log('Using demo data for transactions');
+            });
+    }
+    
+    function updateDashboard() {
+        // Subtle updates for ADHD-friendly experience
+        const stats = document.querySelectorAll('[style*="rgba(56, 15, 23, 0.9)"] .text-2xl.font-bold')[0];
+        if (stats && Math.random() > 0.8) {
+            // Very subtle balance update animation
+            stats.style.transform = 'scale(1.05)';
+            setTimeout(() => {
+                stats.style.transform = 'scale(1)';
+            }, 200);
         }
     }
+    
+    // Feature placeholders
+    window.showFeature = function(feature) {
+        const features = {
+            'add-expense': '💸 Quick expense logging coming soon! This will let you add expenses with voice input and photo receipts.',
+            'set-budget': '🎯 Budget adjustment feature coming soon! Set flexible, ADHD-friendly spending limits.',
+            'savings': '🏆 Savings booster coming soon! Automatic micro-savings and goal tracking.'
+        };
+        
+        if (features[feature]) {
+            showSuccessToast(features[feature]);
+        }
+    };
+    
+    // ADHD-friendly animations on scroll
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+    
+    // Observe cards for gentle entrance animations
+    document.querySelectorAll('.card-hover').forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(card);
+    });
+});
 </script>
 {% endblock %}

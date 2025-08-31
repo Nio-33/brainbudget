@@ -2,20 +2,59 @@
 
 {% block title %}Sign In - BrainBudget{% endblock %}
 
+{% block extra_styles %}
+<style>
+    body { 
+        background-color: #252B2B !important; 
+    }
+    .min-h-screen {
+        background-color: #252B2B !important;
+    }
+    .auth-form-card {
+        background-color: #EFDFC5 !important;
+    }
+    .auth-header {
+        color: #8F0B13 !important;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        border: 3px solid #8F0B13;
+        padding: 0.5rem 1rem;
+        border-radius: 0.75rem;
+        background-color: rgba(239, 223, 197, 0.9);
+    }
+    .auth-subtitle {
+        color: #8F0B13 !important;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        border: 2px solid #8F0B13;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        background-color: rgba(239, 223, 197, 0.8);
+        margin-top: 1rem;
+    }
+    .auth-footer-text {
+        color: #8F0B13 !important;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        border: 2px solid #8F0B13;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        background-color: rgba(239, 223, 197, 0.8);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
     <!-- Main Content -->
     <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-md w-full space-y-8 animate-slideUp">
             <!-- Header -->
             <div class="text-center">
-                <a href="/" class="text-4xl font-bold mb-2 cursor-pointer hover:opacity-80 transition-opacity" style="color: #380F17;">
+                <a href="/" class="text-4xl font-bold mb-2 cursor-pointer hover:opacity-80 transition-opacity" style="color: #8F0B13 !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); border: 3px solid #8F0B13; padding: 0.5rem 1rem; border-radius: 0.75rem; background-color: rgba(239, 223, 197, 0.9); display: inline-block;">
                     BrainBudget
                 </a>
-                <p class="text-lg" style="color: #252B2B;">Welcome back to your financial journey</p>
+                <p class="text-lg" style="color: #8F0B13 !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); border: 2px solid #8F0B13; padding: 0.5rem; border-radius: 0.5rem; background-color: rgba(239, 223, 197, 0.8); margin-top: 1rem;">Welcome back to your financial journey</p>
             </div>
 
             <!-- Signin Form -->
-            <div class="bg-white bg-opacity-80 rounded-3xl shadow-xl p-8 card-hover">
+            <div class="rounded-3xl shadow-xl p-8 card-hover auth-form-card" style="background-color: #EFDFC5 !important;">
                 <form id="signin-form" class="space-y-6">
                     <div>
                         <label for="email" class="block text-sm font-medium mb-2" style="color: #252B2B;">
@@ -90,7 +129,7 @@
                             <div class="w-full border-t border-gray-300"></div>
                         </div>
                         <div class="relative flex justify-center text-sm">
-                            <span class="px-2 bg-white" style="color: #4C4F54;">Or continue with</span>
+                            <span class="px-2" style="background-color: #EFDFC5; color: #4C4F54;">Or continue with</span>
                         </div>
                     </div>
 
@@ -114,9 +153,9 @@
 
             <!-- Sign Up Link -->
             <div class="text-center">
-                <p style="color: #4C4F54;">
+                <p style="color: #8F0B13 !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); border: 2px solid #8F0B13; padding: 0.5rem; border-radius: 0.5rem; background-color: rgba(239, 223, 197, 0.8);">
                     Don't have an account? 
-                    <a href="/auth/register" class="font-semibold hover:opacity-80 underline" style="color: #380F17;">
+                    <a href="/auth/register" class="font-semibold hover:opacity-80" style="color: #8F0B13 !important; border-bottom: 3px solid #8F0B13; text-decoration: none;">
                         Sign up here
                     </a>
                 </p>
@@ -142,13 +181,32 @@
                 return;
             }
             
-            // Show success message
-            showSuccessToast('🎉 Welcome back! Signing you in...');
-            
-            // Redirect to homepage after delay
-            setTimeout(() => {
-                window.location.href = '/home';
-            }, 2000);
+            // Submit to backend
+            fetch('/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: password
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSuccessToast('🎉 ' + data.message);
+                    setTimeout(() => {
+                        window.location.href = data.redirect || '/home';
+                    }, 2000);
+                } else {
+                    showErrorToast(data.error || 'Login failed');
+                }
+            })
+            .catch(error => {
+                console.error('Login error:', error);
+                showErrorToast('Login failed. Please try again.');
+            });
         });
         
         // Google signin

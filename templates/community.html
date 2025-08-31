@@ -5,6 +5,21 @@
 {% block content %}
 <!-- Community Page -->
 <div class="min-h-screen" style="background-color: #EFDFC5;">
+    <!-- Navigation Header -->
+    <header class="absolute top-4 left-4 right-4 z-10 animate-fadeIn">
+        <div class="flex justify-between items-center">
+            <div class="flex space-x-8">
+                <a href="/home" class="flex items-center space-x-2 hover:opacity-80 transition-colors" style="color: #252B2B;">
+                    <span>🏠</span>
+                    <span>Home</span>
+                </a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <!-- Settings link removed - clean navigation -->
+            </div>
+        </div>
+    </header>
+
     <!-- Header Section -->
     <div class="relative py-16 px-4">
         <div class="max-w-6xl mx-auto text-center">
@@ -303,6 +318,15 @@
             </div>
         </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="py-8 text-center animate-fadeIn">
+        <div class="max-w-4xl mx-auto px-4">
+            <p class="text-sm" style="color: #4C4F54;">
+                BrainBudget - Making budgeting accessible | powered by <span class="font-semibold" style="color: #8F0B13;">Niostudio</span>
+            </p>
+        </div>
+    </footer>
 </div>
 
 <!-- New Post Modal -->
@@ -505,6 +529,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Load data when page loads
     loadCommunityData();
+    
+    // Settings feature modal (simple placeholder)
+    window.showFeature = function(feature) {
+        if (feature === 'settings') {
+            alert('⚙️ Settings page coming soon! This will include community notification preferences and display options.');
+        }
+    };
     
     // Simulate real-time updates (in a real app, this would use WebSocket or polling)
     setTimeout(function() {
