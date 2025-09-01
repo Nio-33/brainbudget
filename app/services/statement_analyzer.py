@@ -19,10 +19,11 @@ class Transaction:
     date: date
     description: str
     amount: float
+    currency: str  # Currency code: USD, NGN, EUR, GBP
     transaction_type: str  # 'debit', 'credit'
     category: str
     confidence: float  # AI confidence in categorization (0-1)
-    raw_text: str = ""  # Original text from statemen
+    raw_text: str = ""  # Original text from statement
 
 @dataclass
 class SpendingInsight:
@@ -133,16 +134,24 @@ class StatementAnalyzer:
         prompt = f"""
         You are a helpful AI assistant that extracts transaction data from bank statements.
         Please analyze the following bank statement text and extract all transactions.
-
+        
+        CURRENCY SUPPORT: Recognize these currency symbols and formats:
+        - USD: $123.45 or 123.45 USD
+        - NGN: ₦123.45 or 123.45 NGN or N123.45
+        - EUR: €123.45 or 123.45 EUR
+        - GBP: £123.45 or 123.45 GBP
+        
         For each transaction, provide:
         - Date (YYYY-MM-DD format)
         - Description (clean, readable description)
         - Amount (positive number, we'll determine debit/credit separately)
+        - Currency (detected currency code: USD, NGN, EUR, GBP)
         - Type (either "debit" or "credit")
         - Raw text (original line from statement)
 
         Return the data as a JSON array of transaction objects.
         Be very careful with amounts - include decimals and handle negative/positive correctly.
+        If no currency is explicitly shown, assume the local currency from context clues.
 
         Bank statement text:
         {statement_text}
@@ -187,7 +196,7 @@ class StatementAnalyzer:
                 {', '.join(self.CATEGORIES.keys())}
 
                 Transaction: {raw_txn.get('description', '')}
-                Amount: ${raw_txn.get('amount', 0)}
+                Amount: {raw_txn.get('amount', 0)} {raw_txn.get('currency', 'USD')}
 
                 Consider these category guidelines:
                 - Housing: Rent, mortgage, utilities, home repairs
@@ -212,11 +221,12 @@ class StatementAnalyzer:
                     # Parse AI response
                     category, confidence = self._parse_categorization_response(response.text)
 
-                # Convert raw transaction to Transaction objec
+                # Convert raw transaction to Transaction object
                 transaction = Transaction(
                     date=datetime.strptime(raw_txn.get('date', '2025-01-01'), '%Y-%m-%d').date(),
                     description=raw_txn.get('description', 'Unknown Transaction'),
                     amount=float(raw_txn.get('amount', 0)),
+                    currency=raw_txn.get('currency', 'USD'),
                     transaction_type=raw_txn.get('type', 'debit'),
                     category=category,
                     confidence=confidence,
@@ -232,6 +242,7 @@ class StatementAnalyzer:
                     date=datetime.strptime(raw_txn.get('date', '2025-01-01'), '%Y-%m-%d').date(),
                     description=raw_txn.get('description', 'Unknown Transaction'),
                     amount=float(raw_txn.get('amount', 0)),
+                    currency=raw_txn.get('currency', 'USD'),
                     transaction_type=raw_txn.get('type', 'debit'),
                     category="Other",
                     confidence=0.1,

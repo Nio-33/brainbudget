@@ -2,6 +2,11 @@
 
 {% block title %}Insights - BrainBudget{% endblock %}
 
+{% block head_scripts %}
+<!-- Chart.js for data visualization -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
 {% block content %}
 <!-- Insights Page -->
 <div class="min-h-screen" style="background-color: #EFDFC5;">
@@ -40,6 +45,82 @@
     <!-- Insights Content -->
     <div class="py-12 px-4">
         <div class="max-w-6xl mx-auto">
+            
+            {% if has_analysis and analysis_results %}
+            <!-- Dynamic Analysis Results -->
+            <div class="mb-8 p-6 rounded-3xl" style="background-color: rgba(56, 15, 23, 0.9); color: #EFDFC5;">
+                <h2 class="text-2xl font-bold mb-4 flex items-center">
+                    <span class="mr-3 text-3xl">📊</span>
+                    Your Analysis Results
+                </h2>
+                <p class="opacity-80">Processed: {{ analysis_timestamp[:19] if analysis_timestamp else 'Recently' }}</p>
+                
+                {% if analysis_results.analysis.insights %}
+                <div class="mt-6 space-y-4">
+                    {% for insight in analysis_results.analysis.insights %}
+                    <div class="p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.2); border-left: 4px solid #EFDFC5;">
+                        <div class="flex items-start space-x-3">
+                            <span class="text-2xl">{{ insight.icon }}</span>
+                            <div>
+                                <h3 class="font-semibold text-white">{{ insight.title }}</h3>
+                                <p class="text-sm mt-1 opacity-80">{{ insight.message }}</p>
+                                {% if insight.recommendation %}
+                                <div class="mt-2 text-xs" style="color: #EFDFC5;">💡 {{ insight.recommendation }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <!-- Spending Summary -->
+                {% if analysis_results.analysis.summary %}
+                <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="text-center p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.2);">
+                        <div class="text-2xl font-bold">{{ analysis_results.analysis.summary.total_expenses|currency }}</div>
+                        <div class="text-sm opacity-80">Total Expenses</div>
+                    </div>
+                    <div class="text-center p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.2);">
+                        <div class="text-2xl font-bold">{{ analysis_results.analysis.summary.total_income|currency }}</div>
+                        <div class="text-sm opacity-80">Total Income</div>
+                    </div>
+                    <div class="text-center p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.2);">
+                        <div class="text-2xl font-bold">{{ analysis_results.analysis.summary.transaction_count }}</div>
+                        <div class="text-sm opacity-80">Transactions</div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Spending Breakdown Chart -->
+            {% if analysis_results.analysis.spending_breakdown %}
+            <div class="mb-8 p-6 rounded-3xl" style="background-color: rgba(255, 255, 255, 0.9);">
+                <h2 class="text-2xl font-bold mb-6 flex items-center" style="color: #380F17;">
+                    <span class="mr-3 text-3xl">🥧</span>
+                    Spending Breakdown
+                </h2>
+                <div class="relative h-64">
+                    <canvas id="spendingChart"></canvas>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% else %}
+            <!-- No Analysis Available - Show Upload Prompt -->
+            <div class="text-center py-12">
+                <div class="backdrop-blur-sm rounded-3xl p-8" style="background-color: rgba(56, 15, 23, 0.9); color: #EFDFC5;">
+                    <span class="text-6xl block mb-4">📊</span>
+                    <h2 class="text-2xl font-bold mb-4">No Analysis Yet</h2>
+                    <p class="mb-6 opacity-80">Upload a bank statement to see your personalized spending insights here!</p>
+                    <a href="/home" class="inline-block px-6 py-3 rounded-lg font-semibold text-white brain-gradient hover:shadow-lg transition-all duration-200">
+                        📄 Upload Statement
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Static Demo Content (fallback) -->
             <!-- Key Insights Summary -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <!-- Spending Momentum -->
@@ -291,6 +372,65 @@
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    {% if has_analysis and analysis_results and analysis_results.analysis.spending_breakdown %}
+    // Initialize spending breakdown chart with real data
+    const ctx = document.getElementById('spendingChart');
+    if (ctx) {
+        const spendingData = {{ analysis_results.analysis.spending_breakdown | tojson }};
+        const categories = Object.keys(spendingData);
+        const amounts = Object.values(spendingData);
+        
+        // Generate colors for each category
+        const colors = [
+            '#380F17', '#8F0B13', '#252B2B', '#4C4F54', 
+            '#7CEC86', '#FFC107', '#8B5CF6', '#3B82F6'
+        ];
+        
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: categories,
+                datasets: [{
+                    data: amounts,
+                    backgroundColor: colors.slice(0, categories.length),
+                    borderWidth: 2,
+                    borderColor: '#EFDFC5'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            font: {
+                                size: 12
+                            },
+                            color: '#380F17'
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const value = context.parsed;
+                                const total = amounts.reduce((a, b) => a + b, 0);
+                                const percentage = ((value / total) * 100).toFixed(1);
+                                return `${context.label}: $${value.toFixed(2)} (${percentage}%)`;
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    animateRotate: true,
+                    duration: 1500
+                }
+            }
+        });
+    }
+    {% endif %}
+    
     // Load insights data
     loadInsights();
     

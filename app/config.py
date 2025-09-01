@@ -58,6 +58,15 @@ class Config:
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file size
     ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg'}
 
+    # Currency configuration
+    SUPPORTED_CURRENCIES = {
+        'USD': {'symbol': '$', 'name': 'US Dollar', 'format': 'before'},
+        'NGN': {'symbol': '₦', 'name': 'Nigerian Naira', 'format': 'before'},
+        'EUR': {'symbol': '€', 'name': 'Euro', 'format': 'before'},
+        'GBP': {'symbol': '£', 'name': 'British Pound', 'format': 'before'}
+    }
+    DEFAULT_CURRENCY = os.environ.get('DEFAULT_CURRENCY', 'USD')
+
     # CORS configuration
     CORS_ORIGINS = os.environ.get('CORS_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000').split(',')
 

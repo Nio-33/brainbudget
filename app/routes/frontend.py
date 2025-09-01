@@ -322,7 +322,18 @@ def insights_page():
         if auth_check:
             return auth_check
             
-        return render_template('insights.html', **get_template_context())
+        # Get analysis results from session if available
+        analysis_results = session.get('analysis_results')
+        analysis_timestamp = session.get('analysis_timestamp')
+        
+        template_context = get_template_context()
+        template_context.update({
+            'analysis_results': analysis_results,
+            'analysis_timestamp': analysis_timestamp,
+            'has_analysis': analysis_results is not None
+        })
+        
+        return render_template('insights.html', **template_context)
     except Exception as e:
         logger.error(f"Error serving insights page: {e}")
         return render_template('error.html', message="Unable to load the insights page"), 500
@@ -382,10 +393,39 @@ def settings_page():
         if auth_check:
             return auth_check
             
-        return render_template('settings.html', **get_template_context())
+        template_context = get_template_context()
+        template_context['current_currency'] = session.get('preferred_currency', current_app.config.get('DEFAULT_CURRENCY', 'USD'))
+        template_context['supported_currencies'] = current_app.config.get('SUPPORTED_CURRENCIES', {})
+            
+        return render_template('settings.html', **template_context)
     except Exception as e:
         logger.error(f"Error serving settings page: {e}")
         return render_template('error.html', message="Unable to load the settings page"), 500
+
+@frontend_bp.route('/api/settings/currency', methods=['POST'])
+def update_currency_preference():
+    """Update user's currency preference."""
+    try:
+        data = request.get_json()
+        currency_code = data.get('currency')
+        
+        if not currency_code:
+            return jsonify({'success': False, 'error': 'Currency code required'}), 400
+            
+        supported_currencies = current_app.config.get('SUPPORTED_CURRENCIES', {})
+        if currency_code not in supported_currencies:
+            return jsonify({'success': False, 'error': 'Unsupported currency'}), 400
+            
+        # Save to session
+        session['preferred_currency'] = currency_code
+        session.permanent = True
+        
+        logger.info(f"Currency preference updated to {currency_code}")
+        return jsonify({'success': True, 'message': f'Currency updated to {currency_code}'})
+        
+    except Exception as e:
+        logger.error(f"Error updating currency preference: {e}")
+        return jsonify({'success': False, 'error': 'Failed to update currency'}), 500
 
 
 # ============================================================================
@@ -584,11 +624,28 @@ def sitemap():
 
 # Template filters for ADHD-friendly formatting
 @frontend_bp.app_template_filter('currency')
-def currency_filter(amount):
-    """Format currency amounts in a friendly way."""
+def currency_filter(amount, currency_code=None):
+    """Format currency amounts in a friendly way with multi-currency support."""
     if amount is None:
-        return "$0.00"
-    return f"${amount:,.2f}"
+        amount = 0.0
+    
+    # Get user's preferred currency from session or use default
+    if not currency_code:
+        currency_code = session.get('preferred_currency', current_app.config.get('DEFAULT_CURRENCY', 'USD'))
+    
+    # Get currency info from config
+    currencies = current_app.config.get('SUPPORTED_CURRENCIES', {})
+    currency_info = currencies.get(currency_code, currencies.get('USD', {'symbol': '$', 'format': 'before'}))
+    
+    symbol = currency_info['symbol']
+    format_type = currency_info.get('format', 'before')
+    
+    formatted_amount = f"{amount:,.2f}"
+    
+    if format_type == 'before':
+        return f"{symbol}{formatted_amount}"
+    else:
+        return f"{formatted_amount} {symbol}"
 
 
 @frontend_bp.app_template_filter('friendly_date')

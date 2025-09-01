@@ -82,6 +82,20 @@
                                 </label>
                             </div>
                             
+                            <!-- Currency Selection -->
+                            <div class="p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.8);">
+                                <h3 class="font-semibold mb-3" style="color: #380F17;">Preferred Currency</h3>
+                                <select id="currency-select" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent" style="background-color: rgba(255, 255, 255, 0.9);">
+                                    {% for code, info in supported_currencies.items() %}
+                                    <option value="{{ code }}" {% if code == current_currency %}selected{% endif %}>
+                                        {% if code == 'USD' %}🇺🇸{% elif code == 'NGN' %}🇳🇬{% elif code == 'EUR' %}🇪🇺{% elif code == 'GBP' %}🇬🇧{% endif %} 
+                                        {{ info.name }} ({{ info.symbol }})
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <p class="text-sm mt-2" style="color: #4C4F54;">Choose your preferred currency for displaying amounts throughout the app</p>
+                            </div>
+                            
                             <!-- Information Density -->
                             <div class="p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.8);">
                                 <h3 class="font-semibold mb-3" style="color: #380F17;">Information Density</h3>
@@ -187,18 +201,6 @@
                                         <option value="large">Large</option>
                                         <option value="extra-large">Extra Large</option>
                                     </select>
-                                </div>
-                                
-                                <div class="mt-4">
-                                    <h4 class="font-semibold mb-2" style="color: #380F17;">Currency & Region</h4>
-                                    <div class="p-4 rounded-xl" style="background-color: rgba(239, 223, 197, 0.8);">
-                                        <select id="currency" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:outline-none" style="focus:ring-color: #380F17;">
-                                            <option value="USD" selected>USD ($) - US Dollar</option>
-                                            <option value="EUR">EUR (€) - Euro</option>
-                                            <option value="GBP">GBP (£) - British Pound</option>
-                                            <option value="CAD">CAD ($) - Canadian Dollar</option>
-                                        </select>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -428,7 +430,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Display
             theme: document.querySelector('input[name="theme"]:checked')?.value || 'light',
             fontSize: document.getElementById('font-size').value,
-            currency: document.getElementById('currency').value,
+            currency: document.getElementById('currency-select').value,
             
             // Notifications
             notificationsMaster: document.getElementById('notifications-master').checked,
@@ -438,6 +440,26 @@ document.addEventListener('DOMContentLoaded', function() {
             quietStart: document.getElementById('quiet-start').value,
             quietEnd: document.getElementById('quiet-end').value
         };
+        
+        // Save currency preference to server
+        if (settings.currency) {
+            fetch('/api/settings/currency', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ currency: settings.currency })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Currency preference saved');
+                }
+            })
+            .catch(error => {
+                console.error('Error saving currency preference:', error);
+            });
+        }
         
         // Save to localStorage (in production, this would be an API call)
         localStorage.setItem('brainbudget-settings', JSON.stringify(settings));

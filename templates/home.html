@@ -381,9 +381,16 @@
         .then(data => {
             if (data.success) {
                 showSuccessToast('🎉 Analysis complete! ' + data.message);
-                // In a real app, this would redirect to results page
+                
+                // Store analysis results in session storage for insights page
+                if (data.analysis) {
+                    sessionStorage.setItem('brainbudget_analysis', JSON.stringify(data.analysis));
+                    sessionStorage.setItem('brainbudget_analysis_metadata', JSON.stringify(data.metadata || {}));
+                }
+                
+                // Redirect to insights page to show results
                 setTimeout(() => {
-                    showSuccessToast('📊 Analysis results would appear here in the full app!');
+                    window.location.href = '/insights';
                 }, 1500);
             } else {
                 showErrorToast('Analysis failed: ' + (data.error || 'Unknown error'));
