@@ -37,7 +37,7 @@
                 </h1>
             </div>
             <p class="text-lg max-w-2xl mx-auto leading-relaxed" style="color: #252B2B;">
-                Intelligent spending pattern analysis designed specifically for neurodivergent minds, with gentle guidance that works with your ADHD brain.
+                Intelligent spending pattern analysis with personalized guidance that works with your unique financial habits.
             </p>
         </div>
     </div>
@@ -140,7 +140,7 @@
                     <div class="flex items-center justify-between mb-4">
                         <span class="text-3xl">🧠</span>
                         <div class="text-right">
-                            <div class="text-sm opacity-80">ADHD Awareness</div>
+                            <div class="text-sm opacity-80">Pattern Awareness</div>
                             <div class="text-2xl font-bold">Good</div>
                         </div>
                     </div>
@@ -164,11 +164,11 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <!-- Left Column -->
                 <div class="space-y-8">
-                    <!-- ADHD-Specific Patterns -->
+                    <!-- Spending Patterns -->
                     <div class="backdrop-blur-sm rounded-3xl p-6" style="background-color: rgba(255, 255, 255, 0.9); border: 1px solid #380F17;">
                         <h2 class="text-2xl font-bold mb-6 flex items-center" style="color: #380F17;">
                             <span class="mr-3 text-3xl">🧠</span>
-                            ADHD Spending Patterns
+                            Spending Patterns
                         </h2>
                         
                         <div class="space-y-4">
@@ -179,7 +179,7 @@
                                     <div>
                                         <h3 class="font-semibold" style="color: #380F17;">Great Impulse Control!</h3>
                                         <p class="text-sm mt-1" style="color: #4C4F54;">You've had only 2 impulse purchases this month, down from 7 last month. Your "pause before purchase" strategy is working!</p>
-                                        <div class="mt-2 text-xs" style="color: #7CEC86;">💚 Dopamine reward: Your brain is learning new patterns!</div>
+                                        <div class="mt-2 text-xs" style="color: #7CEC86;">💚 Positive reinforcement: You're building great new habits!</div>
                                     </div>
                                 </div>
                             </div>
@@ -189,8 +189,8 @@
                                 <div class="flex items-start space-x-3">
                                     <span class="text-2xl">🔍</span>
                                     <div>
-                                        <h3 class="font-semibold" style="color: #380F17;">Hyperfocus Alert</h3>
-                                        <p class="text-sm mt-1" style="color: #4C4F54;">Noticed 3 art supply purchases in a row last week. This might be hobby hyperfocus - totally normal for ADHD brains!</p>
+                                        <h3 class="font-semibold" style="color: #380F17;">Focused Interest Alert</h3>
+                                        <p class="text-sm mt-1" style="color: #4C4F54;">Noticed 3 art supply purchases in a row last week. This might be a period of deep engagement with a hobby - totally normal!</p>
                                         <div class="mt-2 text-xs" style="color: #D97706;">💡 Tip: Set a monthly hobby budget to enjoy interests guilt-free</div>
                                     </div>
                                 </div>
@@ -202,7 +202,7 @@
                                     <span class="text-2xl">📅</span>
                                     <div>
                                         <h3 class="font-semibold" style="color: #380F17;">Routine Building Success</h3>
-                                        <p class="text-sm mt-1" style="color: #4C4F54;">You've maintained consistent grocery shopping on Sundays for 3 weeks. Routines help ADHD brains manage executive function!</p>
+                                        <p class="text-sm mt-1" style="color: #4C4F54;">You've maintained consistent grocery shopping on Sundays for 3 weeks. Routines help manage daily tasks more effectively!</p>
                                         <div class="mt-2 text-xs" style="color: #8B5CF6;">✨ Celebration: New healthy habits are forming!</div>
                                     </div>
                                 </div>
@@ -339,15 +339,15 @@
                         </div>
                     </div>
 
-                    <!-- ADHD Support Tips -->
+                    <!-- Smart Money Tips -->
                     <div class="backdrop-blur-sm rounded-3xl p-6" style="background-color: rgba(56, 15, 23, 0.9); color: #EFDFC5;">
                         <h3 class="text-xl font-bold mb-4 flex items-center">
                             <span class="mr-3 text-2xl">🧠</span>
-                            ADHD Money Tip
+                            Smart Money Tip
                         </h3>
                         <div class="text-sm leading-relaxed">
-                            <p class="mb-3">🎨 <strong>Hyperfocus Budgeting:</strong> You spent $67 on art supplies this week during a creative hyperfocus period.</p>
-                            <p class="text-xs opacity-80">This is totally normal! Consider setting aside a "hyperfocus fund" of $50-100/month for when inspiration strikes. Your brain needs creative outlets!</p>
+                            <p class="mb-3">🎨 <strong>Creative Interest Budgeting:</strong> You spent $67 on art supplies this week during a creative period.</p>
+                            <p class="text-xs opacity-80">This is totally normal! Consider setting aside a "creative fund" of $50-100/month for when inspiration strikes. Everyone needs creative outlets!</p>
                             <button class="mt-3 px-4 py-2 rounded-lg font-semibold transition-colors" style="background-color: #EFDFC5; color: #380F17;">
                                 Set Up Fund
                             </button>
@@ -438,16 +438,16 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(loadInsights, 300000); // Every 5 minutes
     
     function loadInsights() {
-        // Load ADHD pattern analysis
-        fetch('/api/insights/adhd-patterns')
+        // Load spending pattern analysis
+        fetch('/api/insights/spending-patterns')
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    updateADHDPatterns(data.patterns);
+                    updateSpendingPatterns(data.patterns);
                 }
             })
             .catch(error => {
-                console.log('Using demo ADHD pattern data');
+                console.log('Using demo spending pattern data');
             });
         
         // Load spending predictions
@@ -487,9 +487,9 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
     
-    function updateADHDPatterns(patterns) {
-        // Update ADHD pattern analysis
-        console.log('ADHD patterns loaded:', patterns);
+    function updateSpendingPatterns(patterns) {
+        // Update spending pattern analysis
+        console.log('Spending patterns loaded:', patterns);
     }
     
     function updatePredictions(predictions) {
@@ -530,12 +530,12 @@ document.addEventListener('DOMContentLoaded', function() {
         observer.observe(card);
     });
     
-    // Dopamine reward system - celebrate positive insights
+    // Positive reinforcement system - celebrate positive insights
     setTimeout(() => {
         const positiveInsights = document.querySelectorAll('[style*="rgba(124, 236, 134, 0.2)"]');
         positiveInsights.forEach(insight => {
             insight.addEventListener('mouseenter', () => {
-                showSuccessToast('🎉 Great job! Your ADHD awareness is paying off!');
+                showSuccessToast('🎉 Great job! Your mindful spending is paying off!');
             }, { once: true });
         });
     }, 2000);

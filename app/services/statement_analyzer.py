@@ -1,6 +1,6 @@
 """
 AI-powered bank statement analyzer using Google Gemini API.
-Provides ADHD-friendly transaction analysis and categorization.
+Provides user-friendly transaction analysis and categorization.
 """
 import logging
 import re
@@ -49,7 +49,7 @@ class AnalysisResult:
     confidence_score: float
 
 class StatementAnalyzer:
-    """AI-powered bank statement analyzer with ADHD-friendly features."""
+    """AI-powered bank statement analyzer with user-friendly features."""
 
     # Spending categories for transaction classification
     CATEGORIES = {
@@ -278,7 +278,7 @@ class StatementAnalyzer:
             return "Other", 0.3
 
     def _generate_analysis(self, transactions: List[Transaction]) -> AnalysisResult:
-        """Generate comprehensive analysis with ADHD-friendly insights."""
+        """Generate comprehensive analysis with user-friendly insights."""
         if not transactions:
             return AnalysisResult(
                 transactions=[],
@@ -312,7 +312,7 @@ class StatementAnalyzer:
         # Calculate overall confidence
         confidence_score = sum(txn.confidence for txn in transactions) / len(transactions) if transactions else 0
 
-        # Generate ADHD-friendly insights
+        # Generate user-friendly insights
         insights = self._generate_insights(transactions, spending_breakdown, total_income, total_expenses)
 
         return AnalysisResult(
@@ -329,7 +329,7 @@ class StatementAnalyzer:
     def _generate_insights(self, transactions: List[Transaction],
                          spending_breakdown: Dict[str, float],
                          total_income: float, total_expenses: float) -> List[SpendingInsight]:
-        """Generate ADHD-friendly insights and recommendations."""
+        """Generate user-friendly insights and recommendations."""
         insights = []
 
         if not spending_breakdown:
@@ -338,7 +338,7 @@ class StatementAnalyzer:
         try:
             # Create AI prompt for generating insights
             prompt = f"""
-            You are a supportive financial advisor who specializes in helping people with ADHD manage their finances.
+            You are a supportive financial advisor who helps people manage their finances effectively.
             Please analyze this spending data and provide 3-5 insights that are:
             - Encouraging and non-judgmental
             - Focused on patterns and positive behaviors
@@ -364,7 +364,7 @@ class StatementAnalyzer:
             6. An optional actionable recommendation
 
             Focus on celebrating what they're doing well first, then gently suggest improvements.
-            Use warm, understanding language that acknowledges ADHD challenges.
+            Use warm, understanding language that acknowledges individual challenges.
 
             Respond with a JSON array of insights.
             """
@@ -462,7 +462,7 @@ class StatementAnalyzer:
                 "colors": []
             }
 
-        # ADHD-friendly colors - soft, warm palette
+        # User-friendly colors - soft, warm palette
         category_colors = {
             'Housing': '#4A90E2',      # Calm blue
             'Transportation': '#7ED321', # Fresh green

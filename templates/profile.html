@@ -2,6 +2,15 @@
 
 {% block title %}Profile - BrainBudget{% endblock %}
 
+{% block head %}
+<!-- Cache busting for development -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<!-- Template version for debugging -->
+<meta name="template-version" content="password-fix-v3.0-{{ current_timestamp or '2025-09-18-21:55' }}">
+{% endblock %}
+
 {% block content %}
 <!-- Profile Page -->
 <div class="min-h-screen" style="background-color: #EFDFC5;">
@@ -219,7 +228,7 @@
                             Account Actions
                         </h3>
                         <div class="space-y-3">
-                            <button onclick="updatePassword()" class="w-full p-3 rounded-xl font-semibold transition-colors hover:shadow-md text-left" style="background-color: #380F17; color: #EFDFC5;">
+                            <button onclick="updatePassword()" class="w-full p-3 rounded-xl font-semibold transition-colors hover:shadow-md text-left" style="background-color: #380F17; color: #EFDFC5;" title="Password change modal - v2.0">
                                 🔐 Change Password
                             </button>
                             <button onclick="exportData()" class="w-full p-3 rounded-xl font-semibold transition-colors hover:shadow-md text-left" style="background-color: #8F0B13; color: #EFDFC5;">
@@ -297,6 +306,12 @@
 
 {% block scripts %}
 <script>
+// Version check for debugging cache issues
+console.log('🧠 BrainBudget Profile Page JavaScript Loaded');
+console.log('📅 Template Version: password-fix-v3.0-2025-09-18-21:55 - FUNCTIONS FIXED');
+console.log('✅ closePasswordModal and togglePasswordVisibility now globally accessible');
+console.log('🔄 If you still see errors, please hard refresh (Ctrl+F5 or Cmd+Shift+R)');
+
 document.addEventListener('DOMContentLoaded', function() {
     // Load profile data
     loadProfileData();
@@ -736,8 +751,352 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     window.updatePassword = function() {
-        showSuccessToast('🔐 Password update feature coming soon! Enhanced security for your financial data.');
+        console.log('🔐 Password change button clicked - NEW VERSION LOADED');
+        console.log('showPasswordChangeModal function exists:', typeof showPasswordChangeModal);
+        try {
+            showPasswordChangeModal();
+        } catch (error) {
+            console.error('Error calling showPasswordChangeModal:', error);
+            // Fallback: show error message
+            alert('Password change functionality is being loaded. Please refresh the page and try again.');
+        }
     };
+    
+    function showPasswordChangeModal() {
+        console.log('🔐 showPasswordChangeModal() called - Creating password change modal');
+        
+        // Create modal overlay
+        const modal = document.createElement('div');
+        modal.id = 'password-change-modal';
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        
+        modal.innerHTML = `
+            <div class="bg-white rounded-2xl p-8 max-w-md mx-4 w-full">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold flex items-center" style="color: #380F17;">
+                        <span class="mr-3 text-3xl">🔐</span>
+                        Change Password
+                    </h2>
+                    <button onclick="closePasswordModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                </div>
+                
+                <div class="mb-6 p-4 rounded-lg" style="background-color: rgba(124, 236, 134, 0.2);">
+                    <div class="flex items-start space-x-3">
+                        <span class="text-xl">🛡️</span>
+                        <div>
+                            <p class="font-semibold text-sm" style="color: #380F17;">Security First!</p>
+                            <p class="text-xs" style="color: #4C4F54;">For your protection, we need to verify your current password before setting a new one.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <form id="password-change-form" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold mb-2" style="color: #380F17;">Current Password *</label>
+                        <div class="relative">
+                            <input type="password" id="current-password" 
+                                   class="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                                   placeholder="Enter your current password" required>
+                            <button type="button" onclick="togglePasswordVisibility('current-password')" 
+                                    class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                                👁️
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold mb-2" style="color: #380F17;">New Password *</label>
+                        <div class="relative">
+                            <input type="password" id="new-password" 
+                                   class="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                                   placeholder="Enter your new password" required minlength="8">
+                            <button type="button" onclick="togglePasswordVisibility('new-password')" 
+                                    class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                                👁️
+                            </button>
+                        </div>
+                        <div id="password-strength" class="mt-2 text-xs"></div>
+                        <p class="text-xs mt-1" style="color: #4C4F54;">💡 Use at least 8 characters with letters, numbers, and symbols</p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold mb-2" style="color: #380F17;">Confirm New Password *</label>
+                        <div class="relative">
+                            <input type="password" id="confirm-password" 
+                                   class="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                                   placeholder="Confirm your new password" required>
+                            <button type="button" onclick="togglePasswordVisibility('confirm-password')" 
+                                    class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                                👁️
+                            </button>
+                        </div>
+                        <div id="password-match" class="mt-2 text-xs"></div>
+                    </div>
+                    
+                    <div class="flex space-x-3 mt-6">
+                        <button type="submit" class="flex-1 py-3 px-4 rounded-lg font-semibold text-white transition-colors" 
+                                style="background-color: #380F17;" id="change-password-btn">
+                            🔒 Update Password
+                        </button>
+                        <button type="button" onclick="closePasswordModal()" 
+                                class="flex-1 py-3 px-4 rounded-lg font-semibold border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Set up form handling and validation
+        setupPasswordForm();
+        
+        // Add click outside to close functionality
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                console.log('🔐 Clicked outside modal - closing');
+                window.closePasswordModal();
+            }
+        });
+        
+        // Add ESC key to close functionality
+        const handleEscKey = function(e) {
+            if (e.key === 'Escape') {
+                console.log('🔐 ESC key pressed - closing modal');
+                window.closePasswordModal();
+                document.removeEventListener('keydown', handleEscKey);
+            }
+        };
+        document.addEventListener('keydown', handleEscKey);
+        
+        // Store the escape handler for cleanup
+        modal.escapeHandler = handleEscKey;
+        
+        // Focus the first input
+        setTimeout(() => {
+            document.getElementById('current-password').focus();
+        }, 100);
+    }
+    
+    // Global functions for modal interaction (accessible to onclick handlers)
+    window.closePasswordModal = function() {
+        console.log('🔐 closePasswordModal() called - Closing modal');
+        const modal = document.getElementById('password-change-modal');
+        if (modal) {
+            // Clean up event listeners
+            if (modal.escapeHandler) {
+                document.removeEventListener('keydown', modal.escapeHandler);
+                console.log('🧹 ESC key listener cleaned up');
+            }
+            
+            // Remove modal from DOM
+            modal.remove();
+            console.log('✅ Password modal closed successfully');
+        } else {
+            console.warn('⚠️ Password modal not found');
+        }
+    };
+    
+    window.togglePasswordVisibility = function(inputId) {
+        console.log('👁️ togglePasswordVisibility() called for:', inputId);
+        try {
+            const input = document.getElementById(inputId);
+            if (!input) {
+                console.error('❌ Input not found:', inputId);
+                return;
+            }
+            
+            const button = input.nextElementSibling;
+            if (!button) {
+                console.error('❌ Button not found for input:', inputId);
+                return;
+            }
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                button.textContent = '🙈';
+                console.log('👁️ Password now visible for:', inputId);
+            } else {
+                input.type = 'password';
+                button.textContent = '👁️';
+                console.log('🙈 Password now hidden for:', inputId);
+            }
+        } catch (error) {
+            console.error('❌ Error toggling password visibility:', error);
+        }
+    };
+    
+    function setupPasswordForm() {
+        const form = document.getElementById('password-change-form');
+        const newPasswordInput = document.getElementById('new-password');
+        const confirmPasswordInput = document.getElementById('confirm-password');
+        
+        // Set up password strength checking
+        newPasswordInput.addEventListener('input', function() {
+            checkPasswordStrength(this.value);
+            if (confirmPasswordInput.value) {
+                checkPasswordMatch();
+            }
+        });
+        
+        // Set up password match checking
+        confirmPasswordInput.addEventListener('input', checkPasswordMatch);
+        
+        // Set up form submission
+        form.addEventListener('submit', handlePasswordChangeSubmit);
+    }
+    
+    function checkPasswordStrength(password) {
+        const strengthDiv = document.getElementById('password-strength');
+        
+        if (!password) {
+            strengthDiv.innerHTML = '';
+            return;
+        }
+        
+        let score = 0;
+        let feedback = [];
+        
+        // Length check
+        if (password.length >= 8) score++;
+        else feedback.push('at least 8 characters');
+        
+        // Lowercase check
+        if (/[a-z]/.test(password)) score++;
+        else feedback.push('lowercase letters');
+        
+        // Uppercase check
+        if (/[A-Z]/.test(password)) score++;
+        else feedback.push('uppercase letters');
+        
+        // Number check
+        if (/\d/.test(password)) score++;
+        else feedback.push('numbers');
+        
+        // Special character check
+        if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) score++;
+        else feedback.push('special characters');
+        
+        if (score < 3) {
+            strengthDiv.innerHTML = `<span style="color: #8F0B13;">⚠️ Weak - Add ${feedback.slice(0, 2).join(' and ')}</span>`;
+        } else if (score < 4) {
+            strengthDiv.innerHTML = `<span style="color: #FFC107;">🟡 Medium - Getting stronger!</span>`;
+        } else {
+            strengthDiv.innerHTML = `<span style="color: #7CEC86;">✅ Strong - Great password!</span>`;
+        }
+    }
+    
+    function checkPasswordMatch() {
+        const newPassword = document.getElementById('new-password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+        const matchDiv = document.getElementById('password-match');
+        
+        if (!confirmPassword) {
+            matchDiv.innerHTML = '';
+            return;
+        }
+        
+        if (newPassword === confirmPassword) {
+            matchDiv.innerHTML = `<span style="color: #7CEC86;">✅ Passwords match!</span>`;
+        } else {
+            matchDiv.innerHTML = `<span style="color: #8F0B13;">❌ Passwords don't match</span>`;
+        }
+    }
+    
+    async function handlePasswordChangeSubmit(event) {
+        event.preventDefault();
+        
+        const currentPassword = document.getElementById('current-password').value;
+        const newPassword = document.getElementById('new-password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+        const submitBtn = document.getElementById('change-password-btn');
+        
+        // Client-side validation
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            showErrorToast('❌ Please fill in all password fields.');
+            return;
+        }
+        
+        if (newPassword !== confirmPassword) {
+            showErrorToast('❌ New passwords don\'t match. Please check and try again.');
+            return;
+        }
+        
+        if (newPassword.length < 8) {
+            showErrorToast('❌ New password must be at least 8 characters long.');
+            return;
+        }
+        
+        if (currentPassword === newPassword) {
+            showErrorToast('⚠️ Your new password must be different from your current password.');
+            return;
+        }
+        
+        // Show loading state
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '🔄 Updating...';
+        submitBtn.disabled = true;
+        
+        try {
+            // Get Firebase authentication token
+            let idToken = null;
+            if (window.firebase && window.firebase.auth && window.firebase.auth.currentUser) {
+                idToken = await window.firebase.auth.currentUser.getIdToken();
+            }
+            
+            // Make API call to change password
+            const response = await fetch('/api/auth/change-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(idToken ? { 'Authorization': `Bearer ${idToken}` } : {})
+                },
+                body: JSON.stringify({
+                    current_password: currentPassword,
+                    new_password: newPassword
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                showSuccessToast('🎉 Password updated successfully! Your account is more secure now.');
+                closePasswordModal();
+                
+                // Show additional security message
+                setTimeout(() => {
+                    showSuccessToast('💡 For security, you may need to log in again on other devices with your new password.');
+                }, 2000);
+            } else {
+                throw new Error(data.error || 'Failed to update password');
+            }
+            
+        } catch (error) {
+            console.error('Password change error:', error);
+            
+            let errorMessage = '❌ Something went wrong changing your password. Please try again!';
+            
+            if (error.message.includes('current password') || error.message.includes('incorrect')) {
+                errorMessage = '🔑 Current password is incorrect. Please check and try again.';
+            } else if (error.message.includes('network') || error.message.includes('fetch')) {
+                errorMessage = '🌐 Network error. Please check your connection and try again.';
+            }
+            
+            showErrorToast(errorMessage);
+        } finally {
+            // Reset button state
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    }
+    
+    // Add helper function for error toasts if it doesn't exist
+    if (typeof showErrorToast === 'undefined') {
+        window.showErrorToast = function(message) {
+            showSuccessToast(message); // Fallback to success toast with error message
+        };
+    }
     
     window.exportData = function() {
         showSuccessToast('📤 Data export coming soon! Download all your BrainBudget data in a secure format.');

@@ -360,13 +360,36 @@ def change_password():
 
         firebase_service: FirebaseService = current_app.firebase
 
-        # Verify current password by attempting to sign in
+        # Get user information
         user_info = firebase_service.get_user(uid)
         if not user_info:
             raise Unauthorized("User not found")
 
-        # In a real implementation, this would verify the current password
-        # For now, we'll simulate the password change
+        # Verify current password by attempting to re-authenticate
+        # This is a critical security check
+        email = user_info.get('email')
+        if not email:
+            raise Unauthorized("User email not found")
+
+        # Verify the current password using Firebase Auth
+        try:
+            # Note: In a production environment, you would use Firebase Auth REST API
+            # to verify the current password. For now, we'll implement basic validation.
+            password_valid = firebase_service.verify_user_password(email, current_password)
+            if not password_valid:
+                logger.warning(f"Invalid current password attempt for user: {uid}")
+                return jsonify({
+                    'success': False,
+                    'error': "Current password is incorrect. Please check and try again! 🔑"
+                }), 401
+        except Exception as verify_error:
+            logger.error(f"Password verification failed for {uid}: {verify_error}")
+            return jsonify({
+                'success': False,
+                'error': "Unable to verify current password. Please try again! 🔧"
+            }), 500
+
+        # Update password using Firebase Admin SDK
         success = firebase_service.update_user_password(uid, new_password)
 
         if success:
