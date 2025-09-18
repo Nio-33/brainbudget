@@ -583,3 +583,328 @@ class FirebaseService:
         except Exception as e:
             logger.error(f"Failed to send deletion email to {uid}: {e}")
             return False
+
+    def update_user_profile(self, uid: str, profile_updates: Dict[str, Any]) -> bool:
+        """
+        Update specific fields in user profile.
+
+        Args:
+            uid: Firebase user UID
+            profile_updates: Dictionary of fields to update
+
+        Returns:
+            True if successful, False otherwise
+        """
+        if not self._initialized:
+            logger.error("Firebase not initialized")
+            return False
+
+        try:
+            profile_updates['updated_at'] = datetime.now(timezone.utc)
+            
+            self.db.collection('users').document(uid).update(profile_updates)
+            logger.info(f"User profile updated for {uid}")
+            return True
+
+        except Exception as e:
+            logger.error(f"Failed to update user profile for {uid}: {e}")
+            return False
+
+    def get_user_stats(self, uid: str) -> Dict[str, Any]:
+        """
+        Calculate user statistics from their data.
+
+        Args:
+            uid: Firebase user UID
+
+        Returns:
+            Dictionary containing user statistics
+        """
+        if not self._initialized:
+            logger.error("Firebase not initialized")
+            return {}
+
+        try:
+            # Get user data
+            profile = self.get_user_profile(uid)
+            transactions = self.get_user_transactions(uid, limit=1000)
+            analyses = self.get_user_analyses(uid, limit=100)
+
+            # Calculate days active
+            days_active = 1
+            if profile and 'created_at' in profile:
+                try:
+                    join_date = profile['created_at']
+                    if hasattr(join_date, 'date'):
+                        days_active = (datetime.now().date() - join_date.date()).days + 1
+                    else:
+                        # Handle Firestore timestamp
+                        days_active = (datetime.now(timezone.utc) - join_date).days + 1
+                except Exception:
+                    pass
+
+            # Calculate financial metrics
+            total_saved = 0.0
+            transaction_count = len(transactions)
+            
+            if transactions:
+                # Simple calculation - sum positive amounts as savings
+                positive_amounts = [t.get('amount', 0) for t in transactions if t.get('amount', 0) > 0]
+                total_saved = sum(positive_amounts)
+
+            # Calculate user score based on activity
+            base_score = 50
+            activity_score = min(len(analyses) * 5, 30)  # Up to 30 points for analyses
+            transaction_score = min(transaction_count // 10, 20)  # Up to 20 points for transactions
+            user_score = min(base_score + activity_score + transaction_score, 100)
+
+            return {
+                'days_active': max(days_active, 1),
+                'goals_achieved': len(analyses),
+                'user_score': user_score,
+                'total_saved': round(total_saved, 2),
+                'avg_monthly_save': round(total_saved / max(days_active / 30, 1), 2),
+                'total_analyses': len(analyses),
+                'total_transactions': transaction_count,
+                'last_activity': datetime.now().strftime('%B %d, %Y')
+            }
+
+        except Exception as e:
+            logger.error(f"Failed to calculate user stats for {uid}: {e}")
+            return {}
+
+    def get_user_timeline(self, uid: str) -> List[Dict[str, Any]]:
+        """
+        Generate user's financial journey timeline.
+
+        Args:
+            uid: Firebase user UID
+
+        Returns:
+            List of timeline events
+        """
+        if not self._initialized:
+            logger.error("Firebase not initialized")
+            return []
+
+        try:
+            timeline = []
+            
+            # Get user data
+            profile = self.get_user_profile(uid)
+            analyses = self.get_user_analyses(uid, limit=10)
+
+            # Add join event
+            if profile and 'created_at' in profile:
+                timeline.append({
+                    'id': 'joined',
+                    'title': 'Joined BrainBudget',
+                    'description': 'Started your smart budgeting journey',
+                    'date': profile['created_at'].strftime('%B %d, %Y') if hasattr(profile['created_at'], 'strftime') else str(profile['created_at']),
+                    'status': 'completed',
+                    'icon': '🎉',
+                    'badge': 'Welcome Milestone'
+                })
+
+            # Add analysis milestones
+            for i, analysis in enumerate(analyses):
+                timeline.append({
+                    'id': f'analysis_{analysis.get("id", i)}',
+                    'title': f'Financial Analysis #{i+1}',
+                    'description': 'Generated spending insights and recommendations',
+                    'date': analysis.get('created_at').strftime('%B %d, %Y') if hasattr(analysis.get('created_at'), 'strftime') else 'Recent',
+                    'status': 'completed',
+                    'icon': '📊',
+                    'badge': 'Insight Generated'
+                })
+
+            # Add current/future goals
+            if len(analyses) > 0:
+                timeline.append({
+                    'id': 'goal_progress',
+                    'title': 'Building Smart Habits',
+                    'description': 'Continue using BrainBudget for financial insights',
+                    'date': 'In Progress',
+                    'status': 'in_progress',
+                    'icon': '🎯',
+                    'badge': 'Current Goal'
+                })
+            else:
+                timeline.append({
+                    'id': 'first_analysis',
+                    'title': 'Upload Your First Statement',
+                    'description': 'Get your first financial insights',
+                    'date': 'Next Step',
+                    'status': 'upcoming',
+                    'icon': '📋',
+                    'badge': 'Getting Started'
+                })
+
+            return timeline
+
+        except Exception as e:
+            logger.error(f"Failed to generate timeline for {uid}: {e}")
+            return []
+
+    def upload_profile_picture(self, uid: str, image_data: bytes, filename: str) -> Optional[str]:
+        """
+        Upload user profile picture to Firebase Storage.
+
+        Args:
+            uid: Firebase user UID
+            image_data: Image file data as bytes
+            filename: Original filename
+
+        Returns:
+            Public URL if successful, None otherwise
+        """
+        if not self._initialized:
+            logger.error("Firebase not initialized")
+            return None
+
+        try:
+            # Create unique blob name for profile picture
+            file_extension = filename.split('.')[-1] if '.' in filename else 'jpg'
+            blob_name = f"profiles/{uid}/avatar.{file_extension}"
+
+            # Upload file
+            blob = self.bucket.blob(blob_name)
+            blob.upload_from_string(image_data, content_type=f'image/{file_extension}')
+
+            # Make blob publicly accessible
+            blob.make_public()
+
+            # Update user profile with new picture URL
+            self.update_user_profile(uid, {'profile_picture': blob.public_url})
+
+            logger.info(f"Profile picture uploaded for user {uid}")
+            return blob.public_url
+
+        except Exception as e:
+            logger.error(f"Failed to upload profile picture for {uid}: {e}")
+            
+            # Fallback to local storage
+            return self._upload_profile_picture_locally(uid, image_data, filename)
+
+    def _upload_profile_picture_locally(self, uid: str, image_data: bytes, filename: str) -> Optional[str]:
+        """
+        Fallback: Upload profile picture to local storage.
+
+        Args:
+            uid: Firebase user UID
+            image_data: Image file data as bytes
+            filename: Original filename
+
+        Returns:
+            Local file URL if successful, None otherwise
+        """
+        import os
+
+        try:
+            # Create profile pictures directory
+            profile_dir = os.path.join("static", "uploads", "profiles", uid)
+            os.makedirs(profile_dir, exist_ok=True)
+
+            # Save profile picture
+            file_extension = filename.split('.')[-1] if '.' in filename else 'jpg'
+            local_filename = f"avatar.{file_extension}"
+            file_path = os.path.join(profile_dir, local_filename)
+
+            with open(file_path, 'wb') as f:
+                f.write(image_data)
+
+            # Return local file URL
+            local_url = f"/static/uploads/profiles/{uid}/{local_filename}"
+            logger.info(f"Profile picture uploaded locally for user {uid}")
+
+            return local_url
+
+        except Exception as e:
+            logger.error(f"Failed to upload profile picture locally for {uid}: {e}")
+            return None
+
+    def get_user_achievements(self, uid: str) -> List[Dict[str, Any]]:
+        """
+        Calculate and return user achievements.
+
+        Args:
+            uid: Firebase user UID
+
+        Returns:
+            List of user achievements
+        """
+        if not self._initialized:
+            logger.error("Firebase not initialized")
+            return []
+
+        try:
+            # Get user data
+            profile = self.get_user_profile(uid)
+            transactions = self.get_user_transactions(uid)
+            analyses = self.get_user_analyses(uid)
+
+            achievements = []
+
+            # First Steps Achievement
+            if profile:
+                achievements.append({
+                    'id': 'first_steps',
+                    'title': 'First Steps',
+                    'description': 'Created your BrainBudget profile',
+                    'icon': '🎯',
+                    'color': 'green',
+                    'unlocked': True,
+                    'date': profile.get('created_at', 'Recent')
+                })
+
+            # Analysis Achievements
+            if len(analyses) >= 1:
+                achievements.append({
+                    'id': 'insight_seeker',
+                    'title': 'Insight Seeker',
+                    'description': 'Completed your first financial analysis',
+                    'icon': '🔍',
+                    'color': 'blue',
+                    'unlocked': True,
+                    'date': 'Recent'
+                })
+
+            if len(analyses) >= 5:
+                achievements.append({
+                    'id': 'analysis_master',
+                    'title': 'Analysis Master',
+                    'description': 'Completed 5+ financial analyses',
+                    'icon': '🔥',
+                    'color': 'orange',
+                    'unlocked': True,
+                    'date': 'Recent'
+                })
+
+            # Transaction Tracking
+            if len(transactions) >= 50:
+                achievements.append({
+                    'id': 'budget_warrior',
+                    'title': 'Budget Warrior',
+                    'description': 'Tracked 50+ transactions',
+                    'icon': '🧠',
+                    'color': 'purple',
+                    'unlocked': True,
+                    'date': 'Recent'
+                })
+
+            # Community Achievement (placeholder)
+            achievements.append({
+                'id': 'community_member',
+                'title': 'Community Member',
+                'description': 'Joined the BrainBudget community',
+                'icon': '🤝',
+                'color': 'teal',
+                'unlocked': True,
+                'date': 'Recent'
+            })
+
+            return achievements
+
+        except Exception as e:
+            logger.error(f"Failed to get achievements for {uid}: {e}")
+            return []

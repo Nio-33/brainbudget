@@ -32,7 +32,7 @@
                 </h1>
             </div>
             <p class="text-lg max-w-2xl mx-auto leading-relaxed" style="color: #252B2B;">
-                Your personalized BrainBudget profile with ADHD-specific preferences, achievements, and financial journey insights.
+                Your personalized BrainBudget profile with user preferences, achievements, and financial journey insights.
             </p>
         </div>
     </div>
@@ -50,8 +50,8 @@
                     
                     <!-- Profile Info -->
                     <div class="flex-1 text-center md:text-left">
-                        <h2 class="text-3xl font-bold mb-2">Alex Thompson</h2>
-                        <p class="text-lg opacity-90 mb-4">ADHD Financial Warrior</p>
+                        <h2 id="profile-display-name" class="text-3xl font-bold mb-2">Loading...</h2>
+                        <p id="profile-title" class="text-lg opacity-90 mb-4">Financial Warrior</p>
                         <div class="flex flex-wrap gap-3 justify-center md:justify-start">
                             <span class="px-4 py-2 rounded-full text-sm font-semibold" style="background-color: #EFDFC5; color: #380F17;">
                                 🎯 Goal Achiever
@@ -60,7 +60,7 @@
                                 📊 Budget Master
                             </span>
                             <span class="px-4 py-2 rounded-full text-sm font-semibold" style="background-color: rgba(239, 223, 197, 0.2); color: #EFDFC5;">
-                                🧠 ADHD Aware
+                                🧠 Self-Aware
                             </span>
                         </div>
                     </div>
@@ -69,19 +69,19 @@
                     <div class="text-center">
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <div class="text-2xl font-bold">127</div>
+                                <div id="days-active" class="text-2xl font-bold">1</div>
                                 <div class="text-sm opacity-80">Days Active</div>
                             </div>
                             <div>
-                                <div class="text-2xl font-bold">3</div>
+                                <div id="goals-achieved" class="text-2xl font-bold">0</div>
                                 <div class="text-sm opacity-80">Goals Achieved</div>
                             </div>
                             <div>
-                                <div class="text-2xl font-bold">85%</div>
-                                <div class="text-sm opacity-80">ADHD Score</div>
+                                <div id="user-score" class="text-2xl font-bold">75%</div>
+                                <div class="text-sm opacity-80">User Score</div>
                             </div>
                             <div>
-                                <div class="text-2xl font-bold">$2.4K</div>
+                                <div id="total-saved" class="text-2xl font-bold">$0</div>
                                 <div class="text-sm opacity-80">Saved Total</div>
                             </div>
                         </div>
@@ -110,35 +110,35 @@
                             <div class="space-y-4">
                                 <div class="p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.8);">
                                     <label class="text-sm font-semibold" style="color: #380F17;">Full Name</label>
-                                    <p class="mt-1" style="color: #252B2B;">Alex Thompson</p>
+                                    <p id="profile-full-name" class="mt-1" style="color: #252B2B;">Loading...</p>
                                 </div>
                                 
                                 <div class="p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.8);">
                                     <label class="text-sm font-semibold" style="color: #380F17;">Email</label>
-                                    <p class="mt-1" style="color: #252B2B;">alex.thompson@email.com</p>
+                                    <p id="profile-email" class="mt-1" style="color: #252B2B;">Loading...</p>
                                 </div>
                                 
                                 <div class="p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.8);">
                                     <label class="text-sm font-semibold" style="color: #380F17;">Join Date</label>
-                                    <p class="mt-1" style="color: #252B2B;">August 15, 2024</p>
+                                    <p id="profile-join-date" class="mt-1" style="color: #252B2B;">Loading...</p>
                                 </div>
                             </div>
                             
-                            <!-- ADHD Profile -->
+                            <!-- User Profile -->
                             <div class="space-y-4">
                                 <div class="p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.8);">
-                                    <label class="text-sm font-semibold" style="color: #380F17;">ADHD Type</label>
-                                    <p class="mt-1" style="color: #252B2B;">Combined Type</p>
+                                    <label class="text-sm font-semibold" style="color: #380F17;">Profile Type</label>
+                                    <p id="profile-type" class="mt-1" style="color: #252B2B;">Balanced User</p>
                                 </div>
                                 
                                 <div class="p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.8);">
                                     <label class="text-sm font-semibold" style="color: #380F17;">Primary Challenges</label>
-                                    <p class="mt-1 text-sm" style="color: #252B2B;">Impulse control, Executive function, Time management</p>
+                                    <p id="profile-challenges" class="mt-1 text-sm" style="color: #252B2B;">Budget tracking, Goal setting</p>
                                 </div>
                                 
                                 <div class="p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.8);">
                                     <label class="text-sm font-semibold" style="color: #380F17;">Preferred Learning Style</label>
-                                    <p class="mt-1" style="color: #252B2B;">Visual + Kinesthetic</p>
+                                    <p id="profile-learning-style" class="mt-1" style="color: #252B2B;">Visual + Interactive</p>
                                 </div>
                             </div>
                         </div>
@@ -151,61 +151,11 @@
                             Your Financial Journey
                         </h2>
                         
-                        <div class="space-y-6">
-                            <!-- Timeline Item 1 -->
-                            <div class="flex items-start space-x-4">
-                                <div class="w-12 h-12 rounded-full flex items-center justify-center" style="background-color: #7CEC86;">
-                                    <span class="text-white text-lg">✅</span>
-                                </div>
-                                <div class="flex-1">
-                                    <h3 class="font-semibold" style="color: #380F17;">Created Emergency Fund</h3>
-                                    <p class="text-sm" style="color: #4C4F54;">Saved $1,000 in 4 months • September 2024</p>
-                                    <div class="mt-2 px-3 py-1 rounded-full inline-block text-xs font-semibold" style="background-color: rgba(124, 236, 134, 0.2); color: #380F17;">
-                                        🎉 First Major Goal Achieved
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Timeline Item 2 -->
-                            <div class="flex items-start space-x-4">
-                                <div class="w-12 h-12 rounded-full flex items-center justify-center" style="background-color: #7CEC86;">
-                                    <span class="text-white text-lg">✅</span>
-                                </div>
-                                <div class="flex-1">
-                                    <h3 class="font-semibold" style="color: #380F17;">Paid Off Credit Card</h3>
-                                    <p class="text-sm" style="color: #4C4F54;">Eliminated $2,500 debt • October 2024</p>
-                                    <div class="mt-2 px-3 py-1 rounded-full inline-block text-xs font-semibold" style="background-color: rgba(124, 236, 134, 0.2); color: #380F17;">
-                                        💪 Debt Freedom Milestone
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Timeline Item 3 -->
-                            <div class="flex items-start space-x-4">
-                                <div class="w-12 h-12 rounded-full flex items-center justify-center" style="background-color: #FFC107;">
-                                    <span class="text-white text-lg">🔄</span>
-                                </div>
-                                <div class="flex-1">
-                                    <h3 class="font-semibold" style="color: #380F17;">Building Vacation Fund</h3>
-                                    <p class="text-sm" style="color: #4C4F54;">$405 of $1,500 target • In Progress</p>
-                                    <div class="mt-2 px-3 py-1 rounded-full inline-block text-xs font-semibold" style="background-color: rgba(255, 193, 7, 0.2); color: #380F17;">
-                                        🎯 Current Goal - 27% Complete
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Timeline Item 4 -->
-                            <div class="flex items-start space-x-4">
-                                <div class="w-12 h-12 rounded-full flex items-center justify-center" style="background-color: #4C4F54;">
-                                    <span class="text-white text-lg">📅</span>
-                                </div>
-                                <div class="flex-1">
-                                    <h3 class="font-semibold" style="color: #380F17;">Investment Journey Planned</h3>
-                                    <p class="text-sm" style="color: #4C4F54;">Starting January 2025 • Upcoming</p>
-                                    <div class="mt-2 px-3 py-1 rounded-full inline-block text-xs font-semibold" style="background-color: rgba(76, 79, 84, 0.2); color: #380F17;">
-                                        🚀 Future Goal
-                                    </div>
-                                </div>
+                        <div id="timeline-container" class="space-y-6">
+                            <!-- Timeline items will be loaded dynamically -->
+                            <div class="text-center py-8">
+                                <div class="text-2xl mb-2">📊</div>
+                                <p class="text-gray-600">Loading your financial journey...</p>
                             </div>
                         </div>
                     </div>
@@ -217,33 +167,11 @@
                             Achievements & Badges
                         </h2>
                         
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <!-- Achievement 1 -->
-                            <div class="text-center p-4 rounded-2xl" style="background-color: rgba(124, 236, 134, 0.2);">
-                                <div class="text-4xl mb-2">🎯</div>
-                                <h3 class="text-sm font-semibold" style="color: #380F17;">Goal Getter</h3>
-                                <p class="text-xs" style="color: #4C4F54;">First goal achieved</p>
-                            </div>
-
-                            <!-- Achievement 2 -->
-                            <div class="text-center p-4 rounded-2xl" style="background-color: rgba(255, 193, 7, 0.2);">
-                                <div class="text-4xl mb-2">🔥</div>
-                                <h3 class="text-sm font-semibold" style="color: #380F17;">Streak Master</h3>
-                                <p class="text-xs" style="color: #4C4F54;">30-day budget track</p>
-                            </div>
-
-                            <!-- Achievement 3 -->
-                            <div class="text-center p-4 rounded-2xl" style="background-color: rgba(139, 92, 246, 0.2);">
-                                <div class="text-4xl mb-2">🧠</div>
-                                <h3 class="text-sm font-semibold" style="color: #380F17;">ADHD Warrior</h3>
-                                <p class="text-xs" style="color: #4C4F54;">Impulse control pro</p>
-                            </div>
-
-                            <!-- Achievement 4 -->
-                            <div class="text-center p-4 rounded-2xl" style="background-color: rgba(76, 79, 84, 0.2);">
-                                <div class="text-4xl mb-2">🤝</div>
-                                <h3 class="text-sm font-semibold" style="color: #380F17;">Community Helper</h3>
-                                <p class="text-xs" style="color: #4C4F54;">10 helpful posts</p>
+                        <div id="achievements-container" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <!-- Achievements will be loaded dynamically -->
+                            <div class="col-span-2 md:col-span-4 text-center py-8">
+                                <div class="text-2xl mb-2">🏆</div>
+                                <p class="text-gray-600">Loading your achievements...</p>
                             </div>
                         </div>
                     </div>
@@ -263,23 +191,23 @@
                                     <p class="text-sm font-semibold" style="color: #380F17;">Total Saved</p>
                                     <p class="text-xs" style="color: #4C4F54;">Across all goals</p>
                                 </div>
-                                <span class="text-lg font-bold" style="color: #8F0B13;">$2,405</span>
+                                <span id="quick-total-saved" class="text-lg font-bold" style="color: #8F0B13;">$0</span>
                             </div>
                             
                             <div class="flex items-center justify-between p-3 rounded-lg" style="background-color: rgba(239, 223, 197, 0.6);">
                                 <div>
                                     <p class="text-sm font-semibold" style="color: #380F17;">Avg Monthly Save</p>
-                                    <p class="text-xs" style="color: #4C4F54;">Last 3 months</p>
+                                    <p class="text-xs" style="color: #4C4F54;">Recent average</p>
                                 </div>
-                                <span class="text-lg font-bold" style="color: #8F0B13;">$320</span>
+                                <span id="quick-avg-save" class="text-lg font-bold" style="color: #8F0B13;">$0</span>
                             </div>
                             
                             <div class="flex items-center justify-between p-3 rounded-lg" style="background-color: rgba(239, 223, 197, 0.6);">
                                 <div>
-                                    <p class="text-sm font-semibold" style="color: #380F17;">ADHD Score</p>
-                                    <p class="text-xs" style="color: #4C4F54;">Brain-friendly habits</p>
+                                    <p class="text-sm font-semibold" style="color: #380F17;">User Score</p>
+                                    <p class="text-xs" style="color: #4C4F54;">Smart habits</p>
                                 </div>
-                                <span class="text-lg font-bold" style="color: #7CEC86;">85%</span>
+                                <span id="quick-user-score" class="text-lg font-bold" style="color: #7CEC86;">75%</span>
                             </div>
                         </div>
                     </div>
@@ -331,15 +259,15 @@
                         </div>
                     </div>
 
-                    <!-- ADHD Support -->
+                    <!-- Progress Support -->
                     <div class="backdrop-blur-sm rounded-3xl p-6" style="background-color: rgba(56, 15, 23, 0.9); color: #EFDFC5;">
                         <h3 class="text-xl font-bold mb-4 flex items-center">
                             <span class="mr-3 text-2xl">🧠</span>
-                            ADHD Journey
+                            Progress Journey
                         </h3>
                         <div class="text-sm leading-relaxed">
-                            <p class="mb-3">🌟 <strong>127 days</strong> of building ADHD-friendly financial habits!</p>
-                            <p class="text-xs opacity-80 mb-4">Your brain has created new neural pathways for money management. That's incredible progress!</p>
+                            <p id="progress-summary" class="mb-3">🌟 <strong>1 day</strong> of building smart financial habits!</p>
+                            <p class="text-xs opacity-80 mb-4">Your brain is creating new neural pathways for money management. That's incredible progress!</p>
                             <div class="space-y-2">
                                 <div class="flex items-center justify-between">
                                     <span class="text-xs">Impulse Control</span>
@@ -383,10 +311,25 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.success) {
                     updateProfileDisplay(data.profile);
+                } else {
+                    showError('Failed to load profile information');
                 }
             })
             .catch(error => {
-                console.log('Using demo profile data');
+                console.error('Error loading profile:', error);
+                showError('Unable to load profile data');
+            });
+        
+        // Load user stats
+        fetch('/api/profile/stats')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateProfileStats(data.stats);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading stats:', error);
             });
         
         // Load user achievements
@@ -398,7 +341,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             })
             .catch(error => {
-                console.log('Using demo achievement data');
+                console.error('Error loading achievements:', error);
+                showDefaultAchievements();
             });
         
         // Load financial journey timeline
@@ -410,20 +354,187 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             })
             .catch(error => {
-                console.log('Using demo timeline data');
+                console.error('Error loading timeline:', error);
+                showDefaultTimeline();
             });
     }
     
     function updateProfileDisplay(profile) {
-        console.log('Profile data loaded:', profile);
+        // Update profile information
+        document.getElementById('profile-display-name').textContent = profile.display_name || 'User';
+        document.getElementById('profile-full-name').textContent = profile.display_name || 'User';
+        document.getElementById('profile-email').textContent = profile.email || 'user@example.com';
+        document.getElementById('profile-join-date').textContent = profile.join_date || 'Today';
+        document.getElementById('profile-type').textContent = profile.profile_type || 'Balanced User';
+        document.getElementById('profile-learning-style').textContent = profile.learning_style || 'Visual + Interactive';
+        
+        // Update challenges
+        const challenges = Array.isArray(profile.primary_challenges) ? 
+            profile.primary_challenges.join(', ') : 
+            (profile.primary_challenges || 'Budget tracking, Goal setting');
+        document.getElementById('profile-challenges').textContent = challenges;
+        
+        // Update profile picture if available
+        if (profile.profile_picture) {
+            // Add profile picture logic here
+            console.log('Profile picture available:', profile.profile_picture);
+        }
+        
+        console.log('Profile updated successfully');
+    }
+    
+    function updateProfileStats(stats) {
+        // Update header stats
+        document.getElementById('days-active').textContent = stats.days_active || 1;
+        document.getElementById('goals-achieved').textContent = stats.goals_achieved || 0;
+        document.getElementById('user-score').textContent = (stats.user_score || 75) + '%';
+        document.getElementById('total-saved').textContent = '$' + (stats.total_saved || 0).toLocaleString();
+        
+        // Update quick stats sidebar
+        document.getElementById('quick-total-saved').textContent = '$' + (stats.total_saved || 0).toLocaleString();
+        document.getElementById('quick-avg-save').textContent = '$' + (stats.avg_monthly_save || 0).toLocaleString();
+        document.getElementById('quick-user-score').textContent = (stats.user_score || 75) + '%';
+        
+        // Update progress summary
+        const daysText = stats.days_active === 1 ? 'day' : 'days';
+        document.getElementById('progress-summary').innerHTML = 
+            `🌟 <strong>${stats.days_active || 1} ${daysText}</strong> of building smart financial habits!`;
     }
     
     function updateAchievements(achievements) {
-        console.log('Achievements loaded:', achievements);
+        const container = document.getElementById('achievements-container');
+        if (!achievements || achievements.length === 0) {
+            showDefaultAchievements();
+            return;
+        }
+        
+        container.innerHTML = '';
+        
+        achievements.forEach(achievement => {
+            const achievementEl = document.createElement('div');
+            achievementEl.className = 'text-center p-4 rounded-2xl achievement-item cursor-pointer hover:scale-105 transition-transform';
+            achievementEl.style.backgroundColor = getAchievementColor(achievement.color);
+            
+            achievementEl.innerHTML = `
+                <div class="text-4xl mb-2">${achievement.icon}</div>
+                <h3 class="text-sm font-semibold" style="color: #380F17;">${achievement.title}</h3>
+                <p class="text-xs" style="color: #4C4F54;">${achievement.description}</p>
+            `;
+            
+            achievementEl.addEventListener('click', () => {
+                showSuccessToast(`🎉 ${achievement.title}: ${achievement.description}`);
+            });
+            
+            container.appendChild(achievementEl);
+        });
     }
     
     function updateTimeline(timeline) {
-        console.log('Timeline loaded:', timeline);
+        const container = document.getElementById('timeline-container');
+        if (!timeline || timeline.length === 0) {
+            showDefaultTimeline();
+            return;
+        }
+        
+        container.innerHTML = '';
+        
+        timeline.forEach(event => {
+            const eventEl = document.createElement('div');
+            eventEl.className = 'flex items-start space-x-4';
+            
+            const statusColors = {
+                'completed': '#7CEC86',
+                'in_progress': '#FFC107',
+                'upcoming': '#4C4F54'
+            };
+            
+            const statusIcons = {
+                'completed': '✅',
+                'in_progress': '🔄',
+                'upcoming': '📅'
+            };
+            
+            eventEl.innerHTML = `
+                <div class="w-12 h-12 rounded-full flex items-center justify-center" style="background-color: ${statusColors[event.status] || '#4C4F54'};">
+                    <span class="text-white text-lg">${statusIcons[event.status] || event.icon || '📍'}</span>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-semibold" style="color: #380F17;">${event.title}</h3>
+                    <p class="text-sm" style="color: #4C4F54;">${event.description} • ${event.date}</p>
+                    <div class="mt-2 px-3 py-1 rounded-full inline-block text-xs font-semibold" style="background-color: ${statusColors[event.status]}33; color: #380F17;">
+                        ${event.icon || '🎯'} ${event.badge || 'Milestone'}
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(eventEl);
+        });
+    }
+    
+    function showDefaultAchievements() {
+        const container = document.getElementById('achievements-container');
+        container.innerHTML = `
+            <div class="text-center p-4 rounded-2xl" style="background-color: rgba(124, 236, 134, 0.2);">
+                <div class="text-4xl mb-2">🎯</div>
+                <h3 class="text-sm font-semibold" style="color: #380F17;">Getting Started</h3>
+                <p class="text-xs" style="color: #4C4F54;">Joined BrainBudget</p>
+            </div>
+            <div class="text-center p-4 rounded-2xl" style="background-color: rgba(255, 193, 7, 0.2);">
+                <div class="text-4xl mb-2">🚀</div>
+                <h3 class="text-sm font-semibold" style="color: #380F17;">First Steps</h3>
+                <p class="text-xs" style="color: #4C4F54;">Upload your first statement</p>
+            </div>
+        `;
+    }
+    
+    function showDefaultTimeline() {
+        const container = document.getElementById('timeline-container');
+        container.innerHTML = `
+            <div class="flex items-start space-x-4">
+                <div class="w-12 h-12 rounded-full flex items-center justify-center" style="background-color: #7CEC86;">
+                    <span class="text-white text-lg">🎉</span>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-semibold" style="color: #380F17;">Joined BrainBudget</h3>
+                    <p class="text-sm" style="color: #4C4F54;">Welcome to your smart budgeting journey!</p>
+                    <div class="mt-2 px-3 py-1 rounded-full inline-block text-xs font-semibold" style="background-color: rgba(124, 236, 134, 0.2); color: #380F17;">
+                        🎯 Welcome!
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-start space-x-4">
+                <div class="w-12 h-12 rounded-full flex items-center justify-center" style="background-color: #FFC107;">
+                    <span class="text-white text-lg">📋</span>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-semibold" style="color: #380F17;">Upload Your First Statement</h3>
+                    <p class="text-sm" style="color: #4C4F54;">Get your first financial insights</p>
+                    <div class="mt-2 px-3 py-1 rounded-full inline-block text-xs font-semibold" style="background-color: rgba(255, 193, 7, 0.2); color: #380F17;">
+                        🚀 Next Step
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    function getAchievementColor(color) {
+        const colors = {
+            'green': 'rgba(124, 236, 134, 0.2)',
+            'blue': 'rgba(59, 130, 246, 0.2)',
+            'orange': 'rgba(255, 193, 7, 0.2)',
+            'purple': 'rgba(139, 92, 246, 0.2)',
+            'teal': 'rgba(20, 184, 166, 0.2)',
+            'red': 'rgba(239, 68, 68, 0.2)'
+        };
+        return colors[color] || 'rgba(156, 163, 175, 0.2)';
+    }
+    
+    function showError(message) {
+        if (typeof showErrorToast === 'function') {
+            showErrorToast(message);
+        } else {
+            console.error(message);
+        }
     }
     
     function setupProfileInteractions() {
@@ -441,8 +552,188 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Profile action functions
     window.editProfile = function() {
-        showSuccessToast('✏️ Profile editing coming soon! You\'ll be able to update your information and ADHD preferences.');
+        showEditProfileModal();
     };
+    
+    function showEditProfileModal() {
+        // Create modal overlay
+        const modal = document.createElement('div');
+        modal.id = 'edit-profile-modal';
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        
+        // Get current profile data
+        const currentName = document.getElementById('profile-display-name').textContent || '';
+        const nameParts = currentName.split(' ');
+        const firstName = nameParts[0] || '';
+        const lastName = nameParts.slice(1).join(' ') || '';
+        const currentType = document.getElementById('profile-type').textContent || 'Balanced User';
+        const currentStyle = document.getElementById('profile-learning-style').textContent || 'Visual + Interactive';
+        
+        modal.innerHTML = `
+            <div class="bg-white rounded-2xl p-8 max-w-md mx-4 w-full">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold" style="color: #380F17;">Edit Profile</h2>
+                    <button onclick="closeEditModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                </div>
+                
+                <form id="edit-profile-form" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold mb-2" style="color: #380F17;">First Name</label>
+                        <input type="text" id="edit-first-name" value="${firstName}" 
+                               class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold mb-2" style="color: #380F17;">Last Name</label>
+                        <input type="text" id="edit-last-name" value="${lastName}" 
+                               class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold mb-2" style="color: #380F17;">Profile Type</label>
+                        <select id="edit-profile-type" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
+                            <option value="Balanced User" ${currentType === 'Balanced User' ? 'selected' : ''}>Balanced User</option>
+                            <option value="Saver" ${currentType === 'Saver' ? 'selected' : ''}>Saver</option>
+                            <option value="Spender" ${currentType === 'Spender' ? 'selected' : ''}>Spender</option>
+                            <option value="Investor" ${currentType === 'Investor' ? 'selected' : ''}>Investor</option>
+                            <option value="Budget Beginner" ${currentType === 'Budget Beginner' ? 'selected' : ''}>Budget Beginner</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold mb-2" style="color: #380F17;">Learning Style</label>
+                        <select id="edit-learning-style" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
+                            <option value="Visual + Interactive" ${currentStyle === 'Visual + Interactive' ? 'selected' : ''}>Visual + Interactive</option>
+                            <option value="Step-by-step" ${currentStyle === 'Step-by-step' ? 'selected' : ''}>Step-by-step</option>
+                            <option value="Quick Overview" ${currentStyle === 'Quick Overview' ? 'selected' : ''}>Quick Overview</option>
+                            <option value="Detailed Analysis" ${currentStyle === 'Detailed Analysis' ? 'selected' : ''}>Detailed Analysis</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold mb-2" style="color: #380F17;">Primary Challenges</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" value="Budget tracking" class="challenge-checkbox mr-2">
+                                <span class="text-sm">Budget tracking</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" value="Goal setting" class="challenge-checkbox mr-2">
+                                <span class="text-sm">Goal setting</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" value="Impulse control" class="challenge-checkbox mr-2">
+                                <span class="text-sm">Impulse control</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" value="Saving money" class="challenge-checkbox mr-2">
+                                <span class="text-sm">Saving money</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" value="Time management" class="challenge-checkbox mr-2">
+                                <span class="text-sm">Time management</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-3 mt-6">
+                        <button type="submit" class="flex-1 py-3 px-4 rounded-lg font-semibold text-white transition-colors" 
+                                style="background-color: #380F17;" id="save-profile-btn">
+                            Save Changes
+                        </button>
+                        <button type="button" onclick="closeEditModal()" 
+                                class="flex-1 py-3 px-4 rounded-lg font-semibold border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Set up form handling
+        document.getElementById('edit-profile-form').addEventListener('submit', handleProfileSave);
+        
+        // Pre-check current challenges
+        const currentChallenges = document.getElementById('profile-challenges').textContent.split(', ');
+        document.querySelectorAll('.challenge-checkbox').forEach(checkbox => {
+            if (currentChallenges.includes(checkbox.value)) {
+                checkbox.checked = true;
+            }
+        });
+    }
+    
+    window.closeEditModal = function() {
+        const modal = document.getElementById('edit-profile-modal');
+        if (modal) {
+            modal.remove();
+        }
+    };
+    
+    function handleProfileSave(event) {
+        event.preventDefault();
+        
+        const saveBtn = document.getElementById('save-profile-btn');
+        const originalText = saveBtn.textContent;
+        saveBtn.textContent = 'Saving...';
+        saveBtn.disabled = true;
+        
+        // Get form data
+        const firstName = document.getElementById('edit-first-name').value.trim();
+        const lastName = document.getElementById('edit-last-name').value.trim();
+        const profileType = document.getElementById('edit-profile-type').value;
+        const learningStyle = document.getElementById('edit-learning-style').value;
+        
+        // Get selected challenges
+        const challenges = Array.from(document.querySelectorAll('.challenge-checkbox:checked'))
+            .map(cb => cb.value);
+        
+        // Validate
+        if (!firstName || !lastName) {
+            showError('Please enter both first and last name');
+            saveBtn.textContent = originalText;
+            saveBtn.disabled = false;
+            return;
+        }
+        
+        // Prepare data
+        const profileData = {
+            first_name: firstName,
+            last_name: lastName,
+            profile_type: profileType,
+            learning_style: learningStyle,
+            primary_challenges: challenges
+        };
+        
+        // Send to API
+        fetch('/api/profile/update', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(profileData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showSuccessToast('✅ Profile updated successfully!');
+                closeEditModal();
+                // Reload profile data
+                loadProfileData();
+            } else {
+                showError(data.error || 'Failed to update profile');
+            }
+        })
+        .catch(error => {
+            console.error('Error updating profile:', error);
+            showError('Unable to update profile. Please try again.');
+        })
+        .finally(() => {
+            saveBtn.textContent = originalText;
+            saveBtn.disabled = false;
+        });
+    }
     
     window.updatePassword = function() {
         showSuccessToast('🔐 Password update feature coming soon! Enhanced security for your financial data.');
@@ -453,7 +744,7 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     
     window.managePreferences = function() {
-        showSuccessToast('🎛️ Advanced preferences coming soon! Fine-tune your ADHD-friendly experience.');
+        showSuccessToast('🎛️ Advanced preferences coming soon! Fine-tune your personalized experience.');
     };
     
     window.logout = async function() {
@@ -497,7 +788,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
     
-    // ADHD-friendly entrance animations
+    // User-friendly entrance animations
     const observerOptions = {
         threshold: 0.1,
         rootMargin: '0px 0px -50px 0px'
@@ -524,7 +815,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const achievements = document.querySelectorAll('[style*="rgba(124, 236, 134, 0.2)"], [style*="rgba(255, 193, 7, 0.2)"], [style*="rgba(139, 92, 246, 0.2)"]');
     achievements.forEach((achievement, index) => {
         achievement.addEventListener('click', () => {
-            showSuccessToast('🎉 Achievement unlocked! Your ADHD journey is inspiring!');
+            showSuccessToast('🎉 Achievement unlocked! Your progress journey is inspiring!');
             // Add celebration animation
             achievement.style.animation = 'bounce 0.6s ease-out';
             setTimeout(() => {
