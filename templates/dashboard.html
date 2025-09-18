@@ -32,7 +32,7 @@
                 </h1>
             </div>
             <p class="text-lg max-w-2xl mx-auto leading-relaxed" style="color: #252B2B;">
-                A clear, ADHD-friendly overview of your finances with visual cues and gentle insights to help you stay on track.
+                A clear, user-friendly overview of your finances with visual cues and gentle insights to help you stay on track.
             </p>
         </div>
     </div>
@@ -215,7 +215,7 @@
 
                 <!-- Right Sidebar -->
                 <div class="lg:col-span-1 space-y-6">
-                    <!-- ADHD-Friendly Quick Actions -->
+                    <!-- User-Friendly Quick Actions -->
                     <div class="backdrop-blur-sm rounded-3xl p-6" style="background-color: rgba(255, 255, 255, 0.9); border: 1px solid #380F17;">
                         <h3 class="text-xl font-bold mb-4 flex items-center" style="color: #380F17;">
                             <span class="mr-3 text-2xl">⚡</span>
@@ -276,11 +276,11 @@
                         </div>
                     </div>
 
-                    <!-- ADHD Support Widget -->
+                    <!-- Daily Tips Widget -->
                     <div class="backdrop-blur-sm rounded-3xl p-6" style="background-color: rgba(56, 15, 23, 0.9); color: #EFDFC5;">
                         <h3 class="text-xl font-bold mb-4 flex items-center">
                             <span class="mr-3 text-2xl">🧠</span>
-                            ADHD Tip of the Day
+                            Tip of the Day
                         </h3>
                         <div class="text-sm leading-relaxed">
                             <p class="mb-3">💡 <strong>Dopamine Reward:</strong> You logged 3 expenses this week! Your brain loves these small wins.</p>
@@ -354,7 +354,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function updateDashboard() {
-        // Subtle updates for ADHD-friendly experience
+        // Subtle updates for user-friendly experience
         const stats = document.querySelectorAll('[style*="rgba(56, 15, 23, 0.9)"] .text-2xl.font-bold')[0];
         if (stats && Math.random() > 0.8) {
             // Very subtle balance update animation
@@ -369,7 +369,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.showFeature = function(feature) {
         const features = {
             'add-expense': '💸 Quick expense logging coming soon! This will let you add expenses with voice input and photo receipts.',
-            'set-budget': '🎯 Budget adjustment feature coming soon! Set flexible, ADHD-friendly spending limits.',
+            'set-budget': '🎯 Budget adjustment feature coming soon! Set flexible, personalized spending limits.',
             'savings': '🏆 Savings booster coming soon! Automatic micro-savings and goal tracking.'
         };
         
@@ -378,7 +378,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
     
-    // ADHD-friendly animations on scroll
+    // User-friendly animations on scroll
     const observerOptions = {
         threshold: 0.1,
         rootMargin: '0px 0px -50px 0px'

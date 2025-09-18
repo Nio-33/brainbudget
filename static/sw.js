@@ -1,6 +1,6 @@
 /**
  * Service Worker for BrainBudget PWA
- * Provides offline functionality and caching for ADHD-friendly experience
+ * Provides offline functionality and caching for user-friendly experience
  */
 
 const CACHE_NAME = 'brainbudget-v1.0.0';

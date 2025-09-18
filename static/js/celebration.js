@@ -1,5 +1,5 @@
 /**
- * ADHD-Friendly Celebration System for BrainBudget
+ * User-Friendly Celebration System for BrainBudget
  * Provides dopamine-boosting animations and feedback
  */
 

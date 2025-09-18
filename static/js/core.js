@@ -1,6 +1,6 @@
 /**
  * Core JavaScript functionality for BrainBudget
- * Handles common utilities, API calls, and ADHD-friendly interactions
+ * Handles common utilities, API calls, and user-friendly interactions
  */
 
 // Global utilities and helpers
@@ -90,7 +90,7 @@ window.BrainBudget = {
         }
     },
     
-    // ADHD-friendly utilities
+    // User-friendly utilities
     Utils: {
         // Debounce function to prevent excessive API calls
         debounce(func, wait) {
@@ -269,7 +269,7 @@ function showLoadingState(show) {
     }
 }
 
-// Gentle focus management for ADHD users
+// Gentle focus management for users
 function setGentleFocus(element) {
     if (element && typeof element.focus === 'function') {
         setTimeout(() => {
@@ -279,7 +279,7 @@ function setGentleFocus(element) {
     }
 }
 
-// Form validation with ADHD-friendly messaging
+// Form validation with user-friendly messaging
 function validateForm(form) {
     const errors = [];
     const requiredFields = form.querySelectorAll('[required]');
@@ -344,7 +344,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Auto-save form inputs (helpful for ADHD users who might navigate away)
+    // Auto-save form inputs (helpful for users who might navigate away)
     const formInputs = document.querySelectorAll('input[type="text"], input[type="email"], textarea');
     formInputs.forEach(input => {
         const saveKey = `form_${input.name || input.id}`;
@@ -365,7 +365,7 @@ document.addEventListener('DOMContentLoaded', function() {
         input.addEventListener('input', debouncedSave);
     });
     
-    // Add subtle visual feedback for ADHD users
+    // Add subtle visual feedback for users
     document.querySelectorAll('input, select, textarea').forEach(element => {
         element.addEventListener('focus', function() {
             this.parentElement?.classList.add('ring-2', 'ring-primary-200');

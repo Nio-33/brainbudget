@@ -1,6 +1,6 @@
 /**
  * Notification Settings Management for BrainBudget
- * ADHD-friendly notification preference handling
+ * User-friendly notification preference handling
  */
 
 class NotificationSettingsManager {
@@ -427,7 +427,7 @@ class NotificationSettingsManager {
     }
     
     resetToDefaults() {
-        const confirmed = confirm('This will reset all your notification preferences to the ADHD-friendly defaults. Are you sure?');
+        const confirmed = confirm('This will reset all your notification preferences to the user-friendly defaults. Are you sure?');
         
         if (confirmed) {
             this.loadDefaults();

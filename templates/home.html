@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}BrainBudget - ADHD-Friendly Financial Management{% endblock %}
+{% block title %}BrainBudget - Smart Financial Management{% endblock %}
 
 {% block extra_styles %}
     body {
@@ -400,7 +400,7 @@
             console.error('Analysis error:', error);
             // For demo purposes, show a success message after delay
             setTimeout(() => {
-                showSuccessToast('🧠 Demo Analysis Complete! In the full app, you would see detailed insights about your spending patterns, categorized transactions, and ADHD-friendly recommendations.');
+                showSuccessToast('🧠 Demo Analysis Complete! In the full app, you would see detailed insights about your spending patterns, categorized transactions, and personalized recommendations.');
             }, 2000);
         })
         .finally(() => {
@@ -413,15 +413,15 @@
     // Feature preview function
     function showFeature(feature) {
         const features = {
-            'dashboard': { icon: '📊', title: 'Dashboard', desc: 'Your personalized financial overview with ADHD-friendly visualizations and progress tracking.' },
-            'insights': { icon: '💡', title: 'AI Insights', desc: 'Intelligent spending pattern analysis designed specifically for neurodivergent minds.' },
-            'goals': { icon: '🎯', title: 'Goal Setting', desc: 'Flexible, ADHD-friendly goal tracking with built-in celebration and accountability.' },
-            'ai_coach': { icon: '🤖', title: 'AI Coach', desc: 'Your personal financial coach that understands ADHD challenges and strengths.' },
-            'advice': { icon: '💬', title: 'Financial Advice', desc: 'Tailored advice for budgeting, debt, and savings that works with ADHD brains.' },
-            'community': { icon: '🤝', title: 'Community', desc: 'Connect with other ADHD individuals on similar financial journeys.' },
-            'settings': { icon: '⚙️', title: 'Settings', desc: 'Customize your BrainBudget experience with neurodivergent-friendly options.' },
+            'dashboard': { icon: '📊', title: 'Dashboard', desc: 'Your personalized financial overview with user-friendly visualizations and progress tracking.' },
+            'insights': { icon: '💡', title: 'AI Insights', desc: 'Intelligent spending pattern analysis designed for smart financial decisions.' },
+            'goals': { icon: '🎯', title: 'Goal Setting', desc: 'Flexible goal tracking with built-in celebration and accountability.' },
+            'ai_coach': { icon: '🤖', title: 'AI Coach', desc: 'Your personal financial coach that understands your challenges and strengths.' },
+            'advice': { icon: '💬', title: 'Financial Advice', desc: 'Tailored advice for budgeting, debt, and savings that works for you.' },
+            'community': { icon: '🤝', title: 'Community', desc: 'Connect with other users on similar financial journeys.' },
+            'settings': { icon: '⚙️', title: 'Settings', desc: 'Customize your BrainBudget experience with user-friendly options.' },
             'notifications': { icon: '🔔', title: 'Notifications', desc: 'Gentle, helpful reminders that support rather than overwhelm.' },
-            'profile': { icon: '👤', title: 'Profile', desc: 'Your personalized BrainBudget profile with ADHD-specific preferences.' }
+            'profile': { icon: '👤', title: 'Profile', desc: 'Your personalized BrainBudget profile with custom preferences.' }
         };
         
         const featureInfo = features[feature];

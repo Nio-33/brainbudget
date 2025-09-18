@@ -1,11 +1,11 @@
 /**
- * BrainBudget Charts - ADHD-Friendly Interactive Visualizations
- * Designed for neurodivergent users with accessibility and cognitive load reduction in mind
+ * BrainBudget Charts - User-Friendly Interactive Visualizations
+ * Designed with accessibility and cognitive load reduction in mind
  */
 
 class BrainBudgetCharts {
     constructor() {
-        // ADHD-friendly color palette with warm, distinct colors that are colorblind-accessible
+        // User-friendly color palette with warm, distinct colors that are colorblind-accessible
         this.colors = {
             // Warm primary palette
             cozyBlue: '#6B9BD6',      // Gentle blue, not harsh
@@ -33,7 +33,7 @@ class BrainBudgetCharts {
             focus: 'rgba(107, 155, 214, 0.3)',  // Stronger focus indicator
         };
         
-        // Typography optimized for ADHD (larger, clearer fonts)
+        // Typography optimized for readability (larger, clearer fonts)
         this.typography = {
             fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
             titleSize: 18,
@@ -114,7 +114,7 @@ class BrainBudgetCharts {
     }
 
     /**
-     * Show loading skeletons with ADHD-friendly animations
+     * Show loading skeletons with user-friendly animations
      */
     showSkeletons() {
         const skeletons = [
@@ -173,7 +173,7 @@ class BrainBudgetCharts {
     }
 
     /**
-     * Render ADHD-friendly donut chart for spending categories
+     * Render user-friendly donut chart for spending categories
      */
     renderCategoryDonutChart() {
         const canvas = document.getElementById('category-chart');
@@ -649,7 +649,7 @@ class BrainBudgetCharts {
     }
 
     /**
-     * Render ADHD-friendly budget progress bars with animations
+     * Render user-friendly budget progress bars with animations
      */
     renderBudgetProgressBars() {
         const container = document.getElementById('progress-bars-container');

@@ -1,7 +1,7 @@
 {
-  "name": "BrainBudget - ADHD-Friendly Budgeting",
+  "name": "BrainBudget - Smart Budgeting",
   "short_name": "BrainBudget",
-  "description": "ADHD-friendly budgeting app with AI-powered spending analysis designed for neurodivergent minds",
+  "description": "Smart budgeting app with AI-powered spending analysis designed for intelligent financial management",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#b2f1ff",

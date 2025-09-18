@@ -1,5 +1,5 @@
 /**
- * ADHD-Friendly Insights Dashboard for BrainBudget
+ * User-Friendly Insights Dashboard for BrainBudget
  * Displays spending pattern analysis with ML insights
  */
 
@@ -272,10 +272,10 @@ class InsightsDashboard {
                         </div>
                     ` : ''}
                     
-                    ${insight.adhd_note ? `
+                    ${insight.smart_note ? `
                         <div class="bg-purple-50 border border-purple-200 rounded-lg p-3 mb-3">
                             <p class="text-purple-800 text-sm">
-                                <strong>🧠 ADHD Insight:</strong> ${insight.adhd_note}
+                                <strong>🧠 Smart Insight:</strong> ${insight.smart_note}
                             </p>
                         </div>
                     ` : ''}
@@ -399,10 +399,10 @@ class InsightsDashboard {
                     </div>
                 </div>
                 
-                ${data.adhd_note ? `
+                ${data.smart_note ? `
                     <div class="bg-purple-50 border border-purple-200 rounded-lg p-3">
                         <p class="text-purple-800 text-sm">
-                            <strong>🧠 ADHD Note:</strong> ${data.adhd_note}
+                            <strong>🧠 Smart Note:</strong> ${data.smart_note}
                         </p>
                     </div>
                 ` : ''}

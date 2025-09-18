@@ -1,6 +1,6 @@
 /**
  * AI Financial Coach Interface for BrainBudget
- * Provides ADHD-friendly conversational AI for financial guidance
+ * Provides user-friendly conversational AI for financial guidance
  */
 
 class AICoachInterface {
@@ -217,7 +217,7 @@ class AICoachInterface {
             { id: 'spending_review', text: 'Review My Spending', icon: '📊' },
             { id: 'budget_help', text: 'Budget Help', icon: '💰' },
             { id: 'motivation', text: 'I Need Encouragement', icon: '💪' },
-            { id: 'adhd_tips', text: 'ADHD Money Tips', icon: '🧠' }
+            { id: 'smart_tips', text: 'Smart Money Tips', icon: '🧠' }
         ];
         
         defaultActions.forEach(action => {

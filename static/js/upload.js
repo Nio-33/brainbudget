@@ -1,6 +1,6 @@
 /**
  * File upload functionality for BrainBudget
- * Handles drag-and-drop, file validation, and upload progress with ADHD-friendly feedback
+ * Handles drag-and-drop, file validation, and upload progress with user-friendly feedback
  */
 
 class FileUploader {

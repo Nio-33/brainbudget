@@ -1,7 +1,7 @@
 /**
  * BrainBudget Notification System - Frontend
  * 
- * ADHD-friendly notification management with:
+ * User-friendly notification management with:
  * - Gentle permission requests with clear benefits
  * - Service worker integration for background notifications
  * - In-app notification center
@@ -85,7 +85,7 @@ class BrainBudgetNotifications {
         this.registrationAttempted = true;
         
         try {
-            // Show ADHD-friendly explanation modal first
+            // Show user-friendly explanation modal first
             const userConsent = await this.showPermissionExplanation();
             
             if (!userConsent) {
@@ -114,7 +114,7 @@ class BrainBudgetNotifications {
     
     showPermissionExplanation() {
         return new Promise((resolve) => {
-            // Create ADHD-friendly explanation modal
+            // Create user-friendly explanation modal
             const modal = document.createElement('div');
             modal.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4';
             modal.innerHTML = `
@@ -127,7 +127,7 @@ class BrainBudgetNotifications {
                             Gentle Financial Reminders
                         </h3>
                         <p class="text-text-secondary leading-relaxed">
-                            Let BrainBudget send you kind, helpful notifications about your money. Perfect for ADHD brains that sometimes forget things!
+                            Let BrainBudget send you kind, helpful notifications about your money. Perfect for busy people who sometimes forget things!
                         </p>
                     </div>
                     
@@ -339,7 +339,7 @@ class BrainBudgetNotifications {
             notificationEl.style.transform = 'translateX(0)';
         });
         
-        // Auto-remove after 8 seconds (longer for ADHD-friendly reading)
+        // Auto-remove after 8 seconds (longer for comfortable reading)
         setTimeout(() => {
             if (notificationEl.parentNode) {
                 notificationEl.style.transform = 'translateX(full)';

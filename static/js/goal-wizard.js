@@ -1,5 +1,5 @@
 /**
- * ADHD-Friendly Goal Creation Wizard for BrainBudget
+ * User-Friendly Goal Creation Wizard for BrainBudget
  * Guides users through creating achievable financial goals step by step
  */
 

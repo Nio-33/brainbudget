@@ -1,6 +1,6 @@
 /**
  * Plaid Link integration for BrainBudget
- * ADHD-friendly bank account connection with step-by-step guidance
+ * User-friendly bank account connection with step-by-step guidance
  */
 
 class BrainBudgetPlaidLink {
@@ -9,7 +9,7 @@ class BrainBudgetPlaidLink {
         this.onExit = options.onExit || this.defaultOnExit;
         this.onEvent = options.onEvent || this.defaultOnEvent;
         
-        // ADHD-friendly configuration
+        // User-friendly configuration
         this.showUI = {
             progressSteps: true,
             encouragingMessages: true,
@@ -107,7 +107,7 @@ class BrainBudgetPlaidLink {
         this.updateProgress(1, "Getting ready to connect your bank...");
         
         try {
-            // Show ADHD-friendly onboarding
+            // Show user-friendly onboarding
             if (this.showUI.progressSteps) {
                 this.showConnectionSteps();
             }
@@ -250,7 +250,7 @@ class BrainBudgetPlaidLink {
     defaultOnEvent(eventName, metadata) {
         console.log('Plaid Link event:', eventName, metadata);
         
-        // ADHD-friendly progress updates based on events
+        // User-friendly progress updates based on events
         switch (eventName) {
             case 'OPEN':
                 this.showMessage('info', "Great! Now choose your bank from the list. 🏦");
@@ -276,7 +276,7 @@ class BrainBudgetPlaidLink {
     }
     
     /**
-     * Show ADHD-friendly connection steps
+     * Show user-friendly connection steps
      */
     showConnectionSteps() {
         const modal = document.createElement('div');
@@ -378,7 +378,7 @@ class BrainBudgetPlaidLink {
     }
     
     /**
-     * Handle connection errors with ADHD-friendly messages
+     * Handle connection errors with user-friendly messages
      */
     handleConnectionError(error) {
         const friendlyMessage = this.getErrorMessage(error);
@@ -388,7 +388,7 @@ class BrainBudgetPlaidLink {
     }
     
     /**
-     * Get ADHD-friendly error message
+     * Get user-friendly error message
      */
     getErrorMessage(error) {
         const errorStr = error.message.toLowerCase();
