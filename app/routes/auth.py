@@ -9,6 +9,11 @@ from flask import Blueprint, request, jsonify, current_app, session
 from werkzeug.exceptions import BadRequest, Unauthorized
 
 from app.services.firebase_service import FirebaseService
+from app.utils.security import rate_limit, account_lockout_check, security_manager, log_security_event
+from app.utils.validators import (
+    validate_user_profile_data, sanitize_html_input, validate_password_strength,
+    validate_email, sanitize_text_input
+)
 
 
 logger = logging.getLogger(__name__)
@@ -42,6 +47,8 @@ def require_auth(f):
 
 
 @auth_bp.route('/verify', methods=['POST'])
+@rate_limit(max_attempts=10, window_minutes=5)
+@account_lockout_check
 def verify_token():
     """
     Verify Firebase authentication token.
@@ -65,6 +72,7 @@ def verify_token():
         # Verify token with Firebase
         decoded_token = firebase_service.verify_token(id_token)
         if not decoded_token:
+            log_security_event('failed_token_verification', {'id_token_present': True})
             raise Unauthorized("Invalid authentication token")
 
         # Get user information
@@ -180,9 +188,16 @@ def update_profile():
 
         firebase_service: FirebaseService = current_app.firebase
 
-        # Validate and sanitize inpu
-        allowed_fields = {'display_name', 'settings', 'preferences'}
-        profile_data = {k: v for k, v in data.items() if k in allowed_fields}
+        # Validate and sanitize input using comprehensive validation
+        validation_result = validate_user_profile_data(data)
+        
+        if not validation_result['is_valid']:
+            return jsonify({
+                'success': False,
+                'error': f"Invalid profile data: {', '.join(validation_result['errors'])}"
+            }), 400
+        
+        profile_data = validation_result['sanitized_data']
 
         # Update profile
         success = firebase_service.create_user_profile(uid, profile_data)
@@ -334,6 +349,7 @@ def export_user_data():
 
 
 @auth_bp.route('/change-password', methods=['POST'])
+@rate_limit(max_attempts=3, window_minutes=10)
 @require_auth
 def change_password():
     """
@@ -355,8 +371,16 @@ def change_password():
         if not data or 'current_password' not in data or 'new_password' not in data:
             raise BadRequest("Current password and new password are required")
 
-        current_password = data['current_password']
-        new_password = data['new_password']
+        current_password = sanitize_text_input(data['current_password'], max_length=128)
+        new_password = sanitize_text_input(data['new_password'], max_length=128)
+        
+        # Validate new password strength
+        password_validation = validate_password_strength(new_password)
+        if not password_validation['is_valid']:
+            return jsonify({
+                'success': False,
+                'error': f"Weak password: {', '.join(password_validation['issues'])}"
+            }), 400
 
         firebase_service: FirebaseService = current_app.firebase
 
@@ -373,11 +397,14 @@ def change_password():
 
         # Verify the current password using Firebase Auth
         try:
-            # Note: In a production environment, you would use Firebase Auth REST API
-            # to verify the current password. For now, we'll implement basic validation.
             password_valid = firebase_service.verify_user_password(email, current_password)
             if not password_valid:
                 logger.warning(f"Invalid current password attempt for user: {uid}")
+                log_security_event('failed_password_change', {'uid': uid, 'email': email})
+                
+                # Record failed attempt for potential account lockout
+                security_manager.record_failed_login(email)
+                
                 return jsonify({
                     'success': False,
                     'error': "Current password is incorrect. Please check and try again! 🔑"
@@ -394,6 +421,11 @@ def change_password():
 
         if success:
             logger.info(f"Password changed for user: {uid}")
+            log_security_event('password_changed', {'uid': uid, 'email': email})
+            
+            # Clear any failed attempts since password was successfully changed
+            security_manager.clear_failed_attempts(email)
+            
             return jsonify({
                 'success': True,
                 'message': "Password updated successfully! Your account is more secure now! 🔒"
@@ -450,6 +482,7 @@ def setup_two_factor_auth():
 
 
 @auth_bp.route('/delete-account', methods=['DELETE'])
+@rate_limit(max_attempts=2, window_minutes=60)
 @require_auth
 def delete_account():
     """

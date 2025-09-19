@@ -12,6 +12,8 @@ from firebase_admin import credentials, firestore, storage, auth
 from google.cloud.firestore import Client as FirestoreClient
 from google.cloud.storage import Bucket
 
+from app.utils.cache import UserProfileCache, AnalysisCache, cache_result
+
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +26,8 @@ class FirebaseService:
         self.db: Optional[FirestoreClient] = None
         self.bucket: Optional[Bucket] = None
         self._initialized = False
+        self.web_api_key = None
+        self.flask_app = None
 
     def initialize(self, flask_app):
         """
@@ -33,10 +37,14 @@ class FirebaseService:
             flask_app: Flask application instance
         """
         try:
+            # Store Flask app reference for accessing config
+            self.flask_app = flask_app
+            
             # Check if we have valid Firebase credentials
             project_id = flask_app.config.get('FIREBASE_PROJECT_ID')
             private_key = flask_app.config.get('FIREBASE_PRIVATE_KEY')
             client_email = flask_app.config.get('FIREBASE_CLIENT_EMAIL')
+            self.web_api_key = flask_app.config.get('FIREBASE_API_KEY')
 
             # Skip Firebase initialization in development if credentials are placeholders
             if (not project_id or not private_key or not client_email or
@@ -155,6 +163,10 @@ class FirebaseService:
 
             self.db.collection('users').document(uid).set(profile_data, merge=True)
             logger.info(f"User profile created/updated for {uid}")
+            
+            # Invalidate cache after update
+            UserProfileCache.invalidate_profile(uid)
+            
             return True
 
         except Exception as e:
@@ -163,7 +175,7 @@ class FirebaseService:
 
     def get_user_profile(self, uid: str) -> Optional[Dict[str, Any]]:
         """
-        Get user profile from Firestore.
+        Get user profile from Firestore with caching.
 
         Args:
             uid: Firebase user UID
@@ -175,10 +187,18 @@ class FirebaseService:
             logger.error("Firebase not initialized")
             return None
 
+        # Try cache first
+        cached_profile = UserProfileCache.get_profile(uid)
+        if cached_profile is not None:
+            return cached_profile
+
         try:
             doc = self.db.collection('users').document(uid).get()
             if doc.exists:
-                return doc.to_dict()
+                profile_data = doc.to_dict()
+                # Cache the result
+                UserProfileCache.set_profile(uid, profile_data)
+                return profile_data
             return None
 
         except Exception as e:
@@ -217,6 +237,7 @@ class FirebaseService:
             logger.error(f"Failed to save analysis result for {uid}: {e}")
             return None
 
+    @cache_result("user_analyses:{key}", ttl=900)  # Cache for 15 minutes
     def get_user_analyses(self, uid: str, limit: int = 10) -> List[Dict[str, Any]]:
         """
         Get user's spending analyses from Firestore.
@@ -480,7 +501,7 @@ class FirebaseService:
 
     def verify_user_password(self, email: str, password: str) -> bool:
         """
-        Verify user password by attempting to sign in.
+        Verify user password using Firebase Auth REST API.
 
         Args:
             email: User email
@@ -494,19 +515,34 @@ class FirebaseService:
             return False
 
         try:
-            # Note: In a production environment, you would use Firebase Auth REST API
-            # to verify the password. This is a simplified implementation.
-            # The proper way would be to use signInWithEmailAndPassword
-            # via the Firebase Auth REST API from the server side.
+            import requests
             
-            # For now, we'll simulate password verification
-            # In a real app, you'd make a request to:
-            # https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword
+            # Get the Web API Key from config
+            if not self.web_api_key:
+                logger.error("Firebase Web API Key not available")
+                return False
             
-            # Temporary implementation - in production, implement proper verification
-            logger.info(f"Password verification attempted for {email}")
-            return True  # For demo purposes, always return True
+            # Firebase Auth REST API endpoint
+            url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={self.web_api_key}"
             
+            payload = {
+                "email": email,
+                "password": password,
+                "returnSecureToken": True
+            }
+            
+            response = requests.post(url, json=payload, timeout=30)
+            
+            if response.status_code == 200:
+                logger.info(f"Password verification successful for {email}")
+                return True
+            else:
+                logger.warning(f"Password verification failed for {email}: {response.status_code}")
+                return False
+            
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Network error during password verification for {email}: {e}")
+            return False
         except Exception as e:
             logger.error(f"Failed to verify password for {email}: {e}")
             return False
@@ -642,6 +678,7 @@ class FirebaseService:
             logger.error(f"Failed to update user profile for {uid}: {e}")
             return False
 
+    @cache_result("user_stats:{key}", ttl=1800)  # Cache for 30 minutes
     def get_user_stats(self, uid: str) -> Dict[str, Any]:
         """
         Calculate user statistics from their data.

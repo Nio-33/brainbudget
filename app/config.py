@@ -102,6 +102,44 @@ class DevelopmentConfig(Config):
 class ProductionConfig(Config):
     """Production configuration."""
     DEBUG = False
+    
+    # Security settings for production
+    SESSION_COOKIE_SECURE = True  # Require HTTPS
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Strict'
+    
+    # Performance settings
+    PERMANENT_SESSION_LIFETIME = timedelta(hours=12)  # Shorter session in prod
+    
+    # Security headers
+    SECURITY_HEADERS = {
+        'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+        'X-Content-Type-Options': 'nosniff',
+        'X-Frame-Options': 'DENY',
+        'X-XSS-Protection': '1; mode=block',
+        'Referrer-Policy': 'strict-origin-when-cross-origin'
+    }
+    
+    # Rate limiting and security
+    REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+    RATE_LIMIT_STORAGE_URL = REDIS_URL
+    
+    # File upload restrictions (stricter in production)
+    MAX_CONTENT_LENGTH = 10 * 1024 * 1024  # 10MB in production
+    
+    # Logging configuration
+    LOG_LEVEL = 'WARNING'
+    ENABLE_ACCESS_LOGS = True
+    
+    # CORS - restrictive in production
+    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', '').split(',') if os.environ.get('CORS_ORIGINS') else []
+    
+    # Database connection pooling
+    FIRESTORE_MAX_CONNECTIONS = 100
+    
+    # SSL Configuration
+    SSL_DISABLE = False
+    PREFERRED_URL_SCHEME = 'https'
 
     @staticmethod
     def validate_config():
@@ -111,6 +149,52 @@ class ProductionConfig(Config):
         # Ensure secret key is set in production
         if not os.environ.get('SECRET_KEY'):
             raise ValueError("SECRET_KEY must be set in production")
+        
+        # Validate security-critical environment variables
+        required_prod_vars = [
+            'FIREBASE_PRIVATE_KEY',
+            'GEMINI_API_KEY',
+            'PLAID_SECRET'
+        ]
+        
+        missing_vars = []
+        for var in required_prod_vars:
+            if not os.environ.get(var):
+                missing_vars.append(var)
+        
+        if missing_vars:
+            raise ValueError(f"Missing critical production environment variables: {', '.join(missing_vars)}")
+        
+        # Validate Redis URL format
+        redis_url = os.environ.get('REDIS_URL')
+        if redis_url and not redis_url.startswith(('redis://', 'rediss://')):
+            raise ValueError("Invalid REDIS_URL format")
+        
+        # Validate CORS origins in production
+        cors_origins = os.environ.get('CORS_ORIGINS', '')
+        if cors_origins:
+            origins = cors_origins.split(',')
+            for origin in origins:
+                if not origin.startswith(('https://', 'http://localhost')):
+                    raise ValueError(f"Invalid CORS origin in production: {origin}")
+
+
+class StagingConfig(ProductionConfig):
+    """Staging configuration - like production but less restrictive."""
+    DEBUG = False
+    
+    # Staging-specific settings
+    LOG_LEVEL = 'INFO'
+    SESSION_COOKIE_SECURE = True  # Still require HTTPS in staging
+    
+    # More lenient file size for testing
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB in staging
+    
+    @staticmethod 
+    def validate_config():
+        """Staging configuration validation."""
+        # Use base Config validation (less strict than production)
+        Config.validate_config()
 
 
 class TestingConfig(Config):
@@ -122,6 +206,7 @@ class TestingConfig(Config):
 
 config = {
     'development': DevelopmentConfig,
+    'staging': StagingConfig,
     'production': ProductionConfig,
     'testing': TestingConfig,
     'default': DevelopmentConfig

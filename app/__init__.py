@@ -9,6 +9,9 @@ from werkzeug.exceptions import HTTPException
 
 from app.config import config
 from app.services.firebase_service import FirebaseService
+from app.utils.security import security_manager
+from app.utils.monitoring import initialize_monitoring
+from app.utils.cache import initialize_cache
 
 
 def create_app(config_name=None):
@@ -53,11 +56,43 @@ def create_app(config_name=None):
         if config_name == 'production':
             raise
 
+    # Initialize Security Manager
+    try:
+        redis_url = app.config.get('REDIS_URL')
+        security_manager.initialize(redis_url)
+        app.logger.info("Security manager initialized successfully")
+    except Exception as e:
+        app.logger.error(f"Failed to initialize security manager: {e}")
+        if config_name == 'production':
+            app.logger.warning("Security features may be limited without Redis")
+
     # Register blueprints
     register_blueprints(app)
 
     # Register error handlers
     register_error_handlers(app)
+    
+    # Add security headers for production
+    add_security_headers(app)
+    
+    # Initialize monitoring and metrics
+    try:
+        initialize_monitoring(app)
+        app.logger.info("Monitoring initialized successfully")
+    except Exception as e:
+        app.logger.error(f"Failed to initialize monitoring: {e}")
+        if config_name == 'production':
+            app.logger.warning("Application starting with limited monitoring")
+    
+    # Initialize caching system
+    try:
+        redis_url = app.config.get('REDIS_URL')
+        initialize_cache(redis_url)
+        app.logger.info("Cache system initialized successfully")
+    except Exception as e:
+        app.logger.error(f"Failed to initialize cache system: {e}")
+        if config_name == 'production':
+            app.logger.warning("Application starting with limited caching")
 
     # Health check endpoin
     @app.route('/health')
@@ -136,6 +171,35 @@ def register_blueprints(app):
     app.register_blueprint(frontend_bp)
 
     app.logger.info("Blueprints registered successfully")
+
+
+def add_security_headers(app):
+    """Add security headers to all responses."""
+    
+    @app.after_request
+    def set_security_headers(response):
+        # Get security headers from config
+        headers = app.config.get('SECURITY_HEADERS', {})
+        
+        for header, value in headers.items():
+            response.headers[header] = value
+        
+        # Content Security Policy
+        if not app.debug:
+            csp = (
+                "default-src 'self'; "
+                "script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://www.gstatic.com; "
+                "style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; "
+                "img-src 'self' data: https:; "
+                "font-src 'self' https:; "
+                "connect-src 'self' https:; "
+                "frame-ancestors 'none'; "
+                "base-uri 'self'; "
+                "form-action 'self'"
+            )
+            response.headers['Content-Security-Policy'] = csp
+        
+        return response
 
 
 def register_error_handlers(app):
