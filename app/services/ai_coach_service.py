@@ -51,31 +51,56 @@ class AICoachService:
 
     def __init__(self, firebase_service: FirebaseService = None, gemini_api_key: str = None):
         """Initialize the AI coach service."""
-        self.firebase_service = firebase_service or FirebaseService()
-        self.db = self.firebase_service.db
+        try:
+            self.firebase_service = firebase_service or FirebaseService()
+            self.db = self.firebase_service.db
+            if self.db is None:
+                logger.error("Firebase database not initialized - db is None")
+            else:
+                logger.info("Firebase database initialized successfully for AI Coach")
+        except Exception as e:
+            logger.error(f"Failed to initialize Firebase for AI Coach: {str(e)}")
+            self.firebase_service = None
+            self.db = None
 
         # Configure Gemini
+        self.api_key_configured = False
+        self.model = None
+        
         if gemini_api_key:
             genai.configure(api_key=gemini_api_key)
+            self.api_key_configured = True
+            logger.info("Gemini API key provided directly")
         else:
-            # Try to get from environmen
+            # Try to get from environment
             import os
             api_key = os.getenv('GEMINI_API_KEY')
             if api_key:
                 genai.configure(api_key=api_key)
+                self.api_key_configured = True
+                logger.info("Gemini API key loaded from environment")
             else:
                 logger.warning("No Gemini API key configured. AI coach will use mock responses.")
 
-        # Initialize Gemini model
-        self.model = genai.GenerativeModel(
-            model_name='gemini-1.5-flash',
-            generation_config={
-                'temperature': 0.7,
-                'top_p': 0.8,
-                'top_k': 40,
-                'max_output_tokens': 1024,
-            }
-        )
+        # Initialize Gemini model only if API key is available
+        if self.api_key_configured:
+            try:
+                self.model = genai.GenerativeModel(
+                    model_name='gemini-1.5-flash',
+                    generation_config={
+                        'temperature': 0.7,
+                        'top_p': 0.8,
+                        'top_k': 40,
+                        'max_output_tokens': 1024,
+                    }
+                )
+                logger.info("Gemini model initialized successfully")
+            except Exception as e:
+                logger.error(f"Failed to initialize Gemini model: {str(e)}")
+                self.model = None
+                self.api_key_configured = False
+        else:
+            logger.warning("Gemini model not initialized - no API key")
 
         # ADHD-friendly coach personality promp
         self.system_prompt = self._build_system_prompt()
@@ -196,10 +221,25 @@ Remember: Your goal is to be the supportive financial friend every ADHD person d
     ) -> Dict[str, Any]:
         """Send a message and get AI coach response."""
         try:
+            logger.info(f"send_message called for session {session_id} with message: '{user_message[:50]}...'")
+            
             # Load conversation session
+            logger.info(f"Loading conversation session {session_id}")
             session = await self._load_conversation_session(session_id)
             if not session:
-                raise ValueError(f"Conversation session {session_id} not found")
+                logger.warning(f"Conversation session {session_id} not found, creating a temporary session")
+                # Create a temporary session for this interaction
+                from datetime import datetime
+                session = ConversationSession(
+                    session_id=session_id,
+                    user_id="anonymous",  # We'll set this properly when we have user context
+                    messages=[],
+                    created_at=datetime.utcnow(),
+                    updated_at=datetime.utcnow(),
+                    context_summary={},
+                    total_messages=0
+                )
+                logger.info(f"Created temporary session {session_id}")
 
             # Process quick action if provided
             if quick_action and quick_action in self.quick_actions:
@@ -214,13 +254,16 @@ Remember: Your goal is to be the supportive financial friend every ADHD person d
             )
             session.messages.append(user_msg)
 
-            # Get fresh user contex
+            # Get fresh user context
+            logger.info(f"Getting user context for user {session.user_id}")
             user_context = await self._get_user_context(session.user_id)
 
             # Generate AI response
+            logger.info(f"Generating AI response for session {session_id}")
             ai_response = await self._generate_response(
-                session, user_message, user_contex
+                session, user_message, user_context
             )
+            logger.info(f"AI response generated successfully, length: {len(ai_response.get('content', ''))}")
 
             # Add AI response to session
             ai_msg = ConversationMessage(
@@ -235,7 +278,7 @@ Remember: Your goal is to be the supportive financial friend every ADHD person d
             # Update session metadata
             session.total_messages += 2
             session.updated_at = datetime.utcnow()
-            session.context_summary = user_contex
+            session.context_summary = user_context
 
             # Save updated session
             await self._save_conversation_session(session)
@@ -265,9 +308,13 @@ Remember: Your goal is to be the supportive financial friend every ADHD person d
             }
 
         except Exception as e:
-            logger.error(f"Error processing message: {str(e)}")
+            logger.error(f"Error processing message in send_message: {str(e)}", exc_info=True)
+            logger.error(f"Exception type: {type(e).__name__}")
+            logger.error(f"Session ID: {session_id}, User message: '{user_message}'")
             # Return fallback response
-            return await self._generate_fallback_response(user_message)
+            fallback = await self._generate_fallback_response(user_message)
+            logger.info("Returning fallback response due to error")
+            return fallback
 
     async def get_conversation_history(
         self,
@@ -412,19 +459,25 @@ What's on your mind today? I'm here to listen and help however I can! 💙"""
     ) -> Dict[str, Any]:
         """Generate AI response using Gemini."""
         try:
-            # Build conversation history for contex
+            logger.info(f"_generate_response called for session {session.session_id}")
+            
+            # Build conversation history for context
             conversation_history = ""
             if session.messages:
                 recent_messages = session.messages[-6:]  # Last 3 exchanges
                 for msg in recent_messages:
                     role = "User" if msg.role == 'user' else "Coach"
                     conversation_history += f"{role}: {msg.content}\n"
+                logger.info(f"Built conversation history with {len(recent_messages)} messages")
 
             # Check for safety keywords
             needs_disclaimer = any(keyword in user_message.lower() for keyword in self.safety_keywords)
+            if needs_disclaimer:
+                logger.info("Safety keywords detected, will add disclaimer")
 
-            # Build prompt with contex
+            # Build prompt with context
             context_info = self._format_context_for_prompt(user_context)
+            logger.info(f"User context formatted: {context_info[:100]}...")
 
             full_prompt = f"""{self.system_prompt}
 
@@ -438,9 +491,20 @@ USER'S CURRENT MESSAGE: {user_message}
 
 Please respond as the supportive ADHD-aware financial coach. Keep your response conversational, encouraging, and helpful."""
 
+            logger.info(f"Prompt built, length: {len(full_prompt)} characters")
+            
+            # Check if model is available
+            if not self.model:
+                logger.error("Gemini model not initialized")
+                raise Exception("Gemini model not initialized")
+
             # Generate response
+            logger.info("Calling Gemini API...")
             response = self.model.generate_content(full_prompt)
+            logger.info("Gemini API call completed")
+            
             ai_response = response.text.strip()
+            logger.info(f"AI response received, length: {len(ai_response)} characters")
 
             # Add disclaimer if needed
             if needs_disclaimer:
@@ -458,7 +522,9 @@ Please respond as the supportive ADHD-aware financial coach. Keep your response 
             }
 
         except Exception as e:
-            logger.error(f"Error generating AI response: {str(e)}")
+            logger.error(f"Error generating AI response: {str(e)}", exc_info=True)
+            logger.error(f"Exception type: {type(e).__name__}")
+            logger.error(f"Gemini model available: {self.model is not None}")
             return await self._generate_fallback_response(user_message)
 
     def _format_context_for_prompt(self, context: Dict[str, Any]) -> str:
@@ -565,6 +631,10 @@ Please respond as the supportive ADHD-aware financial coach. Keep your response 
     async def _save_conversation_session(self, session: ConversationSession):
         """Save conversation session to database."""
         try:
+            if self.db is None:
+                logger.warning("Cannot save session - Firebase database not initialized, skipping save")
+                return
+                
             session_data = {
                 'session_id': session.session_id,
                 'user_id': session.user_id,
@@ -588,17 +658,23 @@ Please respond as the supportive ADHD-aware financial coach. Keep your response 
 
             session_ref = self.db.collection('ai_conversations').document(session.session_id)
             session_ref.set(session_data)
+            logger.info(f"Successfully saved session {session.session_id} to database")
 
         except Exception as e:
-            logger.error(f"Error saving conversation session: {str(e)}")
+            logger.error(f"Error saving conversation session: {str(e)}", exc_info=True)
 
     async def _load_conversation_session(self, session_id: str) -> Optional[ConversationSession]:
         """Load conversation session from database."""
         try:
+            if self.db is None:
+                logger.error("Cannot load session - Firebase database not initialized")
+                return None
+                
             session_ref = self.db.collection('ai_conversations').document(session_id)
             session_doc = session_ref.get()
 
             if not session_doc.exists:
+                logger.info(f"Session {session_id} does not exist in database")
                 return None
 
             data = session_doc.to_dict()
@@ -666,7 +742,14 @@ Please respond as the supportive ADHD-aware financial coach. Keep your response 
     def send_message_sync(self, session_id: str, user_message: str, quick_action: Optional[str] = None) -> Dict[str, Any]:
         """Synchronous wrapper for send_message."""
         import asyncio
-        return asyncio.run(self.send_message(session_id, user_message, quick_action))
+        logger.info(f"send_message_sync called for session {session_id}")
+        try:
+            result = asyncio.run(self.send_message(session_id, user_message, quick_action))
+            logger.info(f"send_message_sync completed successfully for session {session_id}")
+            return result
+        except Exception as e:
+            logger.error(f"send_message_sync failed for session {session_id}: {str(e)}", exc_info=True)
+            raise
 
     def get_conversation_history_sync(self, session_id: str, limit: int = 20) -> List[Dict[str, Any]]:
         """Synchronous wrapper for get_conversation_history."""

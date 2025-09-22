@@ -24,9 +24,9 @@ try:
 except ImportError:
     logger.info("ML libraries not available - using basic advice engine")
 
-from app.services.firebase_service import FirebaseService
-
 logger = logging.getLogger(__name__)
+
+from app.services.firebase_service import FirebaseService
 
 class AdviceCategory(Enum):
     BUDGETING = "budgeting"

@@ -68,64 +68,14 @@
 
                         <!-- Messages Area -->
                         <div id="messages-container" class="flex-1 overflow-y-auto space-y-4 mb-6">
-                            <!-- Welcome Message -->
+                            <!-- Initial loading message -->
                             <div class="flex items-start space-x-3">
                                 <div class="w-10 h-10 rounded-full flex items-center justify-center brain-gradient">
                                     <span class="text-white text-sm">🤖</span>
                                 </div>
                                 <div class="flex-1 p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.8);">
                                     <p class="text-sm font-semibold mb-2" style="color: #380F17;">Your AI Coach</p>
-                                    <p style="color: #252B2B;">Hi there! I'm your personal financial coach. I understand the unique challenges and strengths that come with managing money. How can I help you today?</p>
-                                    <div class="mt-3 flex flex-wrap gap-2">
-                                        <button onclick="sendQuickMessage('Help me budget effectively')" class="px-3 py-1 rounded-lg text-xs font-semibold transition-colors" style="background-color: #380F17; color: #EFDFC5;">
-                                            💰 Smart Budgeting
-                                        </button>
-                                        <button onclick="sendQuickMessage('I made an impulse purchase')" class="px-3 py-1 rounded-lg text-xs font-semibold transition-colors" style="background-color: #8F0B13; color: #EFDFC5;">
-                                            🛒 Impulse Purchase Help
-                                        </button>
-                                        <button onclick="sendQuickMessage('Struggling with executive function')" class="px-3 py-1 rounded-lg text-xs font-semibold transition-colors" style="background-color: #252B2B; color: #EFDFC5;">
-                                            🧠 Executive Function
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Sample conversation for demo -->
-                            <div id="demo-messages" class="space-y-4">
-                                <!-- User message -->
-                                <div class="flex items-start space-x-3 justify-end">
-                                    <div class="flex-1 max-w-xs p-4 rounded-2xl" style="background-color: rgba(56, 15, 23, 0.1);">
-                                        <p style="color: #252B2B;">I keep forgetting to check my budget and then overspend. It's so frustrating!</p>
-                                    </div>
-                                    <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background-color: #8F0B13;">
-                                        <span class="text-white text-sm">👤</span>
-                                    </div>
-                                </div>
-
-                                <!-- AI Coach response -->
-                                <div class="flex items-start space-x-3">
-                                    <div class="w-10 h-10 rounded-full flex items-center justify-center brain-gradient">
-                                        <span class="text-white text-sm">🤖</span>
-                                    </div>
-                                    <div class="flex-1 p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.8);">
-                                        <p class="text-sm font-semibold mb-2" style="color: #380F17;">Your AI Coach</p>
-                                        <p style="color: #252B2B;">I completely understand! Budget checking can be challenging for many people. Let's create some user-friendly strategies:</p>
-                                        <div class="mt-3 space-y-2">
-                                            <div class="p-2 rounded-lg" style="background-color: rgba(56, 15, 23, 0.1);">
-                                                <p class="text-sm font-semibold" style="color: #380F17;">🔔 Smart Reminders</p>
-                                                <p class="text-xs" style="color: #4C4F54;">Set up gentle budget notifications when you're near spending limits</p>
-                                            </div>
-                                            <div class="p-2 rounded-lg" style="background-color: rgba(56, 15, 23, 0.1);">
-                                                <p class="text-sm font-semibold" style="color: #380F17;">📱 Dopamine Triggers</p>
-                                                <p class="text-xs" style="color: #4C4F54;">Use visual cues and celebrations to make budget checking rewarding</p>
-                                            </div>
-                                            <div class="p-2 rounded-lg" style="background-color: rgba(56, 15, 23, 0.1);">
-                                                <p class="text-sm font-semibold" style="color: #380F17;">⚡ Executive Function Support</p>
-                                                <p class="text-xs" style="color: #4C4F54;">Break budget management into tiny, specific steps</p>
-                                            </div>
-                                        </div>
-                                        <p class="mt-3 text-sm" style="color: #252B2B;">Would you like me to help you set up any of these strategies?</p>
-                                    </div>
+                                    <p style="color: #252B2B;">Loading your personal AI coach... 🔄</p>
                                 </div>
                             </div>
                         </div>
@@ -191,13 +141,13 @@
                             Quick Help
                         </h3>
                         <div class="space-y-3">
-                            <button onclick="sendQuickMessage('Help me create a user-friendly budget')" class="w-full p-3 rounded-xl font-semibold transition-colors hover:shadow-md text-left" style="background-color: #380F17; color: #EFDFC5;">
+                            <button onclick="sendQuickMessage('Help me create a budget that works with my ADHD brain')" class="w-full p-3 rounded-xl font-semibold transition-colors hover:shadow-md text-left" style="background-color: #380F17; color: #EFDFC5;">
                                 💰 Budget Setup
                             </button>
-                            <button onclick="sendQuickMessage('I just made an impulse purchase and feel guilty')" class="w-full p-3 rounded-xl font-semibold transition-colors hover:shadow-md text-left" style="background-color: #8F0B13; color: #EFDFC5;">
+                            <button onclick="sendQuickMessage('I just made an impulse purchase and feel guilty about it')" class="w-full p-3 rounded-xl font-semibold transition-colors hover:shadow-md text-left" style="background-color: #8F0B13; color: #EFDFC5;">
                                 🛍️ Impulse Purchase Support
                             </button>
-                            <button onclick="sendQuickMessage('How can I remember to check my spending?')" class="w-full p-3 rounded-xl font-semibold transition-colors hover:shadow-md text-left" style="background-color: #252B2B; color: #EFDFC5;">
+                            <button onclick="sendQuickMessage('How can I remember to check my spending regularly?')" class="w-full p-3 rounded-xl font-semibold transition-colors hover:shadow-md text-left" style="background-color: #252B2B; color: #EFDFC5;">
                                 🔔 Memory Strategies
                             </button>
                         </div>
@@ -245,7 +195,7 @@
     <footer class="py-8 text-center animate-fadeIn">
         <div class="max-w-4xl mx-auto px-4">
             <p class="text-sm" style="color: #4C4F54;">
-                BrainBudget - Making budgeting accessible | powered by <span class="font-semibold" style="color: #8F0B13;">Niostudio</span>
+                BrainBudget - Making budgeting fun | powered by <span class="font-semibold" style="color: #8F0B13;">Niostudio</span>
             </p>
         </div>
     </footer>
@@ -255,42 +205,224 @@
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Global variables
+    let currentSessionId = null;
+    let isLoading = false;
+    let firebaseCheckAttempts = 0;
+    let maxFirebaseChecks = 10; // Max 10 seconds to wait for Firebase
+    
     // Initialize chat interface
     initializeChat();
-    
-    // Load conversation history
-    loadConversationHistory();
     
     function initializeChat() {
         // Set up chat functionality
         const messagesContainer = document.getElementById('messages-container');
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        
+        // Check authentication and start session
+        checkAuthAndStartSession();
     }
     
-    function loadConversationHistory() {
-        // Load recent conversations
-        fetch('/api/coach/conversations')
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    updateConversationHistory(data.conversations);
+    function checkAuthAndStartSession() {
+        console.log('Checking auth and starting session...');
+        
+        // Check if user is authenticated
+        if (window.firebase && window.firebase.auth) {
+            console.log('Firebase loaded, checking auth state...');
+            window.firebase.auth.onAuthStateChanged((user) => {
+                if (user) {
+                    console.log('User is authenticated:', user.uid);
+                    // User is signed in, start conversation session
+                    startNewConversationSession();
+                } else {
+                    console.log('User is not authenticated');
+                    // User is not signed in, show login prompt
+                    showLoginPrompt();
                 }
-            })
-            .catch(error => {
-                console.log('Using demo conversation history');
             });
+        } else {
+            firebaseCheckAttempts++;
+            if (firebaseCheckAttempts < maxFirebaseChecks) {
+                console.log(`Firebase not loaded yet (attempt ${firebaseCheckAttempts}/${maxFirebaseChecks}), retrying in 1 second...`);
+                setTimeout(checkAuthAndStartSession, 1000); // Retry if Firebase not loaded yet
+            } else {
+                console.error('Firebase failed to load after maximum attempts, showing fallback');
+                showFirebaseError();
+            }
+        }
     }
     
-    function updateConversationHistory(conversations) {
-        console.log('Conversation history loaded:', conversations);
+    function showLoginPrompt() {
+        const messagesContainer = document.getElementById('messages-container');
+        messagesContainer.innerHTML = `
+            <div class="flex items-start space-x-3">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center brain-gradient">
+                    <span class="text-white text-sm">🤖</span>
+                </div>
+                <div class="flex-1 p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.8);">
+                    <p class="text-sm font-semibold mb-2" style="color: #380F17;">Your AI Coach</p>
+                    <p style="color: #252B2B;">Hi there! I'd love to help you with your finances, but first you'll need to log in so I can provide personalized guidance. 🔐</p>
+                    <div class="mt-3">
+                        <a href="/auth/login" class="px-4 py-2 rounded-lg font-semibold transition-colors" style="background-color: #380F17; color: #EFDFC5; text-decoration: none;">
+                            Log In to Continue
+                        </a>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Disable input
+        document.getElementById('user-input').disabled = true;
+        document.getElementById('user-input').placeholder = "Please log in to chat with your AI coach...";
+    }
+    
+    function showFirebaseError() {
+        const messagesContainer = document.getElementById('messages-container');
+        messagesContainer.innerHTML = `
+            <div class="flex items-start space-x-3">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center brain-gradient">
+                    <span class="text-white text-sm">🤖</span>
+                </div>
+                <div class="flex-1 p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.8);">
+                    <p class="text-sm font-semibold mb-2" style="color: #380F17;">Your AI Coach</p>
+                    <p style="color: #252B2B;">I'm having trouble connecting right now. Please refresh the page or try again in a moment! 🔄</p>
+                    <div class="mt-3">
+                        <button onclick="location.reload()" class="px-4 py-2 rounded-lg font-semibold transition-colors" style="background-color: #380F17; color: #EFDFC5;">
+                            Refresh Page
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Disable input
+        document.getElementById('user-input').disabled = true;
+        document.getElementById('user-input').placeholder = "Connection error - please refresh the page...";
+    }
+    
+    async function startNewConversationSession() {
+        try {
+            const user = window.firebase.auth.currentUser;
+            if (!user) return;
+            
+            const token = await user.getIdToken();
+            
+            const response = await fetch('/api/coach/start', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                currentSessionId = data.session_id;
+                console.log('Started new AI coach session:', currentSessionId);
+                
+                // Enable input
+                document.getElementById('user-input').disabled = false;
+                document.getElementById('user-input').placeholder = "Ask your AI coach anything about managing money...";
+                
+                // Load conversation history if session already has messages
+                loadCurrentSessionHistory();
+                
+                // Update coach status
+                document.getElementById('coach-status').textContent = 'Ready to help with your finances';
+                
+                showSuccessToast('🤖 Your AI coach is ready to help!');
+            } else {
+                console.error('Failed to start AI coach session:', data.message);
+                showErrorToast('Had trouble starting AI coach session. Please try again!');
+                
+                // Show fallback message
+                const messagesContainer = document.getElementById('messages-container');
+                messagesContainer.innerHTML = `
+                    <div class="flex items-start space-x-3">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center brain-gradient">
+                            <span class="text-white text-sm">🤖</span>
+                        </div>
+                        <div class="flex-1 p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.8);">
+                            <p class="text-sm font-semibold mb-2" style="color: #380F17;">Your AI Coach</p>
+                            <p style="color: #252B2B;">I'm having some technical difficulties starting our conversation. Please try refreshing the page! 🔧</p>
+                            <div class="mt-3">
+                                <button onclick="location.reload()" class="px-4 py-2 rounded-lg font-semibold transition-colors" style="background-color: #380F17; color: #EFDFC5;">
+                                    Refresh & Try Again
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        } catch (error) {
+            console.error('Error starting AI coach session:', error);
+            showErrorToast('Connection error. Please check your internet and try again!');
+            
+            // Show error message in chat
+            const messagesContainer = document.getElementById('messages-container');
+            messagesContainer.innerHTML = `
+                <div class="flex items-start space-x-3">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center brain-gradient">
+                        <span class="text-white text-sm">🤖</span>
+                    </div>
+                    <div class="flex-1 p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.8);">
+                        <p class="text-sm font-semibold mb-2" style="color: #380F17;">Your AI Coach</p>
+                        <p style="color: #252B2B;">I'm having trouble connecting to the server. Please check your internet connection and try again! 🌐</p>
+                        <div class="mt-3">
+                            <button onclick="location.reload()" class="px-4 py-2 rounded-lg font-semibold transition-colors" style="background-color: #380F17; color: #EFDFC5;">
+                                Refresh Page
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    }
+    
+    async function loadCurrentSessionHistory() {
+        if (!currentSessionId) return;
+        
+        try {
+            const user = window.firebase.auth.currentUser;
+            if (!user) return;
+            
+            const token = await user.getIdToken();
+            
+            const response = await fetch(`/api/coach/history/${currentSessionId}?limit=10`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success && data.history.length > 0) {
+                // Clear current messages
+                const messagesContainer = document.getElementById('messages-container');
+                messagesContainer.innerHTML = '';
+                
+                // Add history messages
+                data.history.forEach(msg => {
+                    if (msg.role === 'user') {
+                        addUserMessage(msg.content, false);
+                    } else {
+                        addCoachResponse(msg.content, false);
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Error loading conversation history:', error);
+        }
     }
     
     // Chat functions
-    window.sendMessage = function() {
+    window.sendMessage = async function() {
         const input = document.getElementById('user-input');
         const message = input.value.trim();
         
-        if (!message) return;
+        if (!message || isLoading || !currentSessionId) return;
         
         // Add user message to chat
         addUserMessage(message);
@@ -300,42 +432,85 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Show typing indicator
         showTypingIndicator();
+        isLoading = true;
         
-        // Send to AI coach (simulate for demo)
-        setTimeout(() => {
+        try {
+            const user = window.firebase.auth.currentUser;
+            if (!user) {
+                hideTypingIndicator();
+                isLoading = false;
+                showErrorToast('Please log in to continue chatting!');
+                return;
+            }
+            
+            const token = await user.getIdToken();
+            
+            const response = await fetch(`/api/coach/chat/${currentSessionId}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message: message })
+            });
+            
+            const data = await response.json();
+            
             hideTypingIndicator();
-            addCoachResponse(generateCoachResponse(message));
-        }, 1500 + Math.random() * 1000);
+            isLoading = false;
+            
+            if (data.success) {
+                addCoachResponse(data.response.content);
+                
+                // Update coach status with session info
+                if (data.response.session_info) {
+                    document.getElementById('coach-status').textContent = 
+                        `Conversation: ${data.response.session_info.total_messages} messages`;
+                }
+            } else {
+                console.error('AI coach API error:', data.message);
+                addCoachResponse("I apologize, but I'm having trouble responding right now. Please try asking again! 💙");
+            }
+        } catch (error) {
+            console.error('Error sending message to AI coach:', error);
+            hideTypingIndicator();
+            isLoading = false;
+            addCoachResponse("I'm experiencing some technical difficulties. Let me try to help you in a moment! 🔧");
+        }
     };
     
     window.sendQuickMessage = function(message) {
+        if (isLoading || !currentSessionId) return;
         document.getElementById('user-input').value = message;
         sendMessage();
     };
     
     window.handleKeyPress = function(event) {
-        if (event.key === 'Enter') {
+        if (event.key === 'Enter' && !isLoading) {
             sendMessage();
         }
     };
     
-    function addUserMessage(message) {
+    function addUserMessage(message, scroll = true) {
         const messagesContainer = document.getElementById('messages-container');
         const messageElement = document.createElement('div');
         messageElement.className = 'flex items-start space-x-3 justify-end';
         messageElement.innerHTML = `
             <div class="flex-1 max-w-xs p-4 rounded-2xl" style="background-color: rgba(56, 15, 23, 0.1);">
-                <p style="color: #252B2B;">${message}</p>
+                <p style="color: #252B2B;">${escapeHtml(message)}</p>
             </div>
             <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background-color: #8F0B13;">
                 <span class="text-white text-sm">👤</span>
             </div>
         `;
         messagesContainer.appendChild(messageElement);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        
+        if (scroll) {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
     }
     
-    function addCoachResponse(response) {
+    function addCoachResponse(response, scroll = true) {
         const messagesContainer = document.getElementById('messages-container');
         const messageElement = document.createElement('div');
         messageElement.className = 'flex items-start space-x-3';
@@ -345,11 +520,14 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             <div class="flex-1 p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.8);">
                 <p class="text-sm font-semibold mb-2" style="color: #380F17;">Your AI Coach</p>
-                <p style="color: #252B2B;">${response}</p>
+                <p style="color: #252B2B;">${formatCoachResponse(response)}</p>
             </div>
         `;
         messagesContainer.appendChild(messageElement);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        
+        if (scroll) {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
     }
     
     function showTypingIndicator() {
@@ -381,20 +559,29 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    function generateCoachResponse(userMessage) {
-        const responses = [
-            "I understand how challenging money management can be. Let's work together to find strategies that work for you. What specific area would you like to focus on first?",
-            "That's such a common experience! Everyone's brain works differently, and traditional budgeting advice doesn't work for everyone. Let me suggest some personalized approaches...",
-            "I hear the frustration in your message, and I want you to know that's completely valid. Everyone has unique strengths - like creativity and focus - that we can leverage for your financial goals.",
-            "Great question! Sometimes financial tasks can feel overwhelming. Let's break this down into smaller, more manageable steps that work for you.",
-            "You're not alone in this struggle. Many people face similar challenges with money management. The key is finding systems that provide the right amount of motivation and structure for you."
-        ];
-        
-        return responses[Math.floor(Math.random() * responses.length)];
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    function formatCoachResponse(response) {
+        // Basic formatting for AI responses
+        return escapeHtml(response)
+            .replace(/\n/g, '<br>')
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>');
     }
     
     // Additional functions
     window.startNewConversation = function() {
+        if (isLoading) return;
+        
+        // Reset session and start fresh
+        currentSessionId = null;
+        startNewConversationSession();
+        
+        // Clear messages
         document.getElementById('messages-container').innerHTML = `
             <div class="flex items-start space-x-3">
                 <div class="w-10 h-10 rounded-full flex items-center justify-center brain-gradient">
@@ -402,20 +589,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 <div class="flex-1 p-4 rounded-2xl" style="background-color: rgba(239, 223, 197, 0.8);">
                     <p class="text-sm font-semibold mb-2" style="color: #380F17;">Your AI Coach</p>
-                    <p style="color: #252B2B;">Hi! I'm here to help you navigate financial management. What's on your mind today?</p>
+                    <p style="color: #252B2B;">Starting a fresh conversation... 🔄</p>
                 </div>
             </div>
         `;
+        
         showSuccessToast('🔄 Started new conversation with your AI coach!');
     };
     
     window.showHistory = function() {
-        showSuccessToast('📚 Conversation history coming soon! You\'ll be able to review and continue previous coaching sessions.');
+        showSuccessToast('📚 Conversation history feature coming soon! You\'ll be able to review and continue previous coaching sessions.');
     };
     
-    // Auto-focus on input when page loads
+    // Auto-focus on input when page loads (if enabled)
     setTimeout(() => {
-        document.getElementById('user-input').focus();
+        const input = document.getElementById('user-input');
+        if (!input.disabled) {
+            input.focus();
+        }
     }, 1000);
 });
 </script>

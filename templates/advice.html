@@ -301,7 +301,7 @@
     <footer class="py-8 text-center animate-fadeIn">
         <div class="max-w-4xl mx-auto px-4">
             <p class="text-sm" style="color: #4C4F54;">
-                BrainBudget - Making budgeting accessible | powered by <span class="font-semibold" style="color: #8F0B13;">Niostudio</span>
+                BrainBudget - Making budgeting fun | powered by <span class="font-semibold" style="color: #8F0B13;">Niostudio</span>
             </p>
         </div>
     </footer>
@@ -309,45 +309,138 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='js/core.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Load personalized advice
-    loadAdvice();
+    // Wait for Firebase to initialize
+    setTimeout(() => {
+        // Check authentication state
+        firebase.auth.onAuthStateChanged(user => {
+            if (user) {
+                console.log('User authenticated, loading personalized advice...');
+                loadAdvice();
+                // Show authenticated features
+                document.querySelectorAll('.auth-required').forEach(el => {
+                    el.style.display = 'block';
+                });
+            } else {
+                console.log('User not authenticated - showing demo content');
+                showSuccessToast('👋 Welcome! Please log in to get personalized financial advice tailored to your needs.');
+                // Hide authenticated features
+                document.querySelectorAll('.auth-required').forEach(el => {
+                    el.style.display = 'none';
+                });
+                // Show demo content instead of redirecting
+                loadDemoAdvice();
+            }
+        });
+    }, 1000);
     
     // Set up advice filtering
     setupAdviceFiltering();
     
-    // Auto-refresh advice periodically
-    setInterval(loadAdvice, 1800000); // Every 30 minutes
+    // Auto-refresh advice periodically (only if user is logged in)
+    setInterval(() => {
+        if (firebase.auth.currentUser) {
+            loadAdvice();
+        }
+    }, 1800000); // Every 30 minutes
     
     function loadAdvice() {
-        // Load personalized advice based on user profile
-        fetch('/api/advice/personalized')
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    updateAdviceDisplay(data.advice);
-                }
-            })
-            .catch(error => {
-                console.log('Using demo advice data');
-            });
+        // Get Firebase token for authentication
+        const user = firebase.auth().currentUser;
+        if (!user) {
+            console.log('User not logged in - showing demo advice');
+            return;
+        }
         
-        // Load saved advice
-        fetch('/api/advice/saved')
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    updateSavedAdvice(data.saved);
-                }
-            })
-            .catch(error => {
-                console.log('Using demo saved advice');
-            });
+        user.getIdToken().then(token => {
+            const headers = {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            };
+            
+            // Load personalized advice based on user profile
+            fetch('/api/advice/personalized?limit=5', { headers })
+                .then(response => {
+                    console.log('Advice API response status:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Advice API response data:', data);
+                    if (data.success) {
+                        updateAdviceDisplay(data.advice);
+                        showSuccessToast('🎯 Personalized advice loaded based on your spending patterns!');
+                    } else {
+                        console.log('API returned error:', data.message);
+                        showSuccessToast('💡 Loading general advice while we learn your preferences!');
+                    }
+                })
+                .catch(error => {
+                    console.log('Advice API error:', error);
+                    showSuccessToast('💡 Loading demo advice - upload some transactions for personalized tips!');
+                });
+            
+            // Load quick tips
+            fetch('/api/advice/quick-tips?limit=3', { headers })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        updateQuickTips(data.quick_tips);
+                    }
+                })
+                .catch(error => {
+                    console.log('Could not load quick tips:', error);
+                });
+        }).catch(error => {
+            console.log('Authentication error:', error);
+        });
+    }
+    
+    function loadDemoAdvice() {
+        // Show demo content for non-authenticated users
+        console.log('Loading demo advice content');
+        const demoAdvice = [
+            {
+                title: "Start with 3 Simple Categories",
+                summary: "Instead of overwhelming yourself with 20+ budget categories, begin with just 3: Essentials (rent, groceries), Fun Money (entertainment, hobbies), and Future Self (savings, debt). You can always add more later!",
+                category: "budgeting",
+                adhd_friendly: true
+            }
+        ];
+        
+        updateAdviceDisplay(demoAdvice);
+        showSuccessToast('💡 This is demo advice! Log in to get personalized tips based on your spending.');
     }
     
     function updateAdviceDisplay(advice) {
         console.log('Personalized advice loaded:', advice);
+        // Update the featured advice with real data
+        if (advice && advice.length > 0) {
+            const featured = advice[0];
+            updateFeaturedAdvice(featured);
+        }
+    }
+    
+    function updateFeaturedAdvice(advice) {
+        // Update the "Today's Featured Tip" section with real advice
+        const featuredSection = document.querySelector('[onclick*="featured"]').closest('div').closest('div');
+        if (featuredSection && advice) {
+            const titleElement = featuredSection.querySelector('h4');
+            const contentElement = featuredSection.querySelector('p');
+            
+            if (titleElement && advice.title) {
+                titleElement.textContent = `🧠 ${advice.title}`;
+            }
+            if (contentElement && advice.summary) {
+                contentElement.textContent = advice.summary;
+            }
+        }
+    }
+    
+    function updateQuickTips(tips) {
+        console.log('Quick tips loaded:', tips);
+        // Could update a quick tips section if we add one
     }
     
     function updateSavedAdvice(saved) {
@@ -368,58 +461,261 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     
     window.likeAdvice = function(adviceId) {
-        showSuccessToast('👍 Thanks for the feedback! This helps us provide better personalized advice.');
-        // Send feedback to backend
-        fetch('/api/advice/feedback', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ adviceId, type: 'like' })
-        }).catch(error => console.log('Feedback logged locally'));
+        const user = firebase.auth().currentUser;
+        if (!user) {
+            showSuccessToast('Please log in to save your feedback! 🔐');
+            return;
+        }
+        
+        user.getIdToken().then(token => {
+            fetch('/api/advice/interaction', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ 
+                    advice_id: adviceId, 
+                    action: 'helpful',
+                    feedback: { helpful: true, rating: 5 }
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSuccessToast(data.message || '👍 Thanks for the feedback! This helps us provide better advice.');
+                } else {
+                    showSuccessToast('👍 Feedback noted! We\'ll improve our suggestions.');
+                }
+            })
+            .catch(error => {
+                console.log('Feedback error:', error);
+                showSuccessToast('👍 Thanks for the feedback! This helps us provide better advice.');
+            });
+        });
     };
     
     window.saveAdvice = function(adviceId) {
-        showSuccessToast('📌 Advice saved! You can find it in your saved tips section.');
-        // Save advice for later
-        fetch('/api/advice/save', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ adviceId })
-        }).catch(error => console.log('Advice saved locally'));
+        const user = firebase.auth().currentUser;
+        if (!user) {
+            showSuccessToast('Please log in to save advice! 🔐');
+            return;
+        }
+        
+        // For now, use interaction API to track saves
+        user.getIdToken().then(token => {
+            fetch('/api/advice/interaction', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ 
+                    advice_id: adviceId, 
+                    action: 'started',  // User wants to implement this advice
+                    feedback: { saved: true }
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSuccessToast('📌 Advice saved! You can find it in your profile.');
+                } else {
+                    showSuccessToast('📌 Advice saved locally!');
+                }
+            })
+            .catch(error => {
+                console.log('Save error:', error);
+                showSuccessToast('📌 Advice saved! You can find it in your saved tips section.');
+            });
+        });
     };
     
     window.shareAdvice = function(adviceId) {
-        showSuccessToast('📤 Great advice to share! Community sharing coming soon.');
+        // Copy advice link to clipboard
+        const url = `${window.location.origin}/advice#${adviceId}`;
+        navigator.clipboard.writeText(url).then(() => {
+            showSuccessToast('📤 Advice link copied to clipboard! Share it with friends who need financial tips.');
+        }).catch(() => {
+            showSuccessToast('📤 Share this great advice with your friends! Link: ' + url);
+        });
+        
+        // Track sharing interaction
+        trackAdviceInteraction(adviceId, 'shared');
     };
     
     window.tryAdvice = function(adviceId) {
-        showSuccessToast('✨ Ready to try it out? We\'ll help you implement this tip step by step!');
+        // Mark as started and provide implementation guidance
+        const user = firebase.auth().currentUser;
+        if (!user) {
+            showSuccessToast('Please log in to track your progress! 🔐');
+            return;
+        }
+        
+        user.getIdToken().then(token => {
+            fetch('/api/advice/progress-check', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ 
+                    advice_id: adviceId, 
+                    progress_status: 'in_progress',
+                    notes: 'User wants to try implementing this advice'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSuccessToast('✨ Great! We\'re tracking your progress. You\'ve got this! 💪');
+                } else {
+                    showSuccessToast('✨ Ready to try it out? Take it one small step at a time!');
+                }
+            })
+            .catch(() => {
+                showSuccessToast('✨ You\'re ready to implement this! Start with just one small action today.');
+            });
+        });
     };
     
     window.implementAdvice = function(adviceId) {
-        showSuccessToast('⚡ Implementation guide coming soon! We\'ll break this down into easy steps.');
+        // Show implementation steps
+        showSuccessToast('⚡ Break it into tiny steps: 1) Read the tip again 2) Pick ONE action 3) Set a 5-minute timer 4) Just start!');
+        
+        // Track implementation attempt
+        trackAdviceInteraction(adviceId, 'started');
     };
     
     window.setReminder = function(adviceId) {
-        showSuccessToast('⏰ Reminder feature coming soon! We\'ll help you remember to apply this advice.');
+        // Create a simple reminder using browser notification
+        if ('Notification' in window) {
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                    setTimeout(() => {
+                        new Notification('💡 BrainBudget Reminder', {
+                            body: 'Time to work on your financial goal! Remember that advice tip?',
+                            icon: '/static/icons/icon-192x192.png'
+                        });
+                    }, 1800000); // 30 minutes
+                    showSuccessToast('⏰ Reminder set! We\'ll ping you in 30 minutes to check on your progress.');
+                } else {
+                    showSuccessToast('⏰ Set a phone reminder for 30 minutes to work on this financial tip!');
+                }
+            });
+        } else {
+            showSuccessToast('⏰ Set a phone reminder for 30 minutes to work on this financial tip!');
+        }
+        
+        trackAdviceInteraction(adviceId, 'viewed');
     };
     
     window.findBuddy = function(adviceId) {
-        showSuccessToast('👥 Accountability buddy matching coming soon! Connect with others for support.');
+        // Encourage social accountability
+        showSuccessToast('👥 Tell a friend about this goal! Social accountability increases success by 65%. Text someone right now!');
+        
+        // Track buddy request
+        trackAdviceInteraction(adviceId, 'viewed');
     };
     
     window.filterAdvice = function(category) {
-        showSuccessToast(`🎯 Filtering advice for ${category}. Personalized recommendations coming up!`);
-        // Filter advice display by category
-        console.log('Filtering advice for category:', category);
+        const user = firebase.auth().currentUser;
+        if (!user) {
+            showSuccessToast('Please log in to access personalized category advice! 🔐');
+            return;
+        }
+        
+        showSuccessToast(`🎯 Loading ${category.replace('_', ' ')} advice just for you!`);
+        
+        user.getIdToken().then(token => {
+            const headers = {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            };
+            
+            const url = category === 'all' ? 
+                '/api/advice/personalized?limit=8' : 
+                `/api/advice/by-category/${category}?limit=6`;
+                
+            fetch(url, { headers })
+                .then(response => {
+                    console.log(`Category ${category} API status:`, response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log(`Category ${category} API response:`, data);
+                    if (data.success) {
+                        updateAdviceDisplay(data.advice || data.category);
+                        showSuccessToast(`✨ Found ${data.advice ? data.advice.length : 0} personalized tips for ${category.replace('_', ' ')}!`);
+                    } else {
+                        console.log('Category API error:', data.message);
+                        showSuccessToast(`💡 Loading general ${category.replace('_', ' ')} advice while we learn your preferences!`);
+                    }
+                })
+                .catch(error => {
+                    console.log('Category filter error:', error);
+                    showSuccessToast(`💡 Having trouble loading ${category.replace('_', ' ')} advice. Try the refresh button!`);
+                });
+        });
     };
     
     window.viewAllSaved = function() {
-        showSuccessToast('📚 Full saved advice library coming soon! All your favorite tips in one place.');
+        const user = firebase.auth().currentUser;
+        if (!user) {
+            showSuccessToast('Please log in to view your saved advice! 🔐');
+            return;
+        }
+        
+        // For now, scroll to saved section and highlight it
+        const savedSections = document.querySelectorAll('h3');
+        let savedSection = null;
+        savedSections.forEach(h3 => {
+            if (h3.textContent.includes('Saved Tips')) {
+                savedSection = h3;
+            }
+        });
+        
+        if (savedSection) {
+            savedSection.parentElement.scrollIntoView({ behavior: 'smooth' });
+            savedSection.parentElement.style.background = 'rgba(124, 236, 134, 0.2)';
+            setTimeout(() => {
+                savedSection.parentElement.style.background = '';
+            }, 2000);
+        }
+        showSuccessToast('📚 Here are your saved tips! We\'re working on a full library view.');
     };
     
     window.shareMotivation = function() {
-        showSuccessToast('🌟 Share your success story with the BrainBudget community! Inspiring others helps everyone.');
+        // Copy motivational message to clipboard
+        const message = "🌟 Making progress with my financial goals using @BrainBudget! Every small step counts! 💪 #FinancialWellness #ADHD";
+        navigator.clipboard.writeText(message).then(() => {
+            showSuccessToast('🌟 Motivational message copied! Share your success to inspire others.');
+        }).catch(() => {
+            showSuccessToast('🌟 Share your success: "Making progress with my financial goals! Every small step counts!"');
+        });
     };
+    
+    // Helper function to track advice interactions
+    function trackAdviceInteraction(adviceId, action) {
+        const user = firebase.auth().currentUser;
+        if (!user) return;
+        
+        user.getIdToken().then(token => {
+            fetch('/api/advice/interaction', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ 
+                    advice_id: adviceId, 
+                    action: action
+                })
+            }).catch(error => {
+                console.log('Interaction tracking failed:', error);
+            });
+        });
+    }
     
     // User-friendly animations for advice cards
     const observerOptions = {

@@ -35,8 +35,9 @@ def require_auth():
         except Exception as e:
             logger.warning(f"Token verification failed: {e}")
     
-    # For development, allow access to home page without strict auth
-    if request.endpoint == 'frontend.home_page':
+    # For development, allow access to certain pages without strict auth
+    allowed_endpoints = ['frontend.home_page', 'frontend.advice_page', 'frontend.landing_page', 'frontend.ai_coach_page', 'frontend.ai_coach_page_alt']
+    if request.endpoint in allowed_endpoints:
         return None
     
     return redirect(url_for('frontend.login_page'))
@@ -348,7 +349,7 @@ def ai_coach_page():
         if auth_check:
             return auth_check
             
-        return render_template('ai_coach.html')
+        return render_template('ai_coach.html', **get_template_context())
     except Exception as e:
         logger.error(f"Error serving AI coach page: {e}")
         return render_template('error.html', message="Unable to load the AI coach page"), 500
@@ -363,7 +364,7 @@ def ai_coach_page_alt():
         if auth_check:
             return auth_check
             
-        return render_template('ai_coach.html')
+        return render_template('ai_coach.html', **get_template_context())
     except Exception as e:
         logger.error(f"Error serving AI coach page: {e}")
         return render_template('error.html', message="Unable to load the AI coach page"), 500

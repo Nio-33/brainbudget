@@ -15,29 +15,127 @@
     .text-secondary-contrast {
         color: rgba(239, 223, 197, 0.8);
     }
+    
+    /* Sidebar Styles */
+    .sidebar {
+        transition: all 0.3s ease-in-out;
+        transform: translateX(-100%);
+    }
+    
+    .sidebar.open {
+        transform: translateX(0);
+    }
+    
+    .sidebar-overlay {
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease-in-out;
+    }
+    
+    .sidebar-overlay.open {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    /* Main content adjustment */
+    .main-content {
+        transition: margin-left 0.3s ease-in-out;
+    }
+    
+    @media (min-width: 768px) {
+        .main-content.sidebar-open {
+            margin-left: 280px;
+        }
+    }
 {% endblock %}
 
 {% block content %}
+    <!-- Sidebar Overlay (for mobile) -->
+    <div id="sidebarOverlay" class="sidebar-overlay fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"></div>
+    
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar fixed top-0 left-0 h-full w-80 z-50 shadow-2xl" style="background-color: #cbb799;">
+        <!-- Sidebar Header -->
+        <div class="flex items-center justify-between p-6 border-b" style="border-color: rgba(56, 15, 23, 0.2);">
+            <div class="flex items-center space-x-3">
+                <span class="text-3xl">🧠</span>
+                <h2 class="text-xl font-bold" style="color: #380F17;">BrainBudget</h2>
+            </div>
+            <button id="closeSidebar" class="transition-colors" style="color: #4C4F54;" onmouseover="this.style.color='#380F17'" onmouseout="this.style.color='#4C4F54'">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <!-- Navigation Links -->
+        <nav class="p-6 space-y-4">
+            <a href="/dashboard" class="flex items-center space-x-4 p-3 rounded-xl transition-colors group" style="color: #380F17;" onmouseover="this.style.backgroundColor='rgba(56, 15, 23, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">
+                <span class="text-2xl">📊</span>
+                <span class="font-medium">Dashboard</span>
+            </a>
+            <a href="/insights" class="flex items-center space-x-4 p-3 rounded-xl transition-colors group" style="color: #380F17;" onmouseover="this.style.backgroundColor='rgba(56, 15, 23, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">
+                <span class="text-2xl">💡</span>
+                <span class="font-medium">Insights</span>
+            </a>
+            <a href="/goals" class="flex items-center space-x-4 p-3 rounded-xl transition-colors group" style="color: #380F17;" onmouseover="this.style.backgroundColor='rgba(56, 15, 23, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">
+                <span class="text-2xl">🎯</span>
+                <span class="font-medium">Goals</span>
+            </a>
+            <a href="/ai_coach" class="flex items-center space-x-4 p-3 rounded-xl transition-colors group" style="color: #380F17;" onmouseover="this.style.backgroundColor='rgba(56, 15, 23, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">
+                <span class="text-2xl">🤖</span>
+                <span class="font-medium">AI Coach</span>
+            </a>
+            <a href="/advice" class="flex items-center space-x-4 p-3 rounded-xl transition-colors group" style="color: #380F17;" onmouseover="this.style.backgroundColor='rgba(56, 15, 23, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">
+                <span class="text-2xl">💬</span>
+                <span class="font-medium">Advice</span>
+            </a>
+            <a href="/community" class="flex items-center space-x-4 p-3 rounded-xl transition-colors group" style="color: #380F17;" onmouseover="this.style.backgroundColor='rgba(56, 15, 23, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">
+                <span class="text-2xl">😊</span>
+                <span class="font-medium">Community</span>
+            </a>
+            <a href="/profile" class="flex items-center space-x-4 p-3 rounded-xl transition-colors group" style="color: #380F17;" onmouseover="this.style.backgroundColor='rgba(56, 15, 23, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">
+                <span class="text-2xl">👤</span>
+                <span class="font-medium">Profile</span>
+            </a>
+            <a href="/settings" class="flex items-center space-x-4 p-3 rounded-xl transition-colors group" style="color: #380F17;" onmouseover="this.style.backgroundColor='rgba(56, 15, 23, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">
+                <span class="text-2xl">⚙️</span>
+                <span class="font-medium">Settings</span>
+            </a>
+        </nav>
+        
+        <!-- Sidebar Footer - User Info -->
+        <div class="absolute bottom-6 left-6 right-6">
+            <div class="p-4 rounded-xl text-center" style="background-color: rgba(56, 15, 23, 0.1); border: 1px solid rgba(56, 15, 23, 0.2);">
+                <div class="flex items-center justify-center space-x-3">
+                    <span class="text-2xl">👤</span>
+                    <div>
+                        <p class="text-sm font-medium" style="color: #380F17;" id="userName">Welcome!</p>
+                        <p class="text-xs" style="color: #4C4F54;">Signed in</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Header -->
     <header class="absolute top-4 left-4 right-4 z-10 animate-fadeIn">
         <div class="flex justify-between items-center">
-            <div class="flex space-x-8">
-                <a href="/community" class="flex items-center space-x-2 hover:opacity-80 transition-colors text-contrast">
-                    <span>😊</span>
-                    <span>Community</span>
-                </a>
-            </div>
+            <!-- Left side - Menu button -->
             <div class="flex items-center space-x-4">
-                <a href="/settings" class="flex items-center space-x-2 hover:opacity-80 transition-colors text-contrast">
-                    <span>⚙️</span>
-                    <span>Settings</span>
-                </a>
+                <button id="openSidebar" class="flex items-center space-x-2 hover:opacity-80 transition-colors text-contrast p-2 rounded-lg hover:bg-white hover:bg-opacity-10">
+                    <span>☰</span>
+                    <span class="hidden sm:inline">Menu</span>
+                </button>
             </div>
+            
+            <!-- Right side - Empty for balance -->
+            <div class="w-24"></div>
         </div>
     </header>
 
     <!-- Main Homepage -->
-    <div class="min-h-screen relative overflow-hidden">
+    <div class="min-h-screen relative overflow-hidden main-content">
 
         <!-- Main Content -->
         <div class="flex flex-col items-center justify-center min-h-screen px-4 pt-20">
@@ -96,91 +194,6 @@
                 <span id="analyzeBtnText">📁 Upload a statement first</span>
             </button>
 
-            <!-- Bottom Arrow -->
-            <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2">
-                <div class="animate-bounce cursor-pointer" onclick="scrollToQuickLinks()">
-                    <svg class="w-8 h-8 text-contrast" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-                    </svg>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quick Links Section -->
-    <div class="min-h-screen relative overflow-hidden">
-        <div class="flex flex-col items-center justify-center min-h-screen px-4 py-20">
-            <!-- Section Title -->
-            <h2 class="text-3xl md:text-4xl font-light text-center mb-16 text-contrast">
-                Quick links
-            </h2>
-
-            <!-- Quick Links Grid -->
-            <div class="w-full max-w-5xl relative min-h-[700px] hidden md:block">
-                <!-- Dashboard - Top Right -->
-                <div class="absolute top-0 right-0">
-                    <button onclick="window.location.href='/dashboard'" class="group inline-flex items-center justify-center backdrop-blur-sm px-12 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-[380px] brain-gradient text-white">
-                        <span class="font-medium text-lg">Dashboard</span>
-                    </button>
-                </div>
-
-                <!-- Insights - Left Side -->
-                <div class="absolute top-20 left-0">
-                    <button onclick="window.location.href='/insights'" class="group inline-flex items-center justify-center backdrop-blur-sm px-12 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-[380px] brain-gradient text-white">
-                        <span class="font-medium text-lg">Insights</span>
-                    </button>
-                </div>
-
-                <!-- Goals - Middle Right -->
-                <div class="absolute top-40 right-32">
-                    <button onclick="window.location.href='/goals'" class="group inline-flex items-center justify-center backdrop-blur-sm px-12 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-[380px] brain-gradient text-white">
-                        <span class="font-medium text-lg">Goals</span>
-                    </button>
-                </div>
-
-                <!-- AI Coach - Left Side -->
-                <div class="absolute top-[300px] left-0">
-                    <button onclick="window.location.href='/ai_coach'" class="group inline-flex items-center justify-center backdrop-blur-sm px-12 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-[380px] brain-gradient text-white">
-                        <span class="font-medium text-lg">AI Coach</span>
-                    </button>
-                </div>
-
-                <!-- Advice - Right Side -->
-                <div class="absolute top-[400px] right-0">
-                    <button onclick="window.location.href='/advice'" class="group inline-flex items-center justify-center backdrop-blur-sm px-12 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-[380px] brain-gradient text-white">
-                        <span class="font-medium text-lg">Advice</span>
-                    </button>
-                </div>
-
-                <!-- Profile - Bottom Center (Full Width) -->
-                <div class="absolute top-[550px] left-1/2 transform -translate-x-1/2">
-                    <button onclick="window.location.href='/profile'" class="group inline-flex items-center justify-center backdrop-blur-sm px-16 py-5 rounded-full hover:shadow-xl transition-all duration-300 w-[520px] brain-gradient text-white">
-                        <span class="font-medium text-xl">Profile</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Mobile Layout (Stacked for smaller screens) -->
-            <div class="md:hidden w-full max-w-sm space-y-4 mt-8">
-                <button onclick="window.location.href='/dashboard'" class="group flex items-center justify-center backdrop-blur-sm px-6 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-full brain-gradient text-white">
-                    <span class="font-medium">Dashboard</span>
-                </button>
-                <button onclick="window.location.href='/insights'" class="group flex items-center justify-center backdrop-blur-sm px-6 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-full brain-gradient text-white">
-                    <span class="font-medium">Insights</span>
-                </button>
-                <button onclick="window.location.href='/goals'" class="group flex items-center justify-center backdrop-blur-sm px-6 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-full brain-gradient text-white">
-                    <span class="font-medium">Goals</span>
-                </button>
-                <button onclick="window.location.href='/ai_coach'" class="group flex items-center justify-center backdrop-blur-sm px-6 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-full brain-gradient text-white">
-                    <span class="font-medium">AI Coach</span>
-                </button>
-                <button onclick="window.location.href='/advice'" class="group flex items-center justify-center backdrop-blur-sm px-6 py-4 rounded-full hover:shadow-lg transition-all duration-300 w-full brain-gradient text-white">
-                    <span class="font-medium">Advice</span>
-                </button>
-                <button onclick="window.location.href='/profile'" class="group flex items-center justify-center backdrop-blur-sm px-8 py-5 rounded-full hover:shadow-xl transition-all duration-300 w-full brain-gradient text-white">
-                    <span class="font-medium text-lg">Profile</span>
-                </button>
-            </div>
         </div>
     </div>
 
@@ -202,7 +215,7 @@
     <footer class="py-8 text-center animate-fadeIn">
         <div class="max-w-4xl mx-auto px-4">
             <p class="text-sm" style="color: #4C4F54;">
-                BrainBudget - Making budgeting accessible | powered by <span class="font-semibold" style="color: #8F0B13;">Niostudio</span>
+                BrainBudget - Making budgeting fun | powered by <span class="font-semibold" style="color: #8F0B13;">Niostudio</span>
             </p>
         </div>
     </footer>
@@ -466,13 +479,25 @@
         });
     }
     
-    // Smooth scrolling
-    function scrollToQuickLinks() {
-        window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
+    // Sidebar functionality
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const mainContent = document.querySelector('.main-content');
+        
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('open');
+        mainContent.classList.toggle('sidebar-open');
     }
     
-    function scrollToFeatures() {
-        window.scrollTo({ top: window.innerHeight * 2, behavior: 'smooth' });
+    function closeSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const mainContent = document.querySelector('.main-content');
+        
+        sidebar.classList.remove('open');
+        overlay.classList.remove('open');
+        mainContent.classList.remove('sidebar-open');
     }
     
     // Close modal when clicking outside
@@ -482,8 +507,32 @@
         }
     });
     
+    // Load user information
+    function loadUserInfo() {
+        fetch('/api/profile/info')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.profile) {
+                    const userNameElement = document.getElementById('userName');
+                    if (userNameElement && data.profile.display_name) {
+                        userNameElement.textContent = data.profile.display_name;
+                    } else if (userNameElement && data.profile.email) {
+                        // Fallback to email username if display_name is not available
+                        userNameElement.textContent = data.profile.email.split('@')[0];
+                    }
+                }
+            })
+            .catch(error => {
+                console.log('User info not available:', error);
+                // Keep default "Welcome!" text
+            });
+    }
+
     // Initialize page
     document.addEventListener('DOMContentLoaded', function() {
+        // Load user information
+        loadUserInfo();
+        
         // Add gentle entrance animations
         const cards = document.querySelectorAll('.card-hover');
         cards.forEach((card, index) => {
@@ -495,6 +544,33 @@
                 card.style.opacity = '1';
                 card.style.transform = 'translateY(0)';
             }, index * 100);
+        });
+        
+        // Sidebar event listeners
+        const openSidebarBtn = document.getElementById('openSidebar');
+        const closeSidebarBtn = document.getElementById('closeSidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        
+        if (openSidebarBtn) {
+            openSidebarBtn.addEventListener('click', toggleSidebar);
+        }
+        
+        if (closeSidebarBtn) {
+            closeSidebarBtn.addEventListener('click', closeSidebar);
+        }
+        
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', closeSidebar);
+        }
+        
+        // Close sidebar when clicking on navigation links (mobile)
+        const navLinks = document.querySelectorAll('#sidebar nav a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth < 768) {
+                    closeSidebar();
+                }
+            });
         });
     });
 </script>

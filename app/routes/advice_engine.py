@@ -102,7 +102,7 @@ def get_personalized_advice():
         result = advice_service.get_personalized_advice_sync(
             user_id=user_id,
             category=category,
-            limit=limi
+            limit=limit
         )
 
         if not result.get("success"):
@@ -276,7 +276,7 @@ def get_advice_by_category(category):
         result = advice_service.get_personalized_advice_sync(
             user_id=user_id,
             category=category,
-            limit=limi
+            limit=limit
         )
 
         if not result.get("success"):
@@ -330,7 +330,7 @@ def get_urgent_advice():
         result = advice_service.get_personalized_advice_sync(
             user_id=user_id,
             category=None,
-            limit=limi
+            limit=limit
         )
 
         if not result.get("success"):

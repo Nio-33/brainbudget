@@ -94,13 +94,24 @@ def send_message(session_id):
             }), 400
 
         coach_service = AICoachService()
-        response = coach_service.send_message_sync(session_id, user_message, quick_action)
-
-        return jsonify({
-            'success': True,
-            'response': response,
-            'message': 'Message sent successfully! 💬'
-        })
+        
+        logger.info(f"Processing message for session {session_id}: '{user_message[:50]}...'")
+        
+        try:
+            response = coach_service.send_message_sync(session_id, user_message, quick_action)
+            logger.info(f"AI Coach response generated successfully for session {session_id}")
+            
+            return jsonify({
+                'success': True,
+                'response': response,
+                'message': 'Message sent successfully! 💬'
+            })
+        except Exception as service_error:
+            logger.error(f"AI Coach service error for session {session_id}: {str(service_error)}", exc_info=True)
+            return jsonify({
+                'error': True,
+                'message': f"I'm having trouble processing your message: {str(service_error)}"
+            }), 500
 
     except ValueError as e:
         return jsonify({
@@ -327,15 +338,49 @@ def get_coach_analytics():
         }), 200
 
 
+# Test endpoint for debugging
+@ai_coach_bp.route('/test', methods=['POST'])
+def test_ai_coach():
+    """Test endpoint for debugging AI coach issues."""
+    try:
+        from app.services.ai_coach_service import AICoachService
+        import uuid
+        
+        # Create a test session
+        coach_service = AICoachService()
+        test_session_id = str(uuid.uuid4())
+        
+        # Test message
+        test_message = "Hello, can you help me with my budget?"
+        
+        logger.info(f"Testing AI coach with session {test_session_id} and message: '{test_message}'")
+        
+        # Try direct sync call
+        try:
+            result = coach_service.send_message_sync(test_session_id, test_message)
+            return jsonify({
+                'success': True,
+                'test_result': result,
+                'message': 'AI coach test successful'
+            })
+        except Exception as test_error:
+            logger.error(f"AI coach test failed: {str(test_error)}", exc_info=True)
+            return jsonify({
+                'success': False,
+                'error': str(test_error),
+                'error_type': type(test_error).__name__
+            }), 500
+            
+    except Exception as e:
+        logger.error(f"AI coach test setup failed: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 # Health check for AI coach system
 @ai_coach_bp.route('/health', methods=['GET'])
 def coach_health():
     """Health check for AI coach system."""
     try:
         import os
-
-        # Check Gemini API key availability
-        gemini_key_available = bool(os.getenv('GEMINI_API_KEY'))
 
         # Test basic service initialization
         coach_service = AICoachService()
@@ -344,7 +389,8 @@ def coach_health():
             'status': 'healthy',
             'component': 'ai_coach',
             'timestamp': datetime.utcnow().isoformat(),
-            'gemini_configured': gemini_key_available,
+            'gemini_configured': coach_service.api_key_configured,
+            'gemini_model_ready': coach_service.model is not None,
             'quick_actions_count': len(coach_service.quick_actions)
         }), 200
 
